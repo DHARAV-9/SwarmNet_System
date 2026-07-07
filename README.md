@@ -1,7 +1,7 @@
 # SwarmNet_System
 Autonomous Drone Swarm Simulation using Distributed Consensus Algorithms
 A fully software-simulated drone swarm running on your laptop. No hardware needed.
-Built with Raft consensus, Gossip protocol, and Reynolds flocking — entirely in Python.
+Built with Raft consensus, Gossip protocol, and Reynolds flocking entirely in Python.
 
 What is this?
 
