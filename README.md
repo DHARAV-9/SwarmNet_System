@@ -17,3 +17,19 @@ Pygame visualizer — live top-down view of the swarm
 Flask dashboard — node health, election terms, fault injection at localhost:5000
 Fault injection — kill any drone or simulate packet loss
 CSV metrics export — election time, gossip rounds, formation error
+
+-How It Works
+Raft leader election
+
+Every drone starts as a follower. The leader sends heartbeats every 100 ms. If a follower receives no heartbeat within its random election timeout (150–300 ms), it becomes a candidate and requests votes from peers. The first candidate to receive a majority (⌊N/2⌋ + 1 votes) becomes the new leader. Re-election completes in under 500 ms.
+
+Gossip protocol
+
+Every 200 ms, each drone shares its full state table with 2 random peers. The merge rule keeps the entry with the latest timestamp per drone ID. All nodes converge to a consistent world view within O(log N) rounds.
+
+Reynolds flocking
+
+Each drone computes a velocity update every 50 ms using three weighted forces: separation (avoid neighbors closer than 30 units), alignment (match neighbors' average velocity), and cohesion (steer toward the group's center of mass). The leader broadcasts a waypoint via the Raft log; followers add a steering force toward their assigned formation position.
+
+Fault tolerance
+The swarm survives up to ⌊N/2⌋ simultaneous node failures (standard Raft quorum guarantee). Packet loss up to 30% is handled gracefully by gossip redundancy.
