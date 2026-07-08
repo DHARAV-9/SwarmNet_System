@@ -19,6 +19,7 @@ Fault injection — kill any drone or simulate packet loss
 CSV metrics export — election time, gossip rounds, formation error
 
 -How It Works
+
 Raft leader election
 
 Every drone starts as a follower. The leader sends heartbeats every 100 ms. If a follower receives no heartbeat within its random election timeout (150–300 ms), it becomes a candidate and requests votes from peers. The first candidate to receive a majority (⌊N/2⌋ + 1 votes) becomes the new leader. Re-election completes in under 500 ms.
@@ -33,3 +34,14 @@ Each drone computes a velocity update every 50 ms using three weighted forces: s
 
 Fault tolerance
 The swarm survives up to ⌊N/2⌋ simultaneous node failures (standard Raft quorum guarantee). Packet loss up to 30% is handled gracefully by gossip redundancy.
+
+-Demo Script (for your examiner)
+
+Run python launcher.py --n 8
+Open localhost:5000 in a browser
+Show the Pygame window — 8 drones moving in formation
+Note the leader drone (highlighted in the visualizer)
+Click "Kill Leader" in the dashboard
+Show: swarm pauses briefly → new leader elected → formation resumes
+Export metrics CSV and show the election time graph
+
