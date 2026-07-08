@@ -1,0 +1,4 @@
+pyzmq>=25.0
+numpy>=1.26
+pytest>=7.0
+pytest-cov>=4.0
