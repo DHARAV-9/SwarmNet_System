@@ -1,0 +1,756 @@
+================================================================================
+         SWARMNET — TECHNICAL REQUIREMENTS DOCUMENT (TRD)
+         Autonomous Drone Swarm Simulation using Distributed Consensus Algorithms
+         Version 1.0 | CS Final Year / Semester Project
+================================================================================
+
+DOCUMENT INFO
+-------------
+Document Type   : Technical Requirements Document (TRD)
+Project Name    : SwarmNet
+Author          : [Your Name]
+Roll No         : [Your Roll Number]
+Department      : Computer Science & Engineering
+Institution     : [Your College / University]
+Date            : June 2026
+Status          : Draft v1.0
+Companion Doc   : SwarmNet_PRD.txt
+
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+  1.  System Architecture
+  2.  Technology Stack
+  3.  Module Breakdown
+  4.  Algorithm Specifications
+       4.1  Raft Consensus
+       4.2  Gossip Protocol
+       4.3  Reynolds Flocking
+       4.4  Contract Net Task Allocation
+  5.  Communication Design
+  6.  Data Structures
+  7.  API & Interface Specifications
+  8.  Configuration
+  9.  File & Folder Structure
+ 10.  Testing Requirements
+ 11.  Performance Benchmarks
+ 12.  Deployment & Run Instructions
+================================================================================
+
+
+--------------------------------------------------------------------------------
+1. SYSTEM ARCHITECTURE
+--------------------------------------------------------------------------------
+
+SwarmNet uses a fully decentralized peer-to-peer architecture. There is no
+central broker or coordinator. Each drone is a self-contained process.
+
+PROCESS MODEL
+  - N drone processes run on localhost, each bound to a unique port.
+  - One optional Visualizer process (Pygame) subscribes to all drone state
+    broadcasts and renders the 2D view.
+  - One optional Dashboard process (Flask) aggregates metrics and serves the
+    web UI.
+
+COMMUNICATION TOPOLOGY
+  - Each drone maintains PUSH/PULL sockets to all peers (full mesh for N<=20).
+  - Leader uses a broadcast channel to announce log entries and waypoints.
+  - Gossip uses random peer selection — not a fixed topology.
+
+PROCESS ROLES
+  DroneNode      Core process. Runs Raft state machine, gossip agent,
+                 flocking compute, and task handler. One per simulated drone.
+
+  Visualizer     Subscriber process. Receives state from all DroneNodes via
+                 ZeroMQ PUB/SUB. Renders Pygame window. Read-only.
+
+  Dashboard      Flask app. Polls DroneNode HTTP endpoints (or subscribes via
+                 ZeroMQ) for metrics. Serves web UI at localhost:5000.
+
+  Launcher       Shell script or Python script that spawns all DroneNode
+                 processes with correct arguments.
+
+
+LAYER DIAGRAM (text)
+
+  +--------------------------------------------------+
+  |            Ground Control (Dashboard)            |  <- Flask web UI
+  +--------------------------------------------------+
+           |  HTTP / ZeroMQ SUB
+  +--------------------------------------------------+
+  |               Consensus Layer                    |
+  |   Raft Leader Election + Log Replication         |  <- Raft state machine
+  +--------------------------------------------------+
+           |  log entries (waypoints, tasks)
+  +--------------------------------------------------+
+  |            State Propagation Layer               |
+  |         Gossip Protocol (push/pull)              |  <- peer sync
+  +--------------------------------------------------+
+           |  shared world state
+  +--------------------------------------------------+
+  |             Behavior Layer                       |
+  |   Reynolds Flocking + Task Allocation            |  <- motion + tasks
+  +--------------------------------------------------+
+           |  (x,y) position updates
+  +--------------------------------------------------+
+  |           Visualization Layer                    |
+  |         Pygame 2D + Flask Dashboard              |  <- display only
+  +--------------------------------------------------+
+
+
+--------------------------------------------------------------------------------
+2. TECHNOLOGY STACK
+--------------------------------------------------------------------------------
+
+  Language         Python 3.10+
+  Messaging        ZeroMQ (pyzmq 25+)          pip install pyzmq
+  Visualization    Pygame 2.5+                 pip install pygame
+  Numerics         NumPy 1.26+                 pip install numpy
+  Dashboard        Flask 3.0+                  pip install flask
+  Plotting         Matplotlib 3.8+             pip install matplotlib
+  Testing          pytest + pytest-cov          pip install pytest pytest-cov
+  Logging          Python stdlib logging
+  Config           Python stdlib configparser or .env file
+  Serialization    JSON (stdlib) over ZeroMQ frames
+  OS               Windows 10+, macOS 12+, Ubuntu 20.04+
+
+INSTALL COMMAND (all dependencies):
+  pip install pyzmq pygame numpy flask matplotlib pytest pytest-cov
+
+
+--------------------------------------------------------------------------------
+3. MODULE BREAKDOWN
+--------------------------------------------------------------------------------
+
+  swarmnet/
+  |
+  +-- core/
+  |   +-- drone_node.py        Main DroneNode class. Orchestrates all modules.
+  |   +-- state.py             DroneState dataclass. Single source of truth.
+  |   +-- config.py            Loads config.ini. Exposes constants.
+  |
+  +-- consensus/
+  |   +-- raft.py              Raft state machine (leader/follower/candidate).
+  |   +-- log.py               Replicated log. Entry append, commit, apply.
+  |   +-- election.py          Vote request / vote response handlers.
+  |   +-- heartbeat.py         Heartbeat sender (leader) and receiver (follower).
+  |
+  +-- gossip/
+  |   +-- gossip_agent.py      Periodic gossip loop. Peer selection. Push/pull.
+  |   +-- state_table.py       Local world-state table. Merge logic.
+  |
+  +-- flocking/
+  |   +-- reynolds.py          Separation, alignment, cohesion computation.
+  |   +-- formation.py         Leader waypoint → formation target per drone.
+  |
+  +-- tasks/
+  |   +-- allocator.py         Contract Net Protocol. Bid, award, confirm.
+  |   +-- task.py              Task dataclass. Status enum.
+  |
+  +-- comms/
+  |   +-- messenger.py         ZeroMQ socket setup. Send/receive wrappers.
+  |   +-- serializer.py        JSON encode/decode for all message types.
+  |   +-- fault_sim.py         Packet loss injection. Drop messages at rate p.
+  |
+  +-- viz/
+  |   +-- pygame_viz.py        Pygame subscriber process. Renders drone dots.
+  |   +-- dashboard.py         Flask app. Routes and metric aggregator.
+  |
+  +-- metrics/
+  |   +-- collector.py         Logs election time, gossip rounds, formation error.
+  |   +-- exporter.py          Writes metrics to CSV.
+  |
+  +-- tests/
+  |   +-- test_raft.py
+  |   +-- test_gossip.py
+  |   +-- test_flocking.py
+  |   +-- test_allocator.py
+  |   +-- test_messenger.py
+  |
+  +-- launcher.py              Spawns N DroneNode processes.
+  +-- config.ini               All tunable parameters.
+  +-- requirements.txt
+  +-- README.md
+
+
+--------------------------------------------------------------------------------
+4. ALGORITHM SPECIFICATIONS
+--------------------------------------------------------------------------------
+
+4.1 RAFT CONSENSUS
+-------------------
+
+STATES
+  Each DroneNode is in exactly one state at any time:
+    FOLLOWER    Default state. Receives heartbeats from leader.
+    CANDIDATE   Election timeout fired. Requesting votes from peers.
+    LEADER      Won election. Sends heartbeats. Replicates log.
+
+TERMS
+  Each election starts a new integer term (monotonically increasing).
+  Nodes reject messages from lower terms.
+  Nodes update their term and revert to FOLLOWER on seeing a higher term.
+
+ELECTION TIMEOUT
+  Each follower picks a random timeout T in [ELECTION_TIMEOUT_MIN,
+  ELECTION_TIMEOUT_MAX] (default: 150 ms – 300 ms).
+  If no heartbeat received within T, the follower starts an election.
+
+ELECTION PROCESS
+  1. Increment currentTerm.
+  2. Transition to CANDIDATE.
+  3. Vote for self.
+  4. Send VoteRequest(term, candidateId, lastLogIndex, lastLogTerm)
+     to all peers.
+  5. If votes received >= floor(N/2)+1: become LEADER.
+  6. If heartbeat received from valid leader: revert to FOLLOWER.
+  7. If election timeout fires again: start new election (increment term).
+
+LEADER OPERATION
+  1. Send Heartbeat(term, leaderId, leaderCommit) to all followers
+     every HEARTBEAT_INTERVAL ms (default: 100 ms).
+  2. On new command: append to local log, send AppendEntries RPC to
+     all followers.
+  3. Once majority acknowledge: commit entry, apply to state machine,
+     respond to client.
+
+LOG ENTRY STRUCTURE
+  {
+    "index"    : <int>,        sequential log index
+    "term"     : <int>,        term when entry was created
+    "command"  : <string>,     e.g. "MOVE 120 340" or "ASSIGN TASK_A DRONE_3"
+    "committed": <bool>
+  }
+
+RAFT CONSTANTS (config.ini)
+  HEARTBEAT_INTERVAL     = 100    (ms)
+  ELECTION_TIMEOUT_MIN   = 150    (ms)
+  ELECTION_TIMEOUT_MAX   = 300    (ms)
+  RPC_TIMEOUT            = 50     (ms)
+
+
+4.2 GOSSIP PROTOCOL
+--------------------
+
+PURPOSE
+  Disseminate each drone's local state to the entire swarm without
+  flooding. Achieves eventual consistency in O(log N) rounds.
+
+STATE TABLE ENTRY (per drone)
+  {
+    "drone_id"   : <int>,
+    "x"          : <float>,
+    "y"          : <float>,
+    "vx"         : <float>,
+    "vy"         : <float>,
+    "battery"    : <float>,        0.0 – 100.0
+    "task"       : <string>,
+    "raft_state" : <string>,       "leader" | "follower" | "candidate"
+    "term"       : <int>,
+    "timestamp"  : <float>         Unix epoch (float)
+  }
+
+GOSSIP CYCLE (every GOSSIP_INTERVAL ms, default 200 ms)
+  1. Select GOSSIP_FANOUT (default 2) random peers.
+  2. Send own state table (all known entries) to each selected peer.
+  3. On receive: merge incoming table with local table.
+     Merge rule: keep entry with the highest timestamp per drone_id.
+
+CONVERGENCE MEASUREMENT
+  Round R is complete when all alive nodes have an entry for every
+  other alive node with timestamp >= round start time.
+  Log round count per gossip cycle to metrics collector.
+
+GOSSIP CONSTANTS
+  GOSSIP_INTERVAL    = 200     (ms)
+  GOSSIP_FANOUT      = 2       (peers per round)
+
+
+4.3 REYNOLDS FLOCKING
+----------------------
+
+Each drone computes a new velocity vector every FLOCKING_TICK ms
+(default: 50 ms) using three weighted steering forces.
+
+INPUT
+  - Own position (x, y) and velocity (vx, vy)
+  - Neighbor list from gossip state table filtered by NEIGHBOR_RADIUS
+
+RULE 1 — SEPARATION (weight: W_SEP, default 1.5)
+  For each neighbor closer than MIN_SEP_DIST (default 30 units):
+    Add a vector pointing away from that neighbor, scaled inversely
+    by distance.
+  separation_force = normalize(sum of away-vectors) * W_SEP
+
+RULE 2 — ALIGNMENT (weight: W_ALI, default 1.0)
+  Compute average velocity of all neighbors within NEIGHBOR_RADIUS.
+  alignment_force = normalize(avg_velocity - own_velocity) * W_ALI
+
+RULE 3 — COHESION (weight: W_COH, default 1.0)
+  Compute center of mass of all neighbors within NEIGHBOR_RADIUS.
+  cohesion_force = normalize(center_of_mass - own_position) * W_COH
+
+WAYPOINT STEERING (weight: W_WAY, default 2.0)
+  Leader broadcasts current target waypoint via Raft log.
+  Each drone adds a force toward its formation target position
+  (offset from waypoint based on drone_id for formation shape).
+  waypoint_force = normalize(target - own_position) * W_WAY
+
+VELOCITY UPDATE
+  new_velocity = own_velocity
+               + separation_force
+               + alignment_force
+               + cohesion_force
+               + waypoint_force
+  new_velocity = clip(new_velocity, MAX_SPEED)   (default MAX_SPEED = 5.0)
+  new_position = own_position + new_velocity * dt
+
+FLOCKING CONSTANTS
+  NEIGHBOR_RADIUS    = 100.0    (simulation units)
+  MIN_SEP_DIST       = 30.0     (simulation units)
+  MAX_SPEED          = 5.0      (units per tick)
+  W_SEP              = 1.5
+  W_ALI              = 1.0
+  W_COH              = 1.0
+  W_WAY              = 2.0
+  FLOCKING_TICK      = 50       (ms)
+
+
+4.4 CONTRACT NET TASK ALLOCATION
+----------------------------------
+
+PURPOSE
+  Distribute tasks among drones via a distributed auction without a
+  central task manager (leader facilitates, but any drone can bid).
+
+PROCESS
+  1. Leader posts task announcement via Raft log:
+       ANNOUNCE task_id description deadline
+  2. All drones compute a bid score:
+       bid = (battery_level * 0.5) + (1 / distance_to_task * 0.5)
+  3. Drones send bid to leader within BID_WINDOW ms (default 500 ms).
+  4. Leader awards task to highest bidder via Raft log entry:
+       AWARD task_id drone_id
+  5. Winning drone sends confirmation.
+  6. Task status transitions: OPEN → AWARDED → IN_PROGRESS → DONE.
+
+TASK STATES
+  OPEN          Announced, bids being collected
+  AWARDED       Winner selected, awaiting confirmation
+  IN_PROGRESS   Drone executing task
+  DONE          Task completed
+  FAILED        Drone died mid-task; leader re-announces
+
+
+--------------------------------------------------------------------------------
+5. COMMUNICATION DESIGN
+--------------------------------------------------------------------------------
+
+ZMQEROMQ SOCKET TYPES USED
+
+  Pattern           Socket Pair         Usage
+  -----------       -----------         -----
+  PUSH / PULL       PUSH → PULL         Unicast RPC (vote requests, heartbeats,
+                                        AppendEntries)
+  PUB / SUB         PUB → SUB           Broadcast (state for visualizer,
+                                        leader announcements)
+  REQ / REP         REQ → REP           Synchronous calls (only for metrics
+                                        polling from dashboard)
+
+PORT ASSIGNMENT
+  Base port defined in config.ini (default: 5600).
+  Drone i listens on:
+    PULL socket:  BASE_PORT + i           (e.g., drone 0 → 5600)
+    PUB socket:   BASE_PORT + 100 + i     (e.g., drone 0 → 5700)
+  Visualizer subscribes to PUB sockets of all drones.
+  Dashboard polls REP sockets: BASE_PORT + 200 + i
+
+MESSAGE FORMAT (JSON over ZeroMQ frame)
+  All messages are UTF-8 encoded JSON strings.
+
+  VOTE REQUEST
+  {
+    "type"          : "vote_request",
+    "term"          : <int>,
+    "candidate_id"  : <int>,
+    "last_log_index": <int>,
+    "last_log_term" : <int>
+  }
+
+  VOTE RESPONSE
+  {
+    "type"          : "vote_response",
+    "term"          : <int>,
+    "vote_granted"  : <bool>,
+    "voter_id"      : <int>
+  }
+
+  HEARTBEAT / APPEND ENTRIES
+  {
+    "type"          : "append_entries",
+    "term"          : <int>,
+    "leader_id"     : <int>,
+    "prev_log_index": <int>,
+    "prev_log_term" : <int>,
+    "entries"       : [ <log_entry>, ... ],
+    "leader_commit" : <int>
+  }
+
+  APPEND ENTRIES RESPONSE
+  {
+    "type"          : "append_entries_response",
+    "term"          : <int>,
+    "success"       : <bool>,
+    "follower_id"   : <int>,
+    "match_index"   : <int>
+  }
+
+  GOSSIP PUSH
+  {
+    "type"          : "gossip",
+    "sender_id"     : <int>,
+    "state_table"   : { "<drone_id>": <state_entry>, ... }
+  }
+
+  STATE BROADCAST (PUB channel for visualizer)
+  {
+    "type"          : "state_broadcast",
+    "drone_id"      : <int>,
+    "x"             : <float>,
+    "y"             : <float>,
+    "vx"            : <float>,
+    "vy"            : <float>,
+    "raft_state"    : <string>,
+    "term"          : <int>,
+    "battery"       : <float>
+  }
+
+FAULT SIMULATION
+  fault_sim.py wraps all send() calls.
+  If PACKET_LOSS_RATE > 0.0, each message is dropped with probability p.
+  Dropped messages are logged for metrics.
+
+
+--------------------------------------------------------------------------------
+6. DATA STRUCTURES
+--------------------------------------------------------------------------------
+
+DroneState (dataclass in state.py)
+  drone_id       : int
+  x              : float
+  y              : float
+  vx             : float
+  vy             : float
+  battery        : float          starts at 100.0, decrements 0.1/s
+  raft_state     : str            "leader" | "follower" | "candidate"
+  current_term   : int            starts at 0
+  voted_for      : int | None     candidate_id voted for in current term
+  log            : list[dict]     list of log entry dicts
+  commit_index   : int            highest log index known to be committed
+  last_applied   : int            highest log index applied to state machine
+  next_index     : dict[int,int]  leader only: next log index to send per peer
+  match_index    : dict[int,int]  leader only: highest index replicated per peer
+  task           : str | None
+  alive          : bool
+
+RaftLog (in log.py)
+  entries        : list[LogEntry]
+  LogEntry fields: index, term, command, committed
+
+GossipTable (in state_table.py)
+  table          : dict[int, StateTableEntry]    keyed by drone_id
+  StateTableEntry: all DroneState fields + timestamp
+
+Task (in task.py)
+  task_id        : str
+  description    : str
+  status         : TaskStatus    Enum: OPEN/AWARDED/IN_PROGRESS/DONE/FAILED
+  assigned_to    : int | None
+  deadline       : float         Unix epoch
+
+MetricsRecord (in collector.py)
+  event_type     : str           "election" | "gossip" | "formation"
+  timestamp      : float
+  value          : float         election_ms | convergence_rounds | avg_error
+  swarm_size     : int
+
+
+--------------------------------------------------------------------------------
+7. API & INTERFACE SPECIFICATIONS
+--------------------------------------------------------------------------------
+
+FLASK DASHBOARD ROUTES
+
+  GET  /                    Renders main dashboard HTML page
+  GET  /api/status          Returns JSON: all drone states from gossip table
+  GET  /api/metrics         Returns JSON: latest election time, gossip rounds
+  POST /api/kill/<drone_id> Sends SIGTERM to drone process (fault injection)
+  POST /api/packet_loss     Body: {"rate": 0.3}  Sets packet loss rate
+  GET  /api/metrics/export  Returns CSV file of all logged metrics
+
+PYGAME CONTROLS (keyboard)
+  K           Kill current leader (fault injection shortcut)
+  W/A/S/D     Move target waypoint up/left/down/right
+  1/2/3       Preset formations: V-shape, grid, circle
+  +/-         Increase/decrease swarm speed (MAX_SPEED)
+  Q           Quit simulation
+  F           Toggle formation overlay (convex hull)
+  H           Toggle HUD (drone IDs, battery labels)
+
+LAUNCHER CLI
+  python launcher.py --n 10 --base-port 5600 --loss 0.0 --seed 42
+    --n           Number of drone processes to spawn (default: 5)
+    --base-port   Base ZeroMQ port (default: 5600)
+    --loss        Initial packet loss rate 0.0–1.0 (default: 0.0)
+    --seed        Random seed for reproducibility (default: None)
+    --no-viz      Skip Pygame visualizer process
+    --no-dash     Skip Flask dashboard process
+
+
+--------------------------------------------------------------------------------
+8. CONFIGURATION (config.ini)
+--------------------------------------------------------------------------------
+
+[NETWORK]
+BASE_PORT               = 5600
+DASHBOARD_PORT          = 5000
+RPC_TIMEOUT_MS          = 50
+PACKET_LOSS_RATE        = 0.0
+
+[RAFT]
+HEARTBEAT_INTERVAL_MS   = 100
+ELECTION_TIMEOUT_MIN_MS = 150
+ELECTION_TIMEOUT_MAX_MS = 300
+
+[GOSSIP]
+GOSSIP_INTERVAL_MS      = 200
+GOSSIP_FANOUT           = 2
+
+[FLOCKING]
+NEIGHBOR_RADIUS         = 100.0
+MIN_SEP_DIST            = 30.0
+MAX_SPEED               = 5.0
+W_SEP                   = 1.5
+W_ALI                   = 1.0
+W_COH                   = 1.0
+W_WAY                   = 2.0
+FLOCKING_TICK_MS        = 50
+
+[SIMULATION]
+WORLD_WIDTH             = 800
+WORLD_HEIGHT            = 600
+BATTERY_DRAIN_RATE      = 0.1
+FPS                     = 30
+DEFAULT_N               = 5
+
+[METRICS]
+METRICS_DIR             = ./metrics/
+EXPORT_CSV              = True
+LOG_LEVEL               = INFO
+
+
+--------------------------------------------------------------------------------
+9. FILE & FOLDER STRUCTURE
+--------------------------------------------------------------------------------
+
+swarmnet/
+|
++-- swarmnet/                   Main package
+|   +-- __init__.py
+|   +-- core/
+|   |   +-- drone_node.py
+|   |   +-- state.py
+|   |   +-- config.py
+|   |
+|   +-- consensus/
+|   |   +-- raft.py
+|   |   +-- log.py
+|   |   +-- election.py
+|   |   +-- heartbeat.py
+|   |
+|   +-- gossip/
+|   |   +-- gossip_agent.py
+|   |   +-- state_table.py
+|   |
+|   +-- flocking/
+|   |   +-- reynolds.py
+|   |   +-- formation.py
+|   |
+|   +-- tasks/
+|   |   +-- allocator.py
+|   |   +-- task.py
+|   |
+|   +-- comms/
+|   |   +-- messenger.py
+|   |   +-- serializer.py
+|   |   +-- fault_sim.py
+|   |
+|   +-- viz/
+|   |   +-- pygame_viz.py
+|   |   +-- dashboard.py
+|   |   +-- templates/
+|   |       +-- index.html
+|   |
+|   +-- metrics/
+|       +-- collector.py
+|       +-- exporter.py
+|
++-- tests/
+|   +-- test_raft.py
+|   +-- test_gossip.py
+|   +-- test_flocking.py
+|   +-- test_allocator.py
+|   +-- test_messenger.py
+|
++-- metrics/                    Auto-created at runtime; CSV output here
++-- launcher.py
++-- config.ini
++-- requirements.txt
++-- README.md
++-- .gitignore
+
+
+--------------------------------------------------------------------------------
+10. TESTING REQUIREMENTS
+--------------------------------------------------------------------------------
+
+UNIT TESTS (pytest)
+
+  test_raft.py
+    - test_follower_becomes_candidate_on_timeout()
+    - test_candidate_wins_majority_vote()
+    - test_split_vote_retries_with_new_term()
+    - test_leader_reverts_to_follower_on_higher_term()
+    - test_log_entry_committed_after_majority_ack()
+    - test_new_leader_elected_after_old_leader_killed()
+
+  test_gossip.py
+    - test_state_merge_keeps_latest_timestamp()
+    - test_convergence_within_log_n_rounds()
+    - test_gossip_drops_stale_entries()
+    - test_fanout_2_reaches_all_nodes_by_round_5()
+
+  test_flocking.py
+    - test_separation_force_direction()
+    - test_alignment_matches_neighbor_avg_velocity()
+    - test_cohesion_moves_toward_center_of_mass()
+    - test_speed_capped_at_max_speed()
+    - test_waypoint_force_applied_when_leader_broadcasts()
+
+  test_allocator.py
+    - test_highest_bid_wins_task()
+    - test_task_reassigned_after_drone_failure()
+    - test_task_status_transitions()
+
+  test_messenger.py
+    - test_vote_request_serializes_correctly()
+    - test_dropped_message_under_packet_loss()
+    - test_port_assignment_no_collision()
+
+COVERAGE REQUIREMENT
+  pytest --cov=swarmnet --cov-report=term-missing
+  Minimum 80% line coverage on all files under swarmnet/consensus/,
+  swarmnet/gossip/, and swarmnet/flocking/.
+
+INTEGRATION TEST
+  Run launcher.py with N=5, seed=42.
+  Kill drone 0 (initial leader).
+  Assert new leader elected within 500 ms.
+  Assert all drones have consistent gossip table within 5 rounds.
+  Assert formation re-established within 10 seconds.
+  (Automated via tests/test_integration.py using subprocess and time.)
+
+
+--------------------------------------------------------------------------------
+11. PERFORMANCE BENCHMARKS
+--------------------------------------------------------------------------------
+
+BENCHMARK 1 — ELECTION TIME vs N
+  N values tested: 3, 5, 7, 10, 15, 20
+  For each N: kill leader 10 times, record re-election time (ms).
+  Plot: box plot of election time distribution per N.
+  Expected: election time stays below 500 ms for all tested N.
+
+BENCHMARK 2 — GOSSIP CONVERGENCE vs N
+  N values tested: 5, 10, 15, 20
+  For each N: measure rounds until all nodes have consistent state.
+  Run 20 trials per N.
+  Plot: mean convergence rounds vs N (should be ~log2(N)).
+
+BENCHMARK 3 — FORMATION ERROR vs PACKET LOSS
+  N = 10 fixed.
+  Packet loss rates: 0%, 10%, 30%, 50%
+  Metric: average distance of each drone from its ideal formation position.
+  Measure over 60 seconds per run.
+  Plot: formation error (units) vs packet loss %.
+
+BENCHMARK 4 — MESSAGE THROUGHPUT
+  N = 10.
+  Measure total messages sent per second across all nodes.
+  Break down by type: heartbeat, gossip, vote, state broadcast.
+  Log to CSV for 30 seconds.
+
+ALL BENCHMARKS
+  Run with fixed random seed for reproducibility.
+  Output to metrics/ directory as CSV.
+  Generate matplotlib plots (PNG) with exporter.py.
+
+
+--------------------------------------------------------------------------------
+12. DEPLOYMENT & RUN INSTRUCTIONS
+--------------------------------------------------------------------------------
+
+PREREQUISITES
+  Python 3.10 or higher
+  pip (Python package manager)
+
+SETUP
+  1. Clone / download the project folder.
+  2. Open terminal in project root.
+  3. Install dependencies:
+       pip install -r requirements.txt
+
+RUN SIMULATION (default: 5 drones)
+  python launcher.py
+
+RUN WITH CUSTOM SETTINGS
+  python launcher.py --n 10 --loss 0.1 --seed 42
+
+RUN WITHOUT VISUALIZER (terminal only)
+  python launcher.py --n 5 --no-viz
+
+OPEN DASHBOARD
+  Navigate to http://localhost:5000 in any browser after launching.
+
+RUN TESTS
+  pytest tests/ -v
+
+RUN TESTS WITH COVERAGE
+  pytest --cov=swarmnet --cov-report=term-missing tests/
+
+RUN BENCHMARKS
+  python -m swarmnet.metrics.exporter --benchmark all
+
+KILL ALL DRONE PROCESSES (if stuck)
+  Windows:   taskkill /F /IM python.exe
+  Linux/Mac: pkill -f drone_node.py
+
+EXPECTED OUTPUT ON LAUNCH
+  [LAUNCHER] Starting 5 drone nodes...
+  [DRONE 0] Listening on port 5600
+  [DRONE 1] Listening on port 5601
+  ...
+  [DRONE 2] Election started, term=1
+  [DRONE 2] Received vote from drone 0
+  [DRONE 2] Received vote from drone 4
+  [DRONE 2] Elected as LEADER for term=1
+  [GOSSIP]  Round 1 complete, 5/5 nodes synced
+  [PYGAME]  Visualizer started at 30 FPS
+  [FLASK]   Dashboard running at http://localhost:5000
+
+
+================================================================================
+END OF TECHNICAL REQUIREMENTS DOCUMENT
+SwarmNet v1.0 | CS Student Project | June 2026
+================================================================================

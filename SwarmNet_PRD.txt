@@ -1,0 +1,399 @@
+================================================================================
+         SWARMNET — PRODUCT REQUIREMENTS DOCUMENT (PRD)
+         Autonomous Drone Swarm Simulation using Distributed Consensus Algorithms
+         Version 1.0 | CS Final Year / Semester Project
+================================================================================
+
+DOCUMENT INFO
+-------------
+Document Type   : Product Requirements Document (PRD)
+Project Name    : SwarmNet
+Author          : [Your Name]
+Roll No         : [Your Roll Number]
+Department      : Computer Science & Engineering
+Institution     : [Your College / University]
+Date            : June 2026
+Status          : Draft v1.0
+
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+  1. Project Overview
+  2. Problem Statement
+  3. Goals & Objectives
+  4. Target Users
+  5. Scope
+  6. Features & Requirements
+     6.1 Functional Requirements
+     6.2 Non-Functional Requirements
+  7. User Stories
+  8. Constraints & Assumptions
+  9. Success Metrics
+ 10. Milestones & Timeline
+ 11. Risks
+ 12. Out of Scope
+================================================================================
+
+
+--------------------------------------------------------------------------------
+1. PROJECT OVERVIEW
+--------------------------------------------------------------------------------
+
+SwarmNet is a fully software-simulated autonomous drone swarm system built
+on top of Distributed Consensus Algorithms. The system models N drones as
+independent Python processes that communicate over ZeroMQ sockets, elect a
+leader via the Raft consensus algorithm, synchronize world state using a
+Gossip protocol, and exhibit emergent flocking behavior through Reynolds'
+three-rule algorithm.
+
+The project runs entirely on a single laptop — no physical drone hardware is
+required. Each drone process is analogous to a real drone node: it maintains
+its own state, communicates with peers, and participates in collective
+decision-making without any centralized controller.
+
+The simulation is visualized in real time using Pygame (2D positional view)
+and a Flask web dashboard (node health, election terms, gossip rounds).
+
+This project demonstrates practical application of distributed systems theory
+in a robotics-inspired context, covering:
+  - Consensus & fault tolerance (Raft)
+  - Epidemic state propagation (Gossip protocol)
+  - Emergent collective behavior (Reynolds flocking)
+  - Distributed task allocation (Contract Net Protocol)
+
+
+--------------------------------------------------------------------------------
+2. PROBLEM STATEMENT
+--------------------------------------------------------------------------------
+
+Traditional drone swarm systems rely on a central ground station that
+coordinates all drones. This creates a single point of failure — if the
+controller goes down, the entire swarm fails.
+
+Real-world scenarios (disaster relief, military, agriculture) demand swarms
+that are:
+  - Self-organizing: no central master needed
+  - Fault-tolerant: if one or more drones fail, the swarm continues
+  - Consistent: every drone agrees on the current state of the world
+  - Scalable: adding more drones improves capability, not complexity
+
+This project addresses these requirements by implementing distributed
+consensus at the swarm coordination layer, turning each drone into a fully
+autonomous peer node that participates in collective decision-making.
+
+
+--------------------------------------------------------------------------------
+3. GOALS & OBJECTIVES
+--------------------------------------------------------------------------------
+
+PRIMARY GOALS
+  G1. Implement Raft consensus algorithm for leader election and log replication
+      across simulated drone nodes.
+
+  G2. Implement Gossip protocol for decentralized state synchronization so
+      every drone has an eventually-consistent view of the swarm.
+
+  G3. Implement Reynolds flocking rules (separation, alignment, cohesion) to
+      produce emergent formation behavior driven by consensus commands.
+
+  G4. Demonstrate fault tolerance: up to floor(N/2) drone failures must not
+      break swarm operation.
+
+  G5. Provide real-time visualization and metrics for academic evaluation.
+
+ACADEMIC OBJECTIVES
+  O1. Demonstrate understanding of CAP theorem trade-offs in swarm design.
+  O2. Compare Raft vs Bully election algorithm performance experimentally.
+  O3. Measure and plot gossip convergence time vs swarm size.
+  O4. Generate a reproducible benchmark suite for the final report.
+
+
+--------------------------------------------------------------------------------
+4. TARGET USERS
+--------------------------------------------------------------------------------
+
+PRIMARY USER
+  - CS student (developer + evaluator of this project)
+  - Runs the simulation, tunes parameters, demonstrates to examiner
+
+SECONDARY USERS
+  - Academic examiner / project guide — evaluates correctness and depth
+  - Fellow students — may reuse or extend the codebase
+
+END AUDIENCE (conceptual)
+  - Drone swarm operators who would use such a system in production
+
+
+--------------------------------------------------------------------------------
+5. SCOPE
+--------------------------------------------------------------------------------
+
+IN SCOPE
+  - Software simulation of 5–20 drone nodes on a single machine
+  - Raft consensus: leader election, heartbeat, log replication
+  - Gossip protocol: state propagation, convergence measurement
+  - Reynolds flocking: separation, alignment, cohesion in 2D
+  - Fault injection: process kill, packet loss simulation
+  - Pygame 2D visualization
+  - Flask web dashboard
+  - Performance benchmarks and CSV export
+  - Unit tests for all algorithm modules
+  - Final report with graphs and analysis
+
+OUT OF SCOPE
+  - Physical drone hardware
+  - 3D flight simulation
+  - Real GPS or radio communication
+  - Byzantine fault tolerance (PBFT) — noted as future work
+  - Machine learning or AI-based path planning
+
+
+--------------------------------------------------------------------------------
+6. FEATURES & REQUIREMENTS
+--------------------------------------------------------------------------------
+
+6.1 FUNCTIONAL REQUIREMENTS
+-----------------------------
+
+FR-01  DRONE NODE SIMULATION
+  Each drone must run as an independent Python process.
+  Each node must have: unique ID, (x, y) position, velocity vector,
+  battery level (simulated), task status, and Raft state
+  (follower / candidate / leader).
+
+FR-02  RAFT LEADER ELECTION
+  The system must elect exactly one leader at any time.
+  Leader sends heartbeats every 100 ms to all followers.
+  If a follower receives no heartbeat within 150–300 ms (randomized
+  election timeout), it becomes a candidate and requests votes.
+  A candidate with majority votes (floor(N/2)+1) becomes leader.
+  On leader failure, a new election must complete within 500 ms.
+
+FR-03  RAFT LOG REPLICATION
+  The leader must maintain a replicated log of swarm commands
+  (waypoint changes, task assignments, formation updates).
+  Committed log entries must be replicated to a majority of nodes
+  before being applied.
+  Log must remain consistent after leader failure and re-election.
+
+FR-04  GOSSIP PROTOCOL
+  Each node must gossip its local state to 2 random peers every 200 ms.
+  State includes: position, battery %, task, Raft term, last-seen timestamp.
+  All nodes must converge to a consistent swarm state within
+  O(log N) gossip rounds.
+
+FR-05  REYNOLDS FLOCKING
+  Each drone must compute its next velocity using three rules:
+    - Separation: steer away from drones closer than MIN_DIST (30 units)
+    - Alignment: match average velocity of neighbors within NEIGHBOR_RADIUS
+    - Cohesion: steer toward center of mass of neighbors
+  Weights for each rule must be configurable at runtime.
+  Leader drone broadcasts target waypoint; followers flock toward it.
+
+FR-06  FAULT INJECTION
+  User must be able to kill any drone process via dashboard button or
+  keyboard shortcut.
+  Simulated packet loss must be injectable (10%, 30%, 50%) via config.
+  Swarm must recover formation and elect new leader after fault.
+
+FR-07  PYGAME VISUALIZATION
+  A 2D top-down window must show all drone positions as colored circles.
+  Leader drone must be visually distinct (different color + crown label).
+  Velocity vectors must be shown as short arrows.
+  Formation boundary or convex hull must be optionally overlaid.
+  Window must update at minimum 30 FPS.
+
+FR-08  FLASK DASHBOARD
+  A web UI at localhost:5000 must show:
+    - Current leader ID and election term number
+    - Each node's status: alive / dead / candidate
+    - Gossip round count and last convergence time
+    - Battery levels of all nodes
+    - Fault injection controls
+
+FR-09  METRICS & EXPORT
+  System must log and export to CSV:
+    - Election time (ms) per election event
+    - Gossip convergence rounds per cycle
+    - Formation error (average distance from ideal position)
+    - Message count per second per node
+
+FR-10  TASK ALLOCATION
+  Leader must be able to broadcast a task list (e.g., scan zone A, B, C).
+  Drones must bid for tasks using a simple auction protocol.
+  Task assignments must be replicated via Raft log.
+
+
+6.2 NON-FUNCTIONAL REQUIREMENTS
+---------------------------------
+
+NFR-01  PERFORMANCE
+  Leader election must complete in under 500 ms for N <= 20.
+  Gossip must converge in under 5 rounds for N <= 20.
+  Pygame visualization must maintain >= 30 FPS during normal operation.
+
+NFR-02  FAULT TOLERANCE
+  System must operate correctly with up to floor(N/2) simultaneous
+  node failures (standard Raft quorum guarantee).
+  No single drone failure should cause permanent swarm halt.
+
+NFR-03  SCALABILITY
+  Architecture must support 5 to 20 drone nodes without code changes.
+  N is set via a single config parameter at startup.
+
+NFR-04  REPRODUCIBILITY
+  All random seeds must be seedable for deterministic test runs.
+  Benchmark runs must produce identical results given the same seed.
+
+NFR-05  PORTABILITY
+  Must run on Windows, macOS, and Linux with Python 3.10+.
+  No dependencies outside: pygame, pyzmq, flask, numpy, matplotlib.
+
+NFR-06  TESTABILITY
+  Each algorithm module (raft, gossip, flocking) must have unit tests.
+  Minimum 80% line coverage on core algorithm files.
+
+NFR-07  CODE QUALITY
+  Code must follow PEP 8.
+  Each module must have docstrings.
+  README must include setup and run instructions.
+
+
+--------------------------------------------------------------------------------
+7. USER STORIES
+--------------------------------------------------------------------------------
+
+US-01  As a student, I want to start N drone processes with one command so
+       that I can quickly set up the simulation for a demo.
+
+US-02  As a student, I want to see which drone is the current leader so
+       that I can verify Raft election is working correctly.
+
+US-03  As a student, I want to kill the leader process and watch a new
+       leader be elected automatically so that I can demonstrate fault
+       tolerance to my examiner.
+
+US-04  As a student, I want to tune flocking weights in real time so that
+       I can show different formation behaviors during the demo.
+
+US-05  As a student, I want convergence time data exported to CSV so that
+       I can generate graphs for my final report.
+
+US-06  As an examiner, I want to see the election term number increment
+       after each leader failure so that I can verify Raft correctness.
+
+US-07  As an examiner, I want to see gossip round count so that I can
+       verify O(log N) convergence complexity.
+
+US-08  As a student, I want to inject packet loss and see how the system
+       degrades gracefully so that I can analyze fault tolerance limits.
+
+
+--------------------------------------------------------------------------------
+8. CONSTRAINTS & ASSUMPTIONS
+--------------------------------------------------------------------------------
+
+CONSTRAINTS
+  C1. No physical drone hardware available — simulation only.
+  C2. Project must run on a single laptop (no cluster required).
+  C3. Development time: 8 weeks.
+  C4. Team size: 1 student (individual project).
+  C5. Budget: zero — all tools must be free/open source.
+
+ASSUMPTIONS
+  A1. Network latency between processes on localhost is negligible (<1 ms).
+  A2. All drone processes start simultaneously via a launch script.
+  A3. The 2D simulation plane is 800x600 units.
+  A4. Battery level is simulated (decreases by 0.1% per second, does not
+      affect consensus behavior in base version).
+  A5. Examiner will evaluate on the developer's laptop or a provided VM.
+
+
+--------------------------------------------------------------------------------
+9. SUCCESS METRICS
+--------------------------------------------------------------------------------
+
+  M1. Leader election completes in < 500 ms for N = 10          [PASS/FAIL]
+  M2. Gossip converges in <= ceil(log2(N)) rounds               [PASS/FAIL]
+  M3. Swarm recovers formation within 3 seconds of leader kill  [PASS/FAIL]
+  M4. System survives floor(N/2) simultaneous node kills        [PASS/FAIL]
+  M5. Pygame window runs at >= 30 FPS                           [MEASURED]
+  M6. Unit test coverage >= 80% on algorithm modules            [MEASURED]
+  M7. All benchmark results exportable to CSV                   [PASS/FAIL]
+
+
+--------------------------------------------------------------------------------
+10. MILESTONES & TIMELINE
+--------------------------------------------------------------------------------
+
+  Week 1–2   Phase 1: Raft consensus + inter-process messaging
+               - Drone process skeleton
+               - ZeroMQ pub/sub setup
+               - Raft election (leader, follower, candidate states)
+               - Heartbeat + vote request/response
+               - Basic terminal log output
+               Deliverable: Working election demo in terminal
+
+  Week 3–4   Phase 2: Gossip protocol + state sync
+               - State table per node
+               - Gossip push/pull every 200 ms
+               - Convergence measurement and logging
+               - CSV export of gossip metrics
+               Deliverable: All nodes converge within 5 rounds
+
+  Week 5–6   Phase 3: Flocking + Pygame visualization
+               - Reynolds separation / alignment / cohesion
+               - Leader waypoint broadcasting via Raft log
+               - Pygame 2D canvas with drone dots + arrows
+               - Weight sliders for flocking parameters
+               Deliverable: Formation demo in Pygame window
+
+  Week 7–8   Phase 4: Dashboard + fault injection + benchmarks
+               - Flask dashboard at localhost:5000
+               - Kill button per node
+               - Packet loss injection
+               - Full benchmark suite
+               - Unit tests (>= 80% coverage)
+               - Final report graphs
+               Deliverable: Complete system + report-ready graphs
+
+
+--------------------------------------------------------------------------------
+11. RISKS
+--------------------------------------------------------------------------------
+
+  R1. ZeroMQ port conflicts on some OS
+      Mitigation: Auto-assign ports from a configurable base port
+
+  R2. Raft split-vote deadlock in small N (N=3)
+      Mitigation: Randomized election timeouts (150–300 ms range)
+
+  R3. Pygame performance drop at N > 15
+      Mitigation: Cap visualization FPS independently of simulation loop
+
+  R4. Gossip convergence slower than expected under high packet loss
+      Mitigation: Increase fanout from 2 to 3 peers under stress
+
+  R5. Examiner unfamiliar with simulation-only projects
+      Mitigation: Include a clear explanation in README and report intro
+      that simulation is the standard methodology in distributed systems
+
+
+--------------------------------------------------------------------------------
+12. OUT OF SCOPE (FUTURE WORK)
+--------------------------------------------------------------------------------
+
+  - Physical drone hardware integration (ArduPilot / Crazyflie)
+  - 3D flight simulation (Gazebo / AirSim)
+  - Byzantine fault tolerance (PBFT)
+  - Reinforcement learning for path planning
+  - Real RF mesh communication (ESP-NOW / ZigBee)
+  - Multi-machine deployment (Docker / Kubernetes cluster)
+  - GPS coordinate mapping
+
+
+================================================================================
+END OF PRODUCT REQUIREMENTS DOCUMENT
+SwarmNet v1.0 | CS Student Project | June 2026
+================================================================================
