@@ -73,6 +73,7 @@ def main() -> None:
     print(f"  Drones     : {n}")
     print(f"  Packet loss: {args.loss * 100:.0f}%")
     print(f"  Seed       : {args.seed or 'random'}")
+    print(f"  Visualizer : {'off' if args.no_viz else 'on'}")
     print("=" * 60)
     print()
 
@@ -82,7 +83,9 @@ def main() -> None:
     # ------------------------------------------------------------------
     # Spawn drone processes
     # ------------------------------------------------------------------
-    processes: list[subprocess.Popen] = []
+    processes: list[tuple[str, subprocess.Popen]] = []
+    env = os.environ.copy()
+    env["SWARMNET_BASE_PORT"] = str(args.base_port)
 
     print(f"[LAUNCHER] Starting {n} drone nodes...")
     for i in range(n):
@@ -103,13 +106,28 @@ def main() -> None:
         proc = subprocess.Popen(
             cmd,
             cwd=project_root,
+            env=env,
             # Share stdout/stderr so terminal output is visible
         )
-        processes.append(proc)
+        processes.append((f"Drone {i}", proc))
         print(f"[LAUNCHER] Drone {i} started (PID {proc.pid})")
 
         # Small stagger to avoid ZeroMQ bind race conditions
         time.sleep(0.1)
+
+    if not args.no_viz:
+        cmd = [
+            sys.executable,
+            "-m",
+            "swarmnet.viz.pygame_viz",
+            "--n",
+            str(n),
+            "--base-port",
+            str(args.base_port),
+        ]
+        viz_proc = subprocess.Popen(cmd, cwd=project_root, env=env)
+        processes.append(("Visualizer", viz_proc))
+        print(f"[LAUNCHER] Visualizer started (PID {viz_proc.pid})")
 
     print()
     print(f"[LAUNCHER] All {n} drones are running.")
@@ -122,10 +140,10 @@ def main() -> None:
     try:
         while True:
             # Check if any drone has died unexpectedly
-            for i, proc in enumerate(processes):
+            for name, proc in processes:
                 if proc.poll() is not None:
                     print(
-                        f"[LAUNCHER] ⚠ Drone {i} exited with code {proc.returncode}"
+                        f"[LAUNCHER] ⚠ {name} exited with code {proc.returncode}"
                     )
             time.sleep(1.0)
     except KeyboardInterrupt:
@@ -133,7 +151,7 @@ def main() -> None:
         print("[LAUNCHER] Shutting down all drones...")
 
     # Send SIGTERM to all running processes
-    for i, proc in enumerate(processes):
+    for _, proc in processes:
         if proc.poll() is None:
             try:
                 proc.terminate()
@@ -142,7 +160,7 @@ def main() -> None:
 
     # Wait for graceful shutdown (max 3 seconds)
     deadline = time.time() + 3.0
-    for proc in processes:
+    for _, proc in processes:
         remaining = max(0.1, deadline - time.time())
         try:
             proc.wait(timeout=remaining)
