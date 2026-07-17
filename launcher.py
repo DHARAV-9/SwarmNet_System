@@ -1,17 +1,3 @@
-"""
-launcher.py — Spawns N DroneNode processes and manages their lifecycle.
-
-Usage:
-    python launcher.py                   # Default: 5 drones
-    python launcher.py --n 10            # 10 drones
-    python launcher.py --n 8 --loss 0.3  # 8 drones, 30% packet loss
-    python launcher.py --n 5 --seed 42   # Reproducible run
-
-The launcher starts each drone as a subprocess running
-``python -m swarmnet.core.drone_node --id <i> --n <N> ...``.
-Press Ctrl+C to shut down all drones cleanly.
-"""
-
 from __future__ import annotations
 
 import argparse
@@ -79,10 +65,8 @@ def main() -> None:
 
     # Get the project root (same directory as this script)
     project_root = os.path.dirname(os.path.abspath(__file__))
-
-    # ------------------------------------------------------------------
+    
     # Spawn drone processes
-    # ------------------------------------------------------------------
     processes: list[tuple[str, subprocess.Popen]] = []
     env = os.environ.copy()
     env["SWARMNET_BASE_PORT"] = str(args.base_port)
@@ -134,9 +118,7 @@ def main() -> None:
     print("[LAUNCHER] Press Ctrl+C to shut down the swarm.")
     print()
 
-    # ------------------------------------------------------------------
     # Wait for Ctrl+C, then shut down
-    # ------------------------------------------------------------------
     try:
         while True:
             # Check if any drone has died unexpectedly
