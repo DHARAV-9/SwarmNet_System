@@ -1,3 +1,17 @@
+"""
+launcher.py — Spawns N DroneNode processes and manages their lifecycle.
+
+Usage:
+    python launcher.py                   # Default: 5 drones
+    python launcher.py --n 10            # 10 drones
+    python launcher.py --n 8 --loss 0.3  # 8 drones, 30% packet loss
+    python launcher.py --n 5 --seed 42   # Reproducible run
+
+The launcher starts each drone as a subprocess running
+``python -m swarmnet.core.drone_node --id <i> --n <N> ...``.
+Press Ctrl+C to shut down all drones cleanly.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -44,6 +58,12 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Skip Flask dashboard (Phase 4)",
     )
+    parser.add_argument(
+        "--dashboard-port",
+        type=int,
+        default=5000,
+        help="Flask dashboard port (default: 5000)",
+    )
     return parser.parse_args()
 
 
@@ -60,13 +80,16 @@ def main() -> None:
     print(f"  Packet loss: {args.loss * 100:.0f}%")
     print(f"  Seed       : {args.seed or 'random'}")
     print(f"  Visualizer : {'off' if args.no_viz else 'on'}")
+    print(f"  Dashboard  : {'off' if args.no_dash else f'on (:{args.dashboard_port})'}")
     print("=" * 60)
     print()
 
     # Get the project root (same directory as this script)
     project_root = os.path.dirname(os.path.abspath(__file__))
-    
+
+    # ------------------------------------------------------------------
     # Spawn drone processes
+    # ------------------------------------------------------------------
     processes: list[tuple[str, subprocess.Popen]] = []
     env = os.environ.copy()
     env["SWARMNET_BASE_PORT"] = str(args.base_port)
@@ -113,12 +136,30 @@ def main() -> None:
         processes.append(("Visualizer", viz_proc))
         print(f"[LAUNCHER] Visualizer started (PID {viz_proc.pid})")
 
+    if not args.no_dash:
+        cmd = [
+            sys.executable,
+            "-m",
+            "swarmnet.viz.dashboard",
+            "--n",
+            str(n),
+            "--base-port",
+            str(args.base_port),
+            "--port",
+            str(args.dashboard_port),
+        ]
+        dashboard_proc = subprocess.Popen(cmd, cwd=project_root, env=env)
+        processes.append(("Dashboard", dashboard_proc))
+        print(f"[LAUNCHER] Dashboard started at http://127.0.0.1:{args.dashboard_port}")
+
     print()
     print(f"[LAUNCHER] All {n} drones are running.")
     print("[LAUNCHER] Press Ctrl+C to shut down the swarm.")
     print()
 
+    # ------------------------------------------------------------------
     # Wait for Ctrl+C, then shut down
+    # ------------------------------------------------------------------
     try:
         while True:
             # Check if any drone has died unexpectedly
