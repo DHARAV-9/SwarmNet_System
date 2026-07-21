@@ -1,11 +1,4 @@
-"""
-test_messenger.py — Unit tests for the communications module.
 
-Tests cover:
-  - JSON serialization round-trip for all message types
-  - Port assignment collision avoidance
-  - Fault simulator packet loss behavior
-"""
 
 from __future__ import annotations
 
@@ -17,9 +10,7 @@ from swarmnet.comms.fault_sim import FaultSimulator
 from swarmnet.comms.serializer import decode, encode
 
 
-# ======================================================================
 # Test: Serialization
-# ======================================================================
 
 
 class TestSerializer:
