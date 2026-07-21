@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SwarmNet Dashboard</title>
+  <style>
+    body { background: #111827; color: #e5e7eb; font-family: Arial, sans-serif; margin: 0; padding: 2rem; }
+    main { max-width: 1050px; margin: auto; }
+    h1 { margin-top: 0; } .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .card, table { background: #1f2937; border-radius: .6rem; padding: 1rem; } .value { color: #67e8f9; font-size: 1.5rem; }
+    table { border-collapse: collapse; margin-top: 1.25rem; padding: 0; width: 100%; } th, td { border-bottom: 1px solid #374151; padding: .75rem; text-align: left; }
+    button { background: #ef4444; border: 0; border-radius: .35rem; color: white; cursor: pointer; padding: .45rem .7rem; }
+    select { border-radius: .35rem; padding: .45rem; } .leader { color: #facc15; } .dead { color: #9ca3af; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>SwarmNet Operations Dashboard</h1>
+    <section class="grid">
+      <div class="card">Leader <div class="value" id="leader">—</div></div>
+      <div class="card">Gossip rounds <div class="value" id="gossip">0</div></div>
+      <div class="card">Formation error <div class="value" id="formation">0.00</div></div>
+      <div class="card">Messages / sec <div class="value" id="throughput">0.00</div></div>
+    </section>
+    <p>Packet loss <select id="loss"><option value="0">0%</option><option value="0.1">10%</option><option value="0.3">30%</option><option value="0.5">50%</option></select></p>
+    <section class="card"><strong>New task</strong><p><input id="task-id" placeholder="task id"> <input id="task-description" placeholder="description"> <input id="task-x" type="number" placeholder="x"> <input id="task-y" type="number" placeholder="y"> <button onclick="createTask()">Announce</button></p><div id="tasks">No tasks announced.</div></section>
+    <table><thead><tr><th>ID</th><th>Status</th><th>Term</th><th>Battery</th><th>Task</th><th>Fault injection</th></tr></thead><tbody id="nodes"></tbody></table>
+    <p><a href="/api/metrics/export" style="color:#67e8f9">Download metrics CSV</a></p>
+  </main>
+  <script>
+    async function refresh() {
+      const [status, metrics] = await Promise.all([fetch('/api/status').then(r => r.json()), fetch('/api/metrics').then(r => r.json())]);
+      document.querySelector('#leader').textContent = status.leader_id ?? '—';
+      document.querySelector('#gossip').textContent = metrics.gossip_rounds;
+      document.querySelector('#formation').textContent = metrics.formation_error.toFixed(2);
+      document.querySelector('#throughput').textContent = metrics.message_rate.toFixed(2);
+      document.querySelector('#loss').value = String(metrics.packet_loss);
+      document.querySelector('#nodes').innerHTML = status.nodes.map(n => `<tr class="${n.alive ? '' : 'dead'}"><td>${n.drone_id}</td><td class="${n.status === 'leader' ? 'leader' : ''}">${n.status}</td><td>${n.term ?? '—'}</td><td>${n.battery == null ? '—' : n.battery.toFixed(1) + '%'}</td><td>${n.task ?? '—'}</td><td>${n.alive ? `<button onclick="killNode(${n.drone_id})">Kill</button>` : '—'}</td></tr>`).join('');
+      document.querySelector('#tasks').innerHTML = status.tasks.length ? status.tasks.map(t => `<p><strong>${t.task_id}</strong> — ${t.status}${t.assigned_to == null ? '' : ` (drone ${t.assigned_to})`}</p>`).join('') : 'No tasks announced.';
+    }
+    async function killNode(id) { await fetch(`/api/kill/${id}`, {method: 'POST'}); refresh(); }
+    async function createTask() { const task_id = document.querySelector('#task-id').value.trim(); const x = Number(document.querySelector('#task-x').value); const y = Number(document.querySelector('#task-y').value); if (!task_id || !Number.isFinite(x) || !Number.isFinite(y)) return; await fetch('/api/tasks', {method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({task_id, description: document.querySelector('#task-description').value || task_id, x, y})}); refresh(); }
+    document.querySelector('#loss').addEventListener('change', event => fetch('/api/packet_loss', {method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({rate: Number(event.target.value)})}));
+    refresh(); setInterval(refresh, 1000);
+  </script>
+</body>
+</html>
