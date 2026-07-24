@@ -130,9 +130,7 @@ class DroneNode:
         self._last_broadcast = 0.0
         self._last_battery_tick = time.monotonic()
 
-    # ------------------------------------------------------------------
     # Main loop
-    # ------------------------------------------------------------------
 
     def run(self) -> None:
         """Enter the main event loop.  Blocks until ``stop()`` is called."""
