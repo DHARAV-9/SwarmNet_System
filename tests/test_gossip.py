@@ -1,6 +1,3 @@
-"""
-test_gossip.py - Unit tests for Phase 2 gossip state synchronization.
-"""
 
 from __future__ import annotations
 
