@@ -1,12 +1,3 @@
-"""
-election.py — Raft vote request / vote response handlers.
-
-Implements the election protocol:
-  1. Candidate increments term, votes for self, sends VoteRequest to all.
-  2. Peers respond with VoteResponse (grant / deny).
-  3. Candidate becomes leader on receiving a majority.
-"""
-
 from __future__ import annotations
 
 import logging

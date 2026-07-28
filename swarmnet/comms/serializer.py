@@ -1,11 +1,3 @@
-"""
-serializer.py — JSON encode / decode for all ZeroMQ message types.
-
-Every message travelling over the wire is a UTF-8 encoded JSON string.
-This module provides thin wrappers so the rest of the codebase never
-touches ``json`` directly for network messages.
-"""
-
 from __future__ import annotations
 
 import json

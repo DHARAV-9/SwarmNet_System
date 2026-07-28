@@ -1,10 +1,3 @@
-"""
-fault_sim.py — Packet-loss injection for testing fault tolerance.
-
-Wraps send calls so that each message is independently dropped with
-probability ``loss_rate``.  Dropped messages are counted for metrics.
-"""
-
 from __future__ import annotations
 
 import logging
