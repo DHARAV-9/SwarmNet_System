@@ -1,7 +1,3 @@
-"""
-test_flocking.py - Unit tests for Reynolds flocking and formations.
-"""
-
 from __future__ import annotations
 
 import math
