@@ -1,5 +1,3 @@
-
-
 from __future__ import annotations
 
 import json
@@ -11,7 +9,6 @@ from swarmnet.comms.serializer import decode, encode
 
 
 # Test: Serialization
-
 
 class TestSerializer:
     def test_vote_request_serializes_correctly(self):
@@ -108,11 +105,7 @@ class TestSerializer:
         text = encoded.decode("utf-8")
         assert " " not in text  # compact separators
 
-
-# ======================================================================
 # Test: Port assignment
-# ======================================================================
-
 
 class TestPortAssignment:
     def test_port_assignment_no_collision(self):
@@ -146,9 +139,7 @@ class TestPortAssignment:
         assert pull_range.isdisjoint(pub_range)
 
 
-# ======================================================================
 # Test: Fault Simulator
-# ======================================================================
 
 
 class TestFaultSimulator:
