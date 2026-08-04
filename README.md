@@ -4,7 +4,6 @@
 > A fully software-simulated drone swarm running on your laptop. No hardware needed.  
 > Built with Raft consensus, Gossip protocol, and Reynolds flocking — entirely in Python.
 
----
 
 ## What is this?
 
@@ -12,7 +11,6 @@ SwarmNet simulates N drones as independent Python processes communicating over Z
 
 Kill any drone process and the swarm automatically elects a new leader and resumes formation — all within 500 ms.
 
----
 
 ## Features
 
@@ -25,7 +23,6 @@ Kill any drone process and the swarm automatically elects a new leader and resum
 - **CSV metrics export** — election time, gossip rounds, formation error
 - **Contract Net task allocation** — Raft-replicated task auctions and awards
 
----
 
 ## Tech Stack
 
@@ -39,7 +36,6 @@ Kill any drone process and the swarm automatically elects a new leader and resum
 | Plotting | Matplotlib |
 | Testing | pytest + pytest-cov |
 
----
 
 ## Project Structure
 
@@ -85,7 +81,6 @@ swarmnet/
 └── README.md
 ```
 
----
 
 ## Installation
 
@@ -125,7 +120,6 @@ pytest>=7.0
 pytest-cov>=4.0
 ```
 
----
 
 ## Running the Simulation
 
@@ -171,7 +165,6 @@ python launcher.py --n 5 --no-viz
 --dashboard-port  Flask dashboard port (default: 5000)
 ```
 
----
 
 ## Opening the Dashboard
 
@@ -206,12 +199,10 @@ through Raft, and the task becomes `in_progress` after the winning drone
 confirms it. If that drone becomes unavailable for 3 seconds, the leader marks
 the task failed and automatically re-announces it for a new auction.
 
----
 
 ## Pygame Controls
 
 | Key | Action |
-|---|---|
 | `K` | Kill current leader (fault injection) |
 | `W / A / S / D` | Move target waypoint |
 | `1` | V-shape formation |
@@ -222,7 +213,6 @@ the task failed and automatically re-announces it for a new auction.
 | `H` | Toggle drone ID labels |
 | `Q` | Quit |
 
----
 
 ## Running Tests
 
@@ -238,7 +228,6 @@ pytest --cov=swarmnet --cov-report=term-missing tests/
 
 Target: **≥ 80% line coverage** on consensus, gossip, and flocking modules.
 
----
 
 ## Exporting Metrics
 
@@ -256,7 +245,6 @@ Run benchmark scenarios with different swarm sizes and packet-loss settings
 first; the exporter combines the generated per-node CSV files and plots the
 available measurements.
 
----
 
 ## Configuration
 
@@ -288,7 +276,6 @@ FPS          = 30
 DEFAULT_N    = 5
 ```
 
----
 
 ## How It Works
 
@@ -308,7 +295,6 @@ Each drone computes a velocity update every 50 ms using three weighted forces: s
 
 The swarm survives up to `⌊N/2⌋` simultaneous node failures (standard Raft quorum guarantee). Packet loss up to 30% is handled gracefully by gossip redundancy.
 
----
 
 ## Demo Script (for your examiner)
 
@@ -320,18 +306,16 @@ The swarm survives up to `⌊N/2⌋` simultaneous node failures (standard Raft q
 6. Show: swarm pauses briefly → new leader elected → formation resumes
 7. Export metrics CSV and show the election time graph
 
----
-
 ## Algorithms Used
 
 | Algorithm | Purpose | Complexity |
-|---|---|---|
+
 | Raft | Leader election + log replication | O(N) messages |
 | Gossip | State propagation | O(log N) rounds |
 | Reynolds flocking | Formation behavior | O(N) per tick |
 | Contract Net | Task allocation | O(N) per auction |
 
----
+
 
 ## Future Work
 
@@ -341,7 +325,6 @@ The swarm survives up to `⌊N/2⌋` simultaneous node failures (standard Raft q
 - Reinforcement learning for dynamic path planning
 - Multi-machine deployment via Docker
 
----
 
 ## References
 
@@ -350,17 +333,14 @@ The swarm survives up to `⌊N/2⌋` simultaneous node failures (standard Raft q
 - Castro & Liskov — *Practical Byzantine Fault Tolerance*
 - Choi et al. — *Consensus-Based Decentralized Auctions for Robust Task Allocation*
 
----
 
 ## Author
 
-**[Your Name]**  
-Roll No: [Your Roll Number]  
+**Dharav Bhatt**  
 Department of Computer Science & Engineering  
-[Your College / University]  
-[Year]
+[GSFC University]  
 
----
+
 
 ## License
 
