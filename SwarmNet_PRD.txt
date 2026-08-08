@@ -1,11 +1,10 @@
-================================================================================
+
          SWARMNET — PRODUCT REQUIREMENTS DOCUMENT (PRD)
          Autonomous Drone Swarm Simulation using Distributed Consensus Algorithms
-         Version 1.0 | CS Final Year / Semester Project
-================================================================================
+         Version 1.0 
 
 DOCUMENT INFO
--------------
+
 Document Type   : Product Requirements Document (PRD)
 Project Name    : SwarmNet
 Author          : [Your Name]
@@ -16,9 +15,8 @@ Date            : June 2026
 Status          : Draft v1.0
 
 
-================================================================================
 TABLE OF CONTENTS
-================================================================================
+
   1. Project Overview
   2. Problem Statement
   3. Goals & Objectives
@@ -33,12 +31,9 @@ TABLE OF CONTENTS
  10. Milestones & Timeline
  11. Risks
  12. Out of Scope
-================================================================================
 
 
---------------------------------------------------------------------------------
 1. PROJECT OVERVIEW
---------------------------------------------------------------------------------
 
 SwarmNet is a fully software-simulated autonomous drone swarm system built
 on top of Distributed Consensus Algorithms. The system models N drones as
@@ -63,9 +58,7 @@ in a robotics-inspired context, covering:
   - Distributed task allocation (Contract Net Protocol)
 
 
---------------------------------------------------------------------------------
 2. PROBLEM STATEMENT
---------------------------------------------------------------------------------
 
 Traditional drone swarm systems rely on a central ground station that
 coordinates all drones. This creates a single point of failure — if the
@@ -83,9 +76,7 @@ consensus at the swarm coordination layer, turning each drone into a fully
 autonomous peer node that participates in collective decision-making.
 
 
---------------------------------------------------------------------------------
 3. GOALS & OBJECTIVES
---------------------------------------------------------------------------------
 
 PRIMARY GOALS
   G1. Implement Raft consensus algorithm for leader election and log replication
@@ -109,9 +100,7 @@ ACADEMIC OBJECTIVES
   O4. Generate a reproducible benchmark suite for the final report.
 
 
---------------------------------------------------------------------------------
 4. TARGET USERS
---------------------------------------------------------------------------------
 
 PRIMARY USER
   - CS student (developer + evaluator of this project)
@@ -125,9 +114,7 @@ END AUDIENCE (conceptual)
   - Drone swarm operators who would use such a system in production
 
 
---------------------------------------------------------------------------------
 5. SCOPE
---------------------------------------------------------------------------------
 
 IN SCOPE
   - Software simulation of 5–20 drone nodes on a single machine
@@ -149,12 +136,9 @@ OUT OF SCOPE
   - Machine learning or AI-based path planning
 
 
---------------------------------------------------------------------------------
 6. FEATURES & REQUIREMENTS
---------------------------------------------------------------------------------
 
 6.1 FUNCTIONAL REQUIREMENTS
------------------------------
 
 FR-01  DRONE NODE SIMULATION
   Each drone must run as an independent Python process.
@@ -226,7 +210,6 @@ FR-10  TASK ALLOCATION
 
 
 6.2 NON-FUNCTIONAL REQUIREMENTS
----------------------------------
 
 NFR-01  PERFORMANCE
   Leader election must complete in under 500 ms for N <= 20.
@@ -260,9 +243,7 @@ NFR-07  CODE QUALITY
   README must include setup and run instructions.
 
 
---------------------------------------------------------------------------------
 7. USER STORIES
---------------------------------------------------------------------------------
 
 US-01  As a student, I want to start N drone processes with one command so
        that I can quickly set up the simulation for a demo.
@@ -290,9 +271,7 @@ US-08  As a student, I want to inject packet loss and see how the system
        degrades gracefully so that I can analyze fault tolerance limits.
 
 
---------------------------------------------------------------------------------
 8. CONSTRAINTS & ASSUMPTIONS
---------------------------------------------------------------------------------
 
 CONSTRAINTS
   C1. No physical drone hardware available — simulation only.
@@ -309,10 +288,7 @@ ASSUMPTIONS
       affect consensus behavior in base version).
   A5. Examiner will evaluate on the developer's laptop or a provided VM.
 
-
---------------------------------------------------------------------------------
 9. SUCCESS METRICS
---------------------------------------------------------------------------------
 
   M1. Leader election completes in < 500 ms for N = 10          [PASS/FAIL]
   M2. Gossip converges in <= ceil(log2(N)) rounds               [PASS/FAIL]
@@ -323,9 +299,7 @@ ASSUMPTIONS
   M7. All benchmark results exportable to CSV                   [PASS/FAIL]
 
 
---------------------------------------------------------------------------------
 10. MILESTONES & TIMELINE
---------------------------------------------------------------------------------
 
   Week 1–2   Phase 1: Raft consensus + inter-process messaging
                - Drone process skeleton
@@ -359,9 +333,7 @@ ASSUMPTIONS
                Deliverable: Complete system + report-ready graphs
 
 
---------------------------------------------------------------------------------
 11. RISKS
---------------------------------------------------------------------------------
 
   R1. ZeroMQ port conflicts on some OS
       Mitigation: Auto-assign ports from a configurable base port
@@ -379,10 +351,7 @@ ASSUMPTIONS
       Mitigation: Include a clear explanation in README and report intro
       that simulation is the standard methodology in distributed systems
 
-
---------------------------------------------------------------------------------
 12. OUT OF SCOPE (FUTURE WORK)
---------------------------------------------------------------------------------
 
   - Physical drone hardware integration (ArduPilot / Crazyflie)
   - 3D flight simulation (Gazebo / AirSim)
@@ -393,7 +362,6 @@ ASSUMPTIONS
   - GPS coordinate mapping
 
 
-================================================================================
 END OF PRODUCT REQUIREMENTS DOCUMENT
-SwarmNet v1.0 | CS Student Project | June 2026
-================================================================================
+SwarmNet v1.0 | June 2026
+
