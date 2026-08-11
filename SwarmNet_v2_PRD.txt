@@ -1,0 +1,612 @@
+================================================================================
+         SWARMNET v2.0 — PRODUCT REQUIREMENTS DOCUMENT (PRD)
+         50-Drone Autonomous Swarm System
+         AI-Based Control · Wind Resilient · Jam Hardened
+         Version 2.0 | Research-Level Project
+================================================================================
+
+DOCUMENT INFO
+-------------
+Document Type   : Product Requirements Document (PRD)
+Project Name    : SwarmNet v2.0
+Version         : 2.0 (major upgrade from SwarmNet v1.0)
+Author          : [Your Name]
+Roll No         : [Your Roll Number]
+Department      : Computer Science & Engineering
+Institution     : [Your College / University]
+Date            : August 2026
+Status          : Draft v1.0
+Platform        : macOS (Apple M4 Pro) · Docker · PX4 SITL · ROS2 Humble
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+  1.  Executive Summary
+  2.  Problem Statement
+  3.  Upgrade from v1.0
+  4.  Goals & Objectives
+  5.  Target Users
+  6.  Scope
+  7.  Core Challenges
+  8.  Features & Requirements
+       8.1  Functional Requirements
+       8.2  Non-Functional Requirements
+  9.  User Stories
+ 10.  Constraints & Assumptions
+ 11.  Success Metrics
+ 12.  Milestones & Timeline
+ 13.  Risks & Mitigations
+ 14.  Out of Scope / Future Work
+================================================================================
+
+
+--------------------------------------------------------------------------------
+1. EXECUTIVE SUMMARY
+--------------------------------------------------------------------------------
+
+SwarmNet v2.0 is a research-level autonomous drone swarm system simulating
+50 quadrotor drones operating with a minimum inter-drone spacing of 50 cm
+under adversarial conditions including strong wind (up to 15 m/s) and heavy
+electronic jamming.
+
+The system uses a 1-master + 49-follower architecture where Vehicle 1
+(master drone) runs the PX4 autopilot stack and an AI-based MAPPO
+(Multi-Agent Proximal Policy Optimization) swarm controller. Follower drones
+execute decentralized actor policies trained by the master's centralized
+critic.
+
+The entire system runs in Docker containers on a MacBook with Apple M4 Pro,
+using PX4 SITL (Software In The Loop), Gazebo Harmonic physics simulation,
+ROS2 Humble middleware, and QGroundControl as the ground station — the exact
+stack visible in the project reference screenshot.
+
+SwarmNet v2.0 is a direct, research-grade successor to SwarmNet v1.0
+(Python + ZeroMQ + Raft + Pygame) and represents a complete stack upgrade
+to industry-standard autonomous systems tooling.
+
+
+--------------------------------------------------------------------------------
+2. PROBLEM STATEMENT
+--------------------------------------------------------------------------------
+
+SwarmNet v1.0 demonstrated distributed consensus (Raft), gossip-based state
+sync, and Reynolds flocking in a software simulation. However, it had
+fundamental limitations that prevent real-world applicability:
+
+  L1. Scale: v1.0 handled 5–20 nodes. Real operational swarms need 50+.
+
+  L2. Physics fidelity: v1.0 used 2D dot-on-screen simulation with no
+      aerodynamic model, no wind, no sensor noise, no actuator delays.
+
+  L3. Safety: v1.0 had no hard collision avoidance. At 50cm spacing with
+      real flight dynamics, collisions are a safety-critical problem.
+
+  L4. Adversarial resilience: v1.0 simulated packet loss but had no model
+      of GPS spoofing, RF jamming, or sensor corruption.
+
+  L5. Control quality: Reynolds flocking with hand-tuned weights breaks
+      down at N=50 in complex, dynamic environments. AI control is needed.
+
+  L6. Standard tooling: v1.0 used custom Python processes. Real drone
+      systems use PX4, ROS2, MAVLink, and DDS — which v2.0 implements.
+
+SwarmNet v2.0 addresses all six limitations, producing a simulation system
+that is directly transferable to real hardware with minimal changes.
+
+
+--------------------------------------------------------------------------------
+3. UPGRADE FROM v1.0
+--------------------------------------------------------------------------------
+
+COMPONENT          v1.0                        v2.0
+--------------     -------------------------   -----------------------------
+Simulation         Pygame 2D dots              Gazebo Harmonic 3D physics
+Flight controller  Custom Python process       PX4 Autopilot v1.14
+Middleware         ZeroMQ sockets              ROS2 Humble + DDS (RTPS)
+Consensus          Raft (crash faults)         Raft + PBFT hybrid
+Comms protocol     JSON over TCP               MAVLink v2 + uXRCE-DDS
+Swarm control      Reynolds flocking           MAPPO AI (PyTorch)
+Position control   Simple velocity update      EKF + MPC
+Collision avoid    None                        ORCA (Optimal Reciprocal CA)
+Wind model         None                        Von Kármán turbulence
+Jamming model      Packet loss rate (%)        FHSS + GPS spoof + RSSI drop
+GCS               Flask dashboard             QGroundControl
+Scale             5–20 nodes                  50 nodes (1 master + 49)
+Platform          Any OS, laptop              macOS M4 / Docker
+Language          Python only                 Python + C++ (ROS2 nodes)
+Spacing           No constraint               50 cm hard minimum
+
+
+--------------------------------------------------------------------------------
+4. GOALS & OBJECTIVES
+--------------------------------------------------------------------------------
+
+PRIMARY GOALS
+
+  G1. Deploy and coordinate 50 simulated drone instances (1 master +
+      49 followers) in Gazebo Harmonic via PX4 SITL on Docker.
+
+  G2. Maintain 50 cm minimum inter-drone spacing with ±2 cm positional
+      accuracy during formation flight, transitions, and hover.
+
+  G3. Sustain stable swarm operation under 15 m/s wind using Extended
+      Kalman Filter sensor fusion and Model Predictive Control.
+
+  G4. Maintain swarm cohesion and communication under heavy RF jamming
+      using Frequency-Hopping Spread Spectrum simulation and optical
+      flow fallback when GPS is spoofed.
+
+  G5. Train and deploy a MAPPO multi-agent reinforcement learning
+      controller that outperforms hand-tuned PID/MPC in formation
+      accuracy and energy efficiency.
+
+  G6. Demonstrate Byzantine fault tolerance using PBFT consensus for
+      critical swarm commands, tolerating up to floor(N/3) malicious nodes.
+
+RESEARCH OBJECTIVES
+
+  O1. Benchmark MAPPO vs MPC vs PID controllers across: formation
+      error, energy consumption, recovery time after fault.
+
+  O2. Quantify swarm performance degradation vs wind speed (0–15 m/s)
+      and jamming intensity (0–100% channel interference).
+
+  O3. Measure ORCA collision avoidance effectiveness at 50cm spacing
+      during formation transitions with 50 agents.
+
+  O4. Compare Raft (v1.0) vs Raft+PBFT hybrid (v2.0) in terms of
+      fault coverage, latency overhead, and message complexity.
+
+
+--------------------------------------------------------------------------------
+5. TARGET USERS
+--------------------------------------------------------------------------------
+
+PRIMARY USER
+  - CS / Robotics student developing and evaluating the system
+  - Runs simulation, trains AI, tunes parameters, demonstrates results
+
+SECONDARY USERS
+  - Academic supervisor / examiner — evaluates research depth and results
+  - Fellow researchers — may extend the codebase or replicate experiments
+
+CONCEPTUAL END USERS (production context)
+  - Military swarm operators (search, surveillance, electronic warfare)
+  - Disaster relief coordinators (area mapping, supply delivery)
+  - Agricultural operators (precision crop management)
+  - Infrastructure inspection teams (bridge, pipeline, tower inspection)
+
+
+--------------------------------------------------------------------------------
+6. SCOPE
+--------------------------------------------------------------------------------
+
+IN SCOPE
+  - 50-drone PX4 SITL simulation in Gazebo Harmonic via Docker on macOS
+  - Master drone: PX4 + MAVROS2 + MAPPO centralized critic + formation mgr
+  - Follower drones (×49): PX4 + MAPPO actor + EKF + MPC + ORCA
+  - ROS2 Humble node graph connecting all drone processes
+  - Cyclone DDS mesh for real-time inter-drone communication
+  - uXRCE-DDS bridge between PX4 firmware and ROS2
+  - MAVLink v2 between master drone and QGroundControl
+  - Von Kármán wind turbulence model in Gazebo
+  - FHSS jamming simulation + GPS spoofing model
+  - MAPPO training pipeline (PyTorch, Apple MPS)
+  - ORCA collision avoidance module (C++)
+  - PBFT consensus module for critical commands
+  - QGroundControl integration (runs natively on macOS)
+  - RViz2 3D formation visualization
+  - Full benchmark suite and CSV metric export
+  - PRD, TRD, README, and final research report
+
+OUT OF SCOPE
+  - Physical drone hardware deployment
+  - Real RF communication hardware
+  - FAA/regulatory compliance
+  - Payload or sensor integration beyond IMU/baro/optical flow
+  - Multi-swarm coordination (multiple groups of 50)
+
+
+--------------------------------------------------------------------------------
+7. CORE CHALLENGES
+--------------------------------------------------------------------------------
+
+CHALLENGE 1 — 50 CM SPACING IN DYNAMIC FLIGHT
+  Flying 50 drones within 50 cm of each other is an extreme precision
+  requirement. At this spacing, a 10 cm position error in strong wind
+  means collision. This requires:
+  - Sub-10ms control loop latency
+  - EKF sensor fusion (not GPS alone)
+  - MPC predictive compensation
+  - ORCA hard collision avoidance as safety backstop
+  - Hungarian optimal formation assignment
+
+CHALLENGE 2 — HEAVY ELECTRONIC JAMMING
+  Electronic jamming in military / contested scenarios disrupts:
+  - GPS (position estimate collapses)
+  - RF data links (MAVLink / DDS messages drop)
+  - Drone-to-drone mesh (gossip/consensus breaks down)
+  Solution: FHSS channel hopping, optical flow + IMU dead reckoning,
+  PBFT Byzantine consensus to reject spoofed commands, 10-second
+  autonomous hold on comms loss.
+
+CHALLENGE 3 — AI CONTROL AT N=50
+  Hand-tuned controllers (PID, MPC) require individual tuning per drone
+  and degrade with scale. MAPPO (Multi-Agent PPO) learns a shared policy
+  that generalizes across all 50 drones and improves with training.
+  Training challenge: reward shaping must balance formation accuracy,
+  collision avoidance, energy efficiency, and fault recovery
+  simultaneously across 50 interacting agents.
+
+CHALLENGE 4 — DOCKER ON APPLE SILICON
+  PX4 + Gazebo were built for x86/Linux. Running on ARM64 (M4 Pro)
+  via Docker requires: ARM64-native images where available, Rosetta 2
+  emulation where not, XQuartz for GUI forwarding, careful port mapping
+  for 50 MAVLink streams, and resource allocation tuning for unified
+  memory architecture.
+
+
+--------------------------------------------------------------------------------
+8. FEATURES & REQUIREMENTS
+--------------------------------------------------------------------------------
+
+8.1 FUNCTIONAL REQUIREMENTS
+-----------------------------
+
+FR-01  50-DRONE SITL DEPLOYMENT
+  System must spawn exactly 50 PX4 SITL instances in Gazebo Harmonic.
+  Each instance must have: unique MAV_SYS_ID (1–50), unique UDP port
+  (14550–14600), unique Gazebo model instance, independent PX4 log.
+  All 50 must be launchable with a single command.
+  Vehicle 1 is designated master. Vehicles 2–50 are followers.
+
+FR-02  MASTER DRONE — COMMAND & CONTROL
+  Master drone (Vehicle 1) must:
+  - Maintain MAVLink v2 link to QGroundControl on UDP 14550
+  - Accept mission waypoints from QGroundControl operator
+  - Compute swarm formation assignments via Hungarian algorithm
+  - Broadcast formation targets to 49 followers via DDS topics
+  - Run MAPPO centralized critic during training
+  - Detect follower drone failures and trigger re-assignment
+  - Maintain Raft leader role for consensus commands
+
+FR-03  FOLLOWER DRONES — AUTONOMOUS EXECUTION
+  Each follower drone (Vehicles 2–50) must:
+  - Receive formation target from master via DDS
+  - Execute MAPPO actor policy: local obs → thrust/yaw command
+  - Run EKF: fuse simulated IMU + barometer + optical flow
+  - Run MPC position controller: 500ms prediction horizon
+  - Run ORCA: enforce 50cm minimum spacing every 20ms
+  - Hold last known formation for 10s on comms loss
+  - Report state (position, battery, status) via DDS at 10 Hz
+
+FR-04  EKF SENSOR FUSION
+  Extended Kalman Filter must fuse:
+    - IMU: accelerometer + gyroscope at 1000 Hz
+    - Barometer: altitude at 50 Hz
+    - Optical flow: XY velocity at 30 Hz
+    - GPS: position at 10 Hz (degraded/absent under jamming)
+  EKF output: position estimate ±2cm under nominal conditions,
+  ±10cm under GPS-denied jamming with optical flow active.
+
+FR-05  MPC POSITION CONTROLLER
+  Model Predictive Controller must:
+  - Predict drone state 500ms ahead using quadrotor dynamics model
+  - Compute optimal thrust sequence that minimizes position error
+  - Re-solve every 50ms (20 Hz control loop)
+  - Pre-compensate for measured wind disturbance from EKF
+  - Hand off to ORCA if computed velocity violates spacing constraint
+
+FR-06  ORCA COLLISION AVOIDANCE
+  ORCA (Optimal Reciprocal Collision Avoidance) module must:
+  - Run every 20ms per drone
+  - Read neighbor positions from DDS state topic (10 nearest drones)
+  - Compute velocity obstacle set for each neighbor
+  - Output a collision-free velocity that minimally deviates from MPC cmd
+  - Enforce hard 50cm minimum distance (emergency stop at 30cm)
+  - Handle simultaneous avoidance for up to 10 neighbors per drone
+
+FR-07  MAPPO AI CONTROLLER
+  Multi-Agent Proximal Policy Optimization system must:
+  Training:
+  - Observation space per drone: [own pos, own vel, 10 neighbor
+    relative positions, 10 neighbor relative velocities, wind estimate,
+    target formation position, battery level] = 47-dim vector
+  - Action space: [thrust_x, thrust_y, thrust_z, yaw_rate] = 4-dim
+  - Reward: formation_accuracy(−) + collision_penalty(−) +
+    energy_use(−) + task_completion(+)
+  - Centralized critic: receives global state of all 50 drones
+  - Decentralized actor: each drone sees only local observation
+  - Training runs in Docker AI container using PyTorch + Apple MPS
+  Inference:
+  - Trained actor weights loaded into each follower ROS2 node
+  - Runs at 20 Hz alongside MPC (MAPPO output overrides MPC when
+    trained policy is active)
+  - Fallback to MPC if MAPPO inference latency > 40ms
+
+FR-08  VON KARMAN WIND MODEL
+  Gazebo world must include a Von Kármán turbulence plugin that:
+  - Simulates continuous gust wind field across the entire arena
+  - Supports wind speeds: 0, 5, 10, 15 m/s (configurable)
+  - Applies turbulent fluctuations (±20% of mean speed)
+  - Applies wind force to each drone model's aerodynamic surface
+  - Wind direction configurable per benchmark run
+
+FR-09  JAMMING SIMULATION
+  Communications jamming module must simulate:
+  - RF jamming: drops DDS messages at configurable rate (0–100%)
+  - GPS spoofing: injects false GPS position offset (0–10m error)
+  - RSSI monitoring: detects jamming when RSSI drops below threshold
+  - FHSS response: automatically switches DDS domain/port on detection
+  - Mesh redundancy: each drone maintains 3 backup comm paths
+  - Graceful degradation: swarm holds formation autonomously for 10s
+
+FR-10  PBFT CONSENSUS
+  PBFT module must handle critical swarm commands (formation change,
+  abort, emergency land) using three-phase commit:
+  - Pre-prepare: master broadcasts command + sequence number
+  - Prepare: each drone broadcasts prepare to all peers
+  - Commit: drone executes command after 2f+1 commits received
+  - View change: new master elected on primary failure
+  - Tolerates floor(N/3) Byzantine (malicious/faulty) drones
+  - Must not be used for high-frequency position updates (too slow)
+  - Reserved for: mission commands, formation changes, emergency stops
+
+FR-11  QGC INTEGRATION
+  QGroundControl (running natively on macOS) must:
+  - Display all 50 vehicle icons on the map view
+  - Show Vehicle 1 as master (Home marker, green icon)
+  - Accept mission plan upload and transmit to master drone
+  - Display telemetry for any selected vehicle
+  - Show battery, GPS fix, flight mode for all drones
+  - Allow operator emergency land / RTL for any drone
+
+FR-12  RVIZ2 VISUALIZATION
+  RViz2 node inside ROS2 container must render:
+  - 3D positions of all 50 drones as colored markers
+  - Formation target positions as ghost markers
+  - Position error vectors (actual vs target)
+  - ORCA avoidance vectors (togglable)
+  - Wind field arrows (togglable)
+  - Color-coded drone status: green=OK, yellow=degraded, red=failed
+
+FR-13  METRICS & BENCHMARKING
+  System must log and export:
+  - Formation error: RMS distance of each drone from target (per second)
+  - Collision events: count of <50cm violations per run
+  - MAPPO reward: cumulative reward per episode
+  - EKF accuracy: estimated vs ground truth position error
+  - Comm reliability: message delivery rate per drone pair
+  - Election time: PBFT view-change latency
+  - Energy proxy: cumulative thrust magnitude per drone
+  All metrics exported to CSV. Matplotlib plots auto-generated.
+
+
+8.2 NON-FUNCTIONAL REQUIREMENTS
+---------------------------------
+
+NFR-01  PERFORMANCE
+  Formation position error < 5cm RMS at 0 wind, 0 jamming.
+  Formation position error < 15cm RMS at 15m/s wind, 0 jamming.
+  Formation position error < 25cm RMS at 15m/s wind, 50% jamming.
+  ORCA must enforce 50cm spacing with zero violations at 0 wind.
+  ORCA must have < 3 violations per 60s run at 15m/s wind.
+
+NFR-02  LATENCY
+  DDS state update: drone → master < 3ms on localhost Docker network.
+  MAPPO inference: < 40ms per drone per control tick.
+  MPC solve time: < 50ms per drone (20 Hz loop).
+  ORCA solve time: < 5ms per drone (50 Hz loop).
+  PBFT command commit: < 200ms for N=50.
+
+NFR-03  SCALABILITY
+  All 50 drones must run simultaneously in Docker on M4 Pro 16GB.
+  Total RAM usage must stay below 14GB (leaving 2GB for macOS).
+  System architecture must support N up to 100 with config change only.
+
+NFR-04  FAULT TOLERANCE
+  PBFT: correct operation with up to floor(50/3) = 16 Byzantine nodes.
+  Raft: correct leader election with up to floor(50/2) = 24 crash faults.
+  Comms loss: swarm holds formation autonomously for minimum 10 seconds.
+  Single drone crash: swarm rebalances formation within 5 seconds.
+
+NFR-05  REPRODUCIBILITY
+  All random seeds (wind, spawn positions, jamming) configurable in YAML.
+  Docker images pinned to exact versions for reproducible builds.
+  All benchmark results reproducible within ±5% given same seed.
+
+NFR-06  PORTABILITY
+  Primary: macOS Apple Silicon (M4 Pro) via Docker.
+  Secondary: Ubuntu 22.04 x86 (direct install, no Docker needed).
+  All Docker images must have ARM64 variants or Rosetta 2 fallback.
+
+NFR-07  SAFETY
+  ORCA hard stop at 30cm (below 50cm warning threshold).
+  Emergency land command takes priority over all other commands.
+  Master drone failure triggers autonomous hover hold on all followers.
+  No drone may enter OFFBOARD mode without valid setpoint stream.
+
+
+--------------------------------------------------------------------------------
+9. USER STORIES
+--------------------------------------------------------------------------------
+
+US-01  As a student, I want to launch all 50 drones with one terminal
+       command so that I can quickly set up the demo environment.
+
+US-02  As a student, I want to see all 50 vehicles appear in
+       QGroundControl exactly like my reference screenshot (but with 50),
+       so I can verify the SITL setup is working.
+
+US-03  As a student, I want to enable a 15 m/s wind and watch the swarm
+       maintain formation, so I can demonstrate EKF + MPC robustness.
+
+US-04  As a student, I want to enable RF jamming at 50% and see the
+       swarm switch to optical flow navigation and hold formation,
+       so I can demonstrate resilience to electronic warfare.
+
+US-05  As a student, I want to compare formation error metrics for MPC
+       vs MAPPO so I can show that AI outperforms classical control.
+
+US-06  As a student, I want to trigger a Byzantine drone (one drone
+       sending false positions) and show PBFT rejecting its commands,
+       so I can demonstrate advanced fault tolerance.
+
+US-07  As an examiner, I want to see the RViz2 3D view of 50 drones in
+       precise formation so I can evaluate positional accuracy visually.
+
+US-08  As a student, I want benchmark CSV export so I can generate
+       publication-quality graphs for my research report.
+
+US-09  As a student, I want to change formation shape (V / grid / circle)
+       from QGroundControl and see all 50 drones transition smoothly,
+       so I can demonstrate dynamic task allocation.
+
+US-10  As a student, I want to kill any follower drone mid-flight and
+       watch the swarm automatically rebalance the formation,
+       so I can demonstrate fault recovery.
+
+
+--------------------------------------------------------------------------------
+10. CONSTRAINTS & ASSUMPTIONS
+--------------------------------------------------------------------------------
+
+CONSTRAINTS
+  C1. Hardware: MacBook M4 Pro, 16GB RAM, 512GB SSD. No GPU cluster.
+  C2. Budget: zero. All software must be open source / free.
+  C3. No physical drones — simulation only.
+  C4. Docker must be used as the Linux environment on macOS.
+  C5. QGroundControl must run natively on macOS (not in Docker).
+  C6. Development timeline: 16 weeks.
+
+ASSUMPTIONS
+  A1. Docker Desktop allocated 12GB RAM and 8 CPU cores.
+  A2. XQuartz installed for Gazebo GUI forwarding (or RViz2 used instead).
+  A3. All 50 drones run on the same Docker bridge network (localhost).
+  A4. Simulated arena: 100m × 100m × 30m altitude.
+  A5. Formation spacing: 2m between drones in nominal grid, 50cm minimum.
+  A6. MAPPO training runs for minimum 10,000 episodes before evaluation.
+  A7. Optical flow sensor provides valid XY velocity up to 10 m/s wind.
+  A8. PBFT used only for mission-critical commands, not position updates.
+
+
+--------------------------------------------------------------------------------
+11. SUCCESS METRICS
+--------------------------------------------------------------------------------
+
+  M1. All 50 drones spawn and appear in QGroundControl       [PASS/FAIL]
+  M2. Formation error < 5cm RMS (0 wind, 0 jamming)          [MEASURED]
+  M3. Formation error < 15cm RMS (15m/s wind)                [MEASURED]
+  M4. Zero ORCA violations at 0 wind over 60s                [PASS/FAIL]
+  M5. Swarm holds formation 10s after total comms loss        [PASS/FAIL]
+  M6. MAPPO reward improves over 10,000 training episodes     [PLOT]
+  M7. PBFT rejects Byzantine drone commands correctly         [PASS/FAIL]
+  M8. PBFT view-change completes in < 200ms                  [MEASURED]
+  M9. Total Docker RAM usage < 14GB with 50 drones           [MEASURED]
+  M10. All benchmark results exportable to CSV + PNG plots    [PASS/FAIL]
+
+
+--------------------------------------------------------------------------------
+12. MILESTONES & TIMELINE
+--------------------------------------------------------------------------------
+
+  Week 1–2    Environment setup
+               - Docker Desktop configured (12GB RAM, 8 CPU)
+               - PX4 SITL image pulled and verified
+               - ROS2 Humble image pulled and verified
+               - XQuartz / RViz2 GUI working
+               - QGroundControl connects to single SITL drone
+               Deliverable: 1 drone flying in Gazebo, visible in QGC
+
+  Week 3–5    50-drone SITL deployment
+               - drone_spawn.py: launches 50 PX4 instances
+               - Unique MAV_SYS_ID and ports per drone
+               - All 50 visible in QGroundControl
+               - Basic formation hold (no wind, no AI)
+               Deliverable: 50 drones in grid formation in QGC
+
+  Week 6–8    EKF + MPC wind resilience
+               - Von Kármán wind plugin integrated in Gazebo world
+               - EKF node fusing IMU + baro + optical flow
+               - MPC position controller replacing PID
+               - Formation stable at 10 m/s wind
+               Deliverable: Formation error < 15cm at 10 m/s wind
+
+  Week 9–11   ORCA + precision formation
+               - ORCA C++ ROS2 node
+               - Hungarian assignment algorithm
+               - 50cm spacing verified at 0 wind
+               - Formation transitions (V → grid → circle)
+               Deliverable: Zero spacing violations in 60s test run
+
+  Week 12–14  MAPPO AI controller
+               - Gym environment wrapping Gazebo
+               - MAPPO actor/critic implemented in PyTorch
+               - Training on Apple MPS (10,000+ episodes)
+               - Trained weights deployed to follower nodes
+               - MAPPO vs MPC benchmark
+               Deliverable: MAPPO outperforms MPC in formation error metric
+
+  Week 15–16  Jamming + PBFT + final benchmarks
+               - FHSS jamming simulation
+               - GPS spoofing model
+               - PBFT consensus module
+               - Full stress test: 50 drones, 15m/s wind, 50% jamming
+               - CSV export and matplotlib report graphs
+               - Final report written
+               Deliverable: Complete system + benchmarks + report
+
+
+--------------------------------------------------------------------------------
+13. RISKS & MITIGATIONS
+--------------------------------------------------------------------------------
+
+  R1. Docker RAM exhaustion at 50 drones
+      Mitigation: Cap each PX4 instance to 200MB via Docker cgroups.
+      Test at N=10, 20, 30 first. Scale to 50 only after profiling.
+
+  R2. Gazebo GUI too slow via XQuartz on macOS
+      Mitigation: Use headless Gazebo (HEADLESS=1) + RViz2 for all
+      visualization. RViz2 runs inside VS Code Remote Container.
+
+  R3. MAPPO training takes too long on M4 Pro CPU
+      Mitigation: Use Apple MPS backend in PyTorch 2.x for GPU
+      acceleration. Start training with N=10 drones, transfer to N=50.
+
+  R4. PX4 ARM64 image unavailable for some versions
+      Mitigation: Use Rosetta 2 emulation in Docker Desktop for
+      x86 images. Enable in Docker Settings → Features in development.
+
+  R5. DDS discovery overhead at N=50
+      Mitigation: Partition DDS into subgroups. Use ROS_DOMAIN_ID
+      segmentation. Reduce discovery beacon frequency in Cyclone config.
+
+  R6. ORCA not fast enough at 20ms for 50 drones
+      Mitigation: ORCA is O(N) per drone. At N=50, each drone checks
+      10 nearest only (K-D tree neighbor lookup). C++ implementation.
+
+  R7. PBFT latency too high for formation commands
+      Mitigation: PBFT only used for mission-critical commands
+      (< 1 per second). Position updates go via DDS directly.
+
+
+--------------------------------------------------------------------------------
+14. OUT OF SCOPE / FUTURE WORK
+--------------------------------------------------------------------------------
+
+  - Physical drone hardware deployment (ArduPilot / Crazyflie / Pixhawk)
+  - Real RF communication hardware (ESP-NOW, ZigBee, 900MHz)
+  - Actual GPS jamming hardware testing
+  - FAA / DGCA / regulatory compliance
+  - Multi-swarm coordination (multiple 50-drone groups)
+  - 3D obstacle avoidance (buildings, trees)
+  - Payload integration (cameras, sensors, delivery mechanisms)
+  - Online MAPPO learning (re-training during flight)
+  - Hardware-in-the-loop (HIL) testing
+  - Sim-to-real transfer experiments
+
+
+================================================================================
+END OF PRODUCT REQUIREMENTS DOCUMENT
+SwarmNet v2.0 | Research-Level CS Project | August 2026
+================================================================================
