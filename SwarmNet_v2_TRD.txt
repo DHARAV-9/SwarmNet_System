@@ -1,0 +1,1167 @@
+================================================================================
+         SWARMNET v2.0 — TECHNICAL REQUIREMENTS DOCUMENT (TRD)
+         50-Drone Autonomous Swarm System
+         AI-Based Control · Wind Resilient · Jam Hardened
+         Version 2.0 | Research-Level Project
+================================================================================
+
+DOCUMENT INFO
+-------------
+Document Type   : Technical Requirements Document (TRD)
+Project Name    : SwarmNet v2.0
+Version         : 2.0
+Author          : [Your Name]
+Roll No         : [Your Roll Number]
+Department      : Computer Science & Engineering
+Institution     : [Your College / University]
+Date            : August 2026
+Status          : Draft v1.0
+Companion Doc   : SwarmNet_v2_PRD.txt
+Platform        : macOS Apple M4 Pro · Docker · Ubuntu 22.04 (containerized)
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+  1.  System Architecture
+  2.  Technology Stack
+  3.  Docker Container Design
+  4.  Module Breakdown
+  5.  Algorithm Specifications
+       5.1  EKF Sensor Fusion
+       5.2  MPC Position Controller
+       5.3  ORCA Collision Avoidance
+       5.4  MAPPO AI Swarm Controller
+       5.5  FHSS Jamming Defense
+       5.6  PBFT Byzantine Consensus
+       5.7  Hungarian Formation Assignment
+  6.  Communication Architecture
+  7.  Data Structures & ROS2 Topics
+  8.  PX4 SITL Configuration
+  9.  Gazebo World Specification
+ 10.  File & Folder Structure
+ 11.  API & Interface Specifications
+ 12.  Configuration Files
+ 13.  Testing Requirements
+ 14.  Performance Benchmarks
+ 15.  Deployment & Run Instructions
+================================================================================
+
+
+--------------------------------------------------------------------------------
+1. SYSTEM ARCHITECTURE
+--------------------------------------------------------------------------------
+
+OVERVIEW
+  SwarmNet v2.0 is a three-container Docker system running on macOS M4 Pro.
+  QGroundControl runs natively on macOS outside Docker. All containers
+  share a Docker bridge network (swarm_net) and communicate via DDS (RTPS).
+
+CONTAINER MAP
+
+  +---------------------+     +----------------------+     +--------------+
+  |   Container 1       |     |   Container 2        |     |  Container 3 |
+  |   px4_sitl          |     |   ros2_nodes         |     |  ai_trainer  |
+  |                     |     |                      |     |              |
+  |  50x PX4 SITL       |<--->|  Master node         |     |  MAPPO train |
+  |  Gazebo Harmonic    | DDS |  49x Follower nodes  |<--->|  PyTorch MPS |
+  |  Wind plugin        |     |  ORCA nodes          |     |  Actor/Critic|
+  |  Physics sim        |     |  EKF nodes           |     |  Gym env     |
+  |                     |     |  MPC nodes           |     |              |
+  +---------------------+     |  PBFT module         |     +--------------+
+           |                  |  Metrics collector   |
+           | UDP 14550        +----------------------+
+           |                           |
+  +---------------------+     +--------+-------+
+  |  QGroundControl     |     |   RViz2        |
+  |  (macOS native)     |     |   (in VS Code  |
+  |  Operator GCS       |     |    Remote Cont)|
+  +---------------------+     +----------------+
+
+DRONE ROLE ARCHITECTURE
+
+  Vehicle 1 (MASTER)
+    Responsibilities:
+    - Receives mission from QGroundControl via MAVLink
+    - Runs Hungarian algorithm to assign formation positions
+    - Hosts MAPPO centralized critic (training only)
+    - Publishes /swarm/formation_targets DDS topic
+    - Maintains Raft leader role
+    - Monitors follower health via /swarm/drone_state topics
+    - Triggers re-assignment on follower failure
+
+  Vehicles 2–50 (FOLLOWERS)
+    Each runs independently:
+    - Subscribes to /swarm/formation_targets
+    - Runs EKF: fuses IMU + baro + optical flow → position estimate
+    - Runs MPC: position estimate → thrust setpoint
+    - Runs ORCA: thrust setpoint → collision-safe velocity
+    - Runs MAPPO actor: local obs → policy action (overrides MPC)
+    - Publishes /swarm/drone_state/<id> at 10 Hz
+    - Holds last formation position for 10s on comms loss
+
+
+--------------------------------------------------------------------------------
+2. TECHNOLOGY STACK
+--------------------------------------------------------------------------------
+
+HOST MACHINE
+  Hardware        : Apple MacBook, M4 Pro, 16GB unified memory, 512GB SSD
+  OS              : macOS (latest)
+  GCS             : QGroundControl (native macOS ARM64 build)
+  Container engine: Docker Desktop for Apple Silicon
+  IDE             : VS Code + Remote Containers extension
+
+CONTAINER 1 — px4_sitl
+  Base image      : px4io/px4-dev-ros2-jammy (ARM64)
+  Flight firmware : PX4 Autopilot v1.14
+  Physics sim     : Gazebo Harmonic
+  Wind plugin     : gazebo-wind-plugin (Von Kármán model)
+  Bridge          : uXRCE-DDS Agent (micro-xrce-dds-agent)
+  Languages       : C++ (PX4 firmware), Python (launch scripts)
+
+CONTAINER 2 — ros2_nodes
+  Base image      : osrf/ros:humble-desktop (ARM64)
+  Middleware      : ROS2 Humble Hawksbill
+  DDS             : Eclipse Cyclone DDS (rmw_cyclonedds_cpp)
+  MAVLink bridge  : MAVROS2
+  Control         : custom C++ ROS2 nodes (MPC, ORCA, EKF)
+  AI inference    : PyTorch 2.x (MAPPO actor, CPU inference)
+  Consensus       : custom Python ROS2 node (PBFT)
+  Languages       : C++ (control nodes), Python (AI, consensus, metrics)
+
+CONTAINER 3 — ai_trainer
+  Base image      : pytorch/pytorch:2.2.0 (ARM64)
+  Training lib    : PyTorch 2.x with Apple MPS backend
+  RL framework    : StableBaselines3 or custom MAPPO implementation
+  Gym wrapper     : custom Gazebo environment (gym.Env subclass)
+  Languages       : Python 3.10+
+
+INSTALL COMMAND (inside ros2_nodes container)
+  apt-get install -y ros-humble-mavros ros-humble-mavros-extras
+                     ros-humble-cyclonedds ros-humble-rmw-cyclonedds-cpp
+                     ros-humble-rviz2
+  pip install pyzmq numpy scipy matplotlib pandas pytest torch
+
+
+--------------------------------------------------------------------------------
+3. DOCKER CONTAINER DESIGN
+--------------------------------------------------------------------------------
+
+docker-compose.yml SPECIFICATION
+
+version: '3.8'
+
+services:
+
+  px4_sitl:
+    image: px4io/px4-dev-ros2-jammy
+    platform: linux/arm64
+    container_name: swarmnet_px4
+    environment:
+      - PX4_UXRCE_DDS_AG_IP=ros2_nodes
+      - PX4_UXRCE_DDS_AG_PRT=8888
+      - HEADLESS=1                          # No Gazebo GUI in container
+    volumes:
+      - ./px4_config:/px4_config            # World files, spawn scripts
+      - ./logs/px4:/px4/logs                # PX4 flight logs
+    ports:
+      - "14550-14600:14550-14600/udp"       # MAVLink: one port per drone
+      - "5760-5810:5760-5810/tcp"           # Serial bridge
+    networks:
+      - swarm_net
+    mem_limit: 10g
+    cpus: 6
+
+  ros2_nodes:
+    image: osrf/ros:humble-desktop
+    platform: linux/arm64
+    container_name: swarmnet_ros2
+    environment:
+      - ROS_DOMAIN_ID=0
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - CYCLONEDDS_URI=file:///ros2_ws/cyclone_config.xml
+    volumes:
+      - ./swarmnet_ros2:/ros2_ws/src/swarmnet
+      - ./models:/models                    # Trained MAPPO weights
+      - ./logs/ros2:/ros2_ws/logs
+    depends_on:
+      - px4_sitl
+    networks:
+      - swarm_net
+    mem_limit: 3g
+    cpus: 4
+
+  ai_trainer:
+    image: pytorch/pytorch:2.2.0-cuda11.8-cudnn8-runtime
+    platform: linux/arm64
+    container_name: swarmnet_ai
+    environment:
+      - PYTORCH_ENABLE_MPS_FALLBACK=1
+    volumes:
+      - ./mappo:/workspace/mappo
+      - ./models:/workspace/models
+      - ./logs/training:/workspace/logs
+    networks:
+      - swarm_net
+    mem_limit: 2g
+    cpus: 2
+
+networks:
+  swarm_net:
+    driver: bridge
+
+PORT ALLOCATION
+  MAVLink UDP:    14550 (Vehicle 1 / QGC link)
+                  14551–14599 (Vehicles 2–50)
+  uXRCE-DDS:     8888 (DDS agent port)
+  ROS2 DDS:      automatic discovery via Cyclone DDS multicast
+  RViz2:         forwarded via DISPLAY / XQuartz
+
+
+--------------------------------------------------------------------------------
+4. MODULE BREAKDOWN
+--------------------------------------------------------------------------------
+
+swarmnet_v2/
+|
++-- docker-compose.yml
+|
++-- px4_config/
+|   +-- worlds/
+|   |   +-- swarmnet_world.world        Gazebo world: wind, arena, lighting
+|   |   +-- wind_plugin_config.yaml     Von Karman turbulence parameters
+|   +-- models/
+|   |   +-- x500_swarmnet/              Custom X500 drone model (lighter)
+|   +-- scripts/
+|       +-- drone_spawn.py              Spawns 50 PX4 SITL instances
+|       +-- formation_init.py           Sets initial grid positions
+|
++-- swarmnet_ros2/                      ROS2 workspace src directory
+|   +-- swarmnet_master/                Master drone ROS2 package (Python)
+|   |   +-- master_node.py              Main master orchestrator
+|   |   +-- formation_manager.py        Hungarian algorithm assignment
+|   |   +-- health_monitor.py           Follower failure detection
+|   |   +-- mission_receiver.py         Receives waypoints from QGC/MAVROS2
+|   |
+|   +-- swarmnet_follower/              Follower drone ROS2 package (C++/Py)
+|   |   +-- follower_node.cpp           Main follower orchestrator (C++)
+|   |   +-- ekf_node.cpp                EKF sensor fusion (C++)
+|   |   +-- mpc_node.cpp                Model Predictive Controller (C++)
+|   |   +-- orca_node.cpp               ORCA collision avoidance (C++)
+|   |   +-- mappo_actor_node.py         MAPPO inference node (Python)
+|   |   +-- state_publisher.py          Publishes drone state at 10 Hz
+|   |   +-- comms_watchdog.py           10s hold on comms loss
+|   |
+|   +-- swarmnet_comms/                 Communications package
+|   |   +-- dds_bridge.py               DDS topic management
+|   |   +-- jamming_detector.py         RSSI monitor + FHSS trigger
+|   |   +-- fhss_sim.py                 Frequency hopping simulation
+|   |   +-- pbft_node.py                PBFT three-phase commit
+|   |
+|   +-- swarmnet_metrics/               Metrics package
+|       +-- metric_collector.py         Logs all KPIs per tick
+|       +-- csv_exporter.py             Writes CSV files
+|       +-- plot_generator.py           Matplotlib plots for report
+|
++-- mappo/                              AI training package
+|   +-- env.py                          Gym environment wrapping Gazebo
+|   +-- actor.py                        Per-drone actor network (PyTorch)
+|   +-- critic.py                       Centralized critic network
+|   +-- train.py                        MAPPO training loop
+|   +-- rollout.py                      Episode rollout + buffer
+|   +-- reward.py                       Reward function definition
+|   +-- config.yaml                     Hyperparameters
+|
++-- models/                             Saved MAPPO weights (shared volume)
++-- logs/                               Flight logs, training logs, metrics
++-- tests/
+|   +-- test_ekf.py
+|   +-- test_mpc.py
+|   +-- test_orca.py
+|   +-- test_mappo.py
+|   +-- test_pbft.py
+|   +-- test_formation.py
++-- config/
+|   +-- swarm_config.yaml               Master config (N, spacing, ports)
+|   +-- cyclone_config.xml              CycloneDDS configuration
++-- README.md
+
+
+--------------------------------------------------------------------------------
+5. ALGORITHM SPECIFICATIONS
+--------------------------------------------------------------------------------
+
+5.1 EKF SENSOR FUSION
+----------------------
+
+PURPOSE
+  Estimate true drone position in 3D space by fusing multiple noisy
+  sensors. Critical for maintaining 50cm spacing when GPS is degraded.
+
+STATE VECTOR (15-dimensional)
+  x = [px, py, pz,          # position (m)
+       vx, vy, vz,          # velocity (m/s)
+       roll, pitch, yaw,    # attitude (rad)
+       bx, by, bz,          # accelerometer bias (m/s²)
+       balt]                # barometer bias (m)
+
+SENSOR MODELS
+  IMU (1000 Hz):
+    z_imu = R(q) * (a_true - g) + b_acc + noise_imu
+    Noise: sigma_acc = 0.005 m/s², sigma_gyro = 0.001 rad/s
+
+  Barometer (50 Hz):
+    z_baro = pz + b_alt + noise_baro
+    Noise: sigma_baro = 0.1 m
+
+  Optical Flow (30 Hz):
+    z_flow = [vx, vy] + noise_flow (valid up to 10m/s wind)
+    Noise: sigma_flow = 0.02 m/s
+
+  GPS (10 Hz, degraded under jamming):
+    z_gps = [px, py, pz] + spoof_offset + noise_gps
+    Noise: sigma_gps = 0.5 m (nominal), 10 m (spoofed)
+    When RSSI drops below threshold: GPS weight → 0 (rejected)
+
+EKF CYCLE (every 1ms, fuse available sensor when ready)
+  PREDICT:   x_k = f(x_{k-1}, u_k)      // quadrotor dynamics
+             P_k = F * P_{k-1} * F^T + Q // propagate covariance
+  UPDATE:    K = P_k * H^T * (H*P_k*H^T + R)^{-1}  // Kalman gain
+             x_k = x_k + K * (z - H * x_k)
+             P_k = (I - K*H) * P_k
+
+IMPLEMENTATION
+  C++ ROS2 node: ekf_node.cpp
+  Uses Eigen3 for matrix operations
+  Publishes: /drone_{id}/ekf/state  at 100 Hz (PoseWithCovarianceStamped)
+
+
+5.2 MPC POSITION CONTROLLER
+-----------------------------
+
+PURPOSE
+  Compute optimal thrust sequence that drives drone to formation target
+  while pre-compensating for wind disturbance.
+
+SYSTEM MODEL (discrete, dt = 50ms)
+  x_{k+1} = A * x_k + B * u_k + w_k
+  where:
+    x_k = [px, py, pz, vx, vy, vz]   state
+    u_k = [Fx, Fy, Fz]                thrust forces
+    w_k = wind disturbance (estimated from EKF)
+    A, B = linearized quadrotor dynamics matrices
+
+OPTIMIZATION PROBLEM (solved every 50ms)
+  minimize   sum_{k=0}^{N-1} [ (x_k - x_ref)^T Q (x_k - x_ref)
+                               + u_k^T R u_k ]
+             + (x_N - x_ref)^T P (x_N - x_ref)
+
+  subject to:
+    x_{k+1} = A*x_k + B*u_k + w_k
+    |u_k| <= U_MAX  (thrust limits)
+    |x_k - x_ref| >= 0.5m  (ORCA spacing — soft constraint here)
+
+  Parameters:
+    N = 10 (horizon steps, 500ms at dt=50ms)
+    Q = diag(10, 10, 10, 1, 1, 1)    position error weight
+    R = diag(0.1, 0.1, 0.1)           control effort weight
+    U_MAX = 15 N per axis
+
+SOLVER
+  OSQP (C++ library) — fast QP solver, solves in < 10ms for N=10
+  ROS2 node: mpc_node.cpp
+  Publishes: /drone_{id}/mpc/thrust_setpoint at 20 Hz
+
+
+5.3 ORCA COLLISION AVOIDANCE
+------------------------------
+
+PURPOSE
+  Post-process MPC velocity commands to guarantee minimum 50cm spacing.
+  Each drone independently computes a collision-free velocity.
+
+INPUTS PER DRONE (every 20ms)
+  - Own position (px, py, pz) from EKF
+  - Own velocity (vx, vy, vz) from EKF
+  - Positions and velocities of K nearest drones from DDS state topic
+    (K = 10 nearest, found via K-D tree on gossip state)
+
+VELOCITY OBSTACLE (VO) CONSTRUCTION
+  For each neighbor j:
+    VO_ij = { v | exists t in [0, tau]: p_ij + t*(v - v_j) in D(r_ij) }
+    where:
+      p_ij = p_i - p_j            relative position
+      r_ij = 0.5m                 sum of safety radii (0.25m each)
+      tau = 1.0s                  time horizon
+      D(r) = disk of radius r     collision region
+
+  ORCA half-plane:
+    ORCA_ij = { v | (v - (v_pref + u/2)) . n >= 0 }
+    where u = closest point on boundary of VO to v_pref
+
+LINEAR PROGRAM
+  Find v_new that:
+    - Satisfies all ORCA_ij half-planes (one per neighbor)
+    - Minimizes |v_new - v_mpc|  (stay close to MPC command)
+  Solved via LP in O(K) time (< 2ms for K=10)
+
+EMERGENCY STOP
+  If any neighbor within 0.3m: publish EMERGENCY_HOVER immediately.
+  Overrides all other commands.
+
+IMPLEMENTATION
+  C++ ROS2 node: orca_node.cpp
+  Uses libRVO2-3D (3D extension of RVO2 library)
+  Publishes: /drone_{id}/orca/velocity_cmd at 50 Hz
+
+
+5.4 MAPPO AI SWARM CONTROLLER
+-------------------------------
+
+PURPOSE
+  Replace hand-tuned MPC weights with a learned control policy that
+  generalizes across weather, jamming, and dynamic formation changes.
+
+ARCHITECTURE
+  Centralized Training / Decentralized Execution (CTDE):
+    Training:  Master runs centralized critic (sees all 50 drones)
+    Inference: Each follower runs own actor (sees local observation only)
+
+OBSERVATION SPACE (per drone, 47-dimensional)
+  own_pos:          [px, py, pz]                          3
+  own_vel:          [vx, vy, vz]                          3
+  own_target_delta: [dx, dy, dz] to formation target      3
+  neighbor_rel_pos: [dx,dy,dz] × 10 nearest drones       30
+  neighbor_rel_vel: [dvx,dvy,dvz] × 10 nearest           (compressed 3)
+  wind_estimate:    [wx, wy, wz]                          3
+  battery:          [b]                                   1
+  raft_state:       [0=follower, 1=leader]                1
+  Total:                                                  47
+
+ACTION SPACE (per drone, 4-dimensional, continuous)
+  [delta_thrust_x, delta_thrust_y, delta_thrust_z, delta_yaw_rate]
+  Range: [-1, 1] normalized, scaled by MAX_THRUST at execution
+
+REWARD FUNCTION (per step, per drone)
+  R = w1 * formation_reward
+    + w2 * collision_penalty
+    + w3 * energy_penalty
+    + w4 * task_completion_bonus
+
+  formation_reward  = -||pos_i - target_i||^2 / scale
+  collision_penalty = -1000  if dist(i,j) < 0.5m for any j
+                    = 0      otherwise
+  energy_penalty    = -||action||^2 * 0.01
+  task_completion   = +100   if all drones within 5cm of target
+
+  Weights: w1=1.0, w2=5.0, w3=0.1, w4=2.0
+
+ACTOR NETWORK (per drone)
+  Input:  47-dim observation vector
+  Layer1: Linear(47 → 128) + LayerNorm + Tanh
+  Layer2: Linear(128 → 128) + LayerNorm + Tanh
+  Layer3: Linear(128 → 64) + Tanh
+  Output: Linear(64 → 4) + Tanh  → action mean
+          Linear(64 → 4) + Softplus → action std (for stochastic policy)
+  Total parameters: ~35,000
+
+CRITIC NETWORK (centralized, master only during training)
+  Input:  47 * 50 = 2350-dim global state vector
+  Layer1: Linear(2350 → 512) + LayerNorm + ReLU
+  Layer2: Linear(512 → 256) + ReLU
+  Layer3: Linear(256 → 128) + ReLU
+  Output: Linear(128 → 1) → value estimate
+  Total parameters: ~1.4M
+
+MAPPO TRAINING LOOP
+  1. Collect T=2000 steps from 50 drones in Gazebo (rollout buffer)
+  2. Compute advantages using GAE (gamma=0.99, lambda=0.95)
+  3. Update critic: minimize MSE(V(s), returns) for K=10 epochs
+  4. Update actor: maximize clipped PPO objective, clip=0.2
+  5. Entropy bonus: 0.01 * H(pi) to encourage exploration
+  6. Repeat for 10,000+ episodes
+  7. Save best actor weights to /models/mappo_actor.pt
+
+APPLE MPS TRAINING
+  device = torch.device("mps")  # M4 Pro GPU
+  All tensors and networks moved to MPS device
+  Expected training speed: ~3x faster than CPU on M4 Pro
+
+INFERENCE DEPLOYMENT
+  Load: actor.load_state_dict(torch.load('/models/mappo_actor.pt'))
+  Run on CPU in follower ROS2 node (MPS not available in Docker CPU mode)
+  Latency: < 5ms per inference on M4 Pro CPU (35K param network)
+  Fallback: if inference > 40ms → use MPC output instead
+
+
+5.5 FHSS JAMMING DEFENSE
+--------------------------
+
+PURPOSE
+  Simulate frequency-hopping spread spectrum to maintain comms under
+  RF jamming. Detect jamming early via RSSI monitoring.
+
+RSSI MONITORING
+  Each drone monitors simulated signal strength of DDS heartbeats.
+  RSSI modeled as: RSSI = RSSI_nominal - jammer_power * distance_factor
+  Jam detection threshold: RSSI < -85 dBm
+
+FHSS SIMULATION
+  15 virtual channels defined (ports 7400–7414 in Cyclone DDS config)
+  Hopping sequence: pseudo-random, seeded with shared swarm key
+  Hop rate: every 100ms under normal operation
+  Forced hop: immediately on jam detection
+  Channel unavailable: simulated by dropping all DDS messages on port
+
+JAMMING INJECTION (test mode)
+  JammerNode publishes /swarm/jammer topic with:
+    intensity:  0.0 – 1.0  (fraction of messages dropped)
+    spoof_gps:  True/False  (activates GPS spoof offset)
+    spoof_mag:  0 – 10 m   (GPS offset magnitude)
+
+GPS SPOOFING RESPONSE
+  EKF detects spoofing: GPS innovation > 3σ threshold → reject GPS
+  Fallback: optical flow + IMU dead reckoning
+  Alert: publish /swarm/alerts/gps_spoofed (triggers PBFT lockdown)
+
+
+5.6 PBFT BYZANTINE CONSENSUS
+------------------------------
+
+PURPOSE
+  Ensure critical swarm commands (formation change, abort, emergency land)
+  cannot be executed by a compromised or malfunctioning drone.
+
+PARAMETERS
+  N = 50 drones total
+  f = floor(50/3) = 16 maximum Byzantine faults tolerated
+  Quorum = 2f+1 = 33 drones must agree for command to execute
+
+THREE-PHASE PROTOCOL (per critical command)
+
+  PHASE 1 — PRE-PREPARE (Master → All)
+    Message: {type: PRE_PREPARE, view: v, seq: n, cmd: C, digest: H(C)}
+    Master signs with its private key (simulated HMAC)
+
+  PHASE 2 — PREPARE (All → All)
+    On valid pre-prepare: each honest drone broadcasts:
+    Message: {type: PREPARE, view: v, seq: n, digest: H(C), drone_id: i}
+    Drone proceeds to commit phase after receiving 2f PREPARE messages
+    matching the same (view, seq, digest)
+
+  PHASE 3 — COMMIT (All → All)
+    Message: {type: COMMIT, view: v, seq: n, digest: H(C), drone_id: i}
+    Drone executes command after receiving 2f+1 COMMIT messages
+
+  VIEW CHANGE (on primary failure)
+    Drone suspects primary if no pre-prepare in 2s (timeout)
+    Broadcasts: {type: VIEW_CHANGE, new_view: v+1, drone_id: i}
+    New primary = argmin(drone_id) of alive drones (deterministic)
+    New primary starts after 2f+1 VIEW_CHANGE messages received
+
+MESSAGE COMPLEXITY
+  Pre-prepare: O(N)    (1 master → N drones)
+  Prepare:     O(N²)   (N drones → N drones)
+  Commit:      O(N²)   (N drones → N drones)
+  Total per command: O(N²) = ~2500 messages for N=50
+
+PBFT SCOPE (what it protects)
+  Protected commands:    CHANGE_FORMATION, EMERGENCY_LAND, ABORT_MISSION,
+                         RETURN_TO_HOME, SWARM_HALT
+  Not protected:         Position updates, state gossip, heartbeats
+                         (these are too frequent for PBFT overhead)
+
+IMPLEMENTATION
+  Python ROS2 node: pbft_node.py
+  One instance per drone (master and followers)
+  Subscribes: /swarm/pbft/incoming
+  Publishes:  /swarm/pbft/outgoing
+
+
+5.7 HUNGARIAN FORMATION ASSIGNMENT
+-------------------------------------
+
+PURPOSE
+  Optimally assign N formation target positions to N drones to minimize
+  total travel distance during formation transitions.
+
+ALGORITHM
+  Input:  N drone positions, N target positions
+  Output: bijective assignment drone_i → target_j
+
+  1. Build N×N cost matrix C where C[i][j] = ||drone_i - target_j||²
+  2. Run Hungarian algorithm (Kuhn-Munkres): O(N³)
+     With N=50: O(125,000) operations — completes in < 1ms
+  3. Output assignment array: assignment[i] = j
+  4. Publish /swarm/formation_targets with per-drone targets
+
+LIBRARY
+  scipy.optimize.linear_sum_assignment (Python, in master_node.py)
+  Re-runs every time: formation changes, drone fails, drone recovers
+
+FORMATION PRESETS
+  V_FORMATION:     positions on two diagonal lines from master
+  GRID_FORMATION:  7×7 grid with 2m spacing (50 positions)
+  CIRCLE:          concentric rings (master center, 49 on rings)
+  LINE:            single file, 2m spacing
+  CUSTOM:          loaded from YAML file
+
+
+--------------------------------------------------------------------------------
+6. COMMUNICATION ARCHITECTURE
+--------------------------------------------------------------------------------
+
+PROTOCOL STACK
+
+  QGroundControl ←→ MAVLink v2 UDP ←→ MAVROS2 ←→ ROS2 topics
+  PX4 firmware   ←→ uXRCE-DDS     ←→ ROS2 topics
+  Drone ↔ Drone  ←→ Cyclone DDS   ←→ ROS2 topics (pub/sub)
+  PBFT           ←→ Cyclone DDS   ←→ /swarm/pbft/* topics
+
+ROS2 TOPIC DESIGN
+
+  /swarm/formation_targets         (master publishes, all drones subscribe)
+    Type: swarmnet_msgs/FormationTargets
+    Rate: on change (formation update)
+    Content: array of 50 PoseStamped targets with drone_id assignment
+
+  /swarm/drone_state/<drone_id>    (each drone publishes)
+    Type: swarmnet_msgs/DroneState
+    Rate: 10 Hz
+    Content: position, velocity, battery, raft_state, task, alive
+
+  /drone_<id>/ekf/state            (EKF node publishes)
+    Type: geometry_msgs/PoseWithCovarianceStamped
+    Rate: 100 Hz
+
+  /drone_<id>/mpc/thrust_setpoint  (MPC node publishes)
+    Type: geometry_msgs/Vector3Stamped
+    Rate: 20 Hz
+
+  /drone_<id>/orca/velocity_cmd    (ORCA node publishes)
+    Type: geometry_msgs/TwistStamped
+    Rate: 50 Hz
+
+  /drone_<id>/px4/offboard_setpoint (sent to PX4 via uXRCE-DDS)
+    Type: px4_msgs/TrajectorySetpoint
+    Rate: 50 Hz (PX4 requires > 2 Hz in OFFBOARD mode)
+
+  /swarm/jammer                    (test node publishes for benchmarks)
+    Type: swarmnet_msgs/JammerState
+    Rate: on change
+
+  /swarm/alerts/<type>             (any drone publishes alerts)
+    Type: std_msgs/String
+    Rate: event-driven
+
+  /swarm/pbft/incoming             (PBFT messages, all drones)
+  /swarm/pbft/outgoing             (PBFT messages, per drone)
+    Type: swarmnet_msgs/PBFTMessage
+
+  /swarm/metrics                   (metrics collector subscribes to all)
+    Aggregated at: swarmnet_metrics/metric_collector.py
+
+CYCLONE DDS CONFIGURATION
+  ROS_DOMAIN_ID = 0 (all containers on same domain)
+  Discovery: multicast on swarm_net Docker bridge
+  Reliability: RELIABLE for control topics, BEST_EFFORT for telemetry
+  History depth: 10 for control, 1 for state broadcast
+
+
+--------------------------------------------------------------------------------
+7. DATA STRUCTURES & ROS2 TOPIC TYPES
+--------------------------------------------------------------------------------
+
+swarmnet_msgs/DroneState.msg
+  uint8   drone_id
+  float64 x, y, z                   # EKF position estimate (m)
+  float64 vx, vy, vz                # EKF velocity (m/s)
+  float64 roll, pitch, yaw          # attitude (rad)
+  float32 battery                   # 0.0 – 100.0 %
+  uint8   raft_state                # 0=follower, 1=candidate, 2=leader
+  uint8   flight_mode               # 0=hold, 1=offboard, 2=RTL, 3=land
+  string  task                      # current assigned task
+  bool    alive
+  bool    gps_healthy
+  bool    comms_healthy
+  float64 timestamp                 # Unix epoch
+
+swarmnet_msgs/FormationTargets.msg
+  uint8                formation_type    # 0=grid, 1=V, 2=circle, 3=line
+  swarmnet_msgs/DroneTarget[] targets   # one per drone
+
+swarmnet_msgs/DroneTarget.msg
+  uint8   drone_id
+  float64 target_x, target_y, target_z  # absolute position (m)
+  float64 target_yaw                     # heading (rad)
+
+swarmnet_msgs/PBFTMessage.msg
+  uint8  phase          # 0=PRE_PREPARE, 1=PREPARE, 2=COMMIT, 3=VIEW_CHANGE
+  uint32 view
+  uint32 seq_num
+  string command
+  string digest         # SHA256 of command
+  uint8  sender_id
+  string signature      # HMAC (simulated)
+
+swarmnet_msgs/JammerState.msg
+  float32 intensity     # 0.0–1.0 message drop rate
+  bool    gps_spoof
+  float32 spoof_magnitude_m
+  float32 rssi_floor_dbm
+
+
+--------------------------------------------------------------------------------
+8. PX4 SITL CONFIGURATION
+--------------------------------------------------------------------------------
+
+SPAWN SCRIPT: drone_spawn.py
+
+  Spawns 50 PX4 SITL instances with unique parameters:
+    MAV_SYS_ID:    1–50 (unique vehicle ID)
+    UDP port:      14550–14599 (MAVLink to QGC)
+    DDS port:      incremented from base 8888
+    Gazebo model:  x500_swarmnet (spawned at grid positions)
+    Initial pos:   7×7 grid with 2m spacing, centered at origin
+
+  Grid position formula:
+    row = (drone_id - 1) // 7
+    col = (drone_id - 1) % 7
+    x_init = (col - 3) * 2.0    # meters
+    y_init = (row - 3) * 2.0    # meters
+    z_init = 5.0                  # meters altitude
+
+PX4 PARAMETERS (per drone, set via MAVLink)
+  SYS_VEHICLE_TYPE  = 1 (multicopter)
+  COM_RCL_EXCEPT    = 4 (allow offboard without RC)
+  NAV_RCL_ACT       = 0 (no RC loss action in sim)
+  EKF2_AID_MASK     = 1 (GPS) → 24 (optical flow) under jamming
+  MPC_XY_P          = 0.95 (position P gain, tuned for 50cm spacing)
+  MPC_Z_P           = 1.0
+
+PX4 FLIGHT MODES USED
+  OFFBOARD:  primary mode. ROS2 sends TrajectorySetpoint at 50 Hz.
+  HOLD:      fallback on comms loss (10s autonomous hold).
+  LAND:      triggered by PBFT emergency command.
+  RTL:       triggered by low battery (< 20%).
+
+
+--------------------------------------------------------------------------------
+9. GAZEBO WORLD SPECIFICATION
+--------------------------------------------------------------------------------
+
+FILE: swarmnet_world.world
+
+ARENA
+  Size: 100m × 100m × 50m
+  Ground plane with grass texture
+  Lighting: directional sunlight + ambient
+
+WIND PLUGIN (Von Kármán Turbulence Model)
+  Plugin: libgazebo_wind_plugin.so
+  Parameters:
+    wind_velocity_mean: configurable (0, 5, 10, 15 m/s)
+    wind_direction:     [1, 0, 0] (East, configurable)
+    turbulence_scale:   0.2 (20% fluctuation)
+    turbulence_freq:    0.1 Hz base frequency
+    Von_Karman_L:       762 m (standard atmospheric length scale)
+  Applied to: every drone model's aerodynamic link
+
+DRONE MODEL: x500_swarmnet
+  Base: PX4 X500 quadrotor model (lighter mesh for 50 instances)
+  Mass: 2.0 kg
+  Rotor: 4× props, KV=900
+  Sensors: simulated IMU, baro, optical flow, GPS (all via Gazebo plugins)
+  Collision geometry: sphere radius 0.25m (50cm total between two drones)
+
+PERFORMANCE TUNING FOR 50 INSTANCES
+  physics_engine: Bullet (lighter than ODE for 50 models)
+  update_rate:    500 Hz (physics), 30 Hz (rendering if headless=0)
+  max_step_size:  0.002 (2ms physics step)
+  real_time_factor: 1.0 (target real time, may drop to 0.5 under load)
+
+
+--------------------------------------------------------------------------------
+10. FILE & FOLDER STRUCTURE
+--------------------------------------------------------------------------------
+
+swarmnet_v2/
+├── docker-compose.yml                 # Orchestrates all containers
+├── .env                               # Port base, N_DRONES, seed
+│
+├── px4_config/
+│   ├── worlds/
+│   │   ├── swarmnet_world.world       # Gazebo world definition
+│   │   └── wind_plugin_config.yaml
+│   ├── models/
+│   │   └── x500_swarmnet/             # Drone SDF model
+│   └── scripts/
+│       ├── drone_spawn.py             # Launch 50 PX4 SITL instances
+│       └── formation_init.py          # Set initial grid positions
+│
+├── swarmnet_ros2/                     # ROS2 workspace src
+│   ├── swarmnet_msgs/                 # Custom message definitions
+│   │   ├── msg/
+│   │   │   ├── DroneState.msg
+│   │   │   ├── FormationTargets.msg
+│   │   │   ├── DroneTarget.msg
+│   │   │   ├── PBFTMessage.msg
+│   │   │   └── JammerState.msg
+│   │   └── CMakeLists.txt
+│   │
+│   ├── swarmnet_master/               # Master drone package
+│   │   ├── swarmnet_master/
+│   │   │   ├── master_node.py
+│   │   │   ├── formation_manager.py
+│   │   │   ├── health_monitor.py
+│   │   │   └── mission_receiver.py
+│   │   ├── setup.py
+│   │   └── package.xml
+│   │
+│   ├── swarmnet_follower/             # Follower drone package (C++)
+│   │   ├── src/
+│   │   │   ├── follower_node.cpp
+│   │   │   ├── ekf_node.cpp
+│   │   │   ├── mpc_node.cpp
+│   │   │   └── orca_node.cpp
+│   │   ├── swarmnet_follower/
+│   │   │   ├── mappo_actor_node.py
+│   │   │   ├── state_publisher.py
+│   │   │   └── comms_watchdog.py
+│   │   ├── CMakeLists.txt
+│   │   └── package.xml
+│   │
+│   ├── swarmnet_comms/
+│   │   ├── swarmnet_comms/
+│   │   │   ├── dds_bridge.py
+│   │   │   ├── jamming_detector.py
+│   │   │   ├── fhss_sim.py
+│   │   │   └── pbft_node.py
+│   │   └── package.xml
+│   │
+│   └── swarmnet_metrics/
+│       ├── swarmnet_metrics/
+│       │   ├── metric_collector.py
+│       │   ├── csv_exporter.py
+│       │   └── plot_generator.py
+│       └── package.xml
+│
+├── mappo/                             # AI training (Container 3)
+│   ├── env.py                         # Gym environment
+│   ├── actor.py                       # Actor network
+│   ├── critic.py                      # Centralized critic
+│   ├── train.py                       # Training loop
+│   ├── rollout.py                     # Rollout buffer
+│   ├── reward.py                      # Reward function
+│   └── config.yaml                    # Hyperparameters
+│
+├── models/                            # Trained MAPPO weights
+│   └── mappo_actor.pt                 # Best actor weights
+│
+├── config/
+│   ├── swarm_config.yaml              # Master config
+│   └── cyclone_config.xml             # CycloneDDS config
+│
+├── tests/
+│   ├── test_ekf.py
+│   ├── test_mpc.py
+│   ├── test_orca.py
+│   ├── test_mappo.py
+│   ├── test_pbft.py
+│   └── test_formation.py
+│
+├── logs/                              # Auto-created at runtime
+│   ├── px4/                           # PX4 ULog files
+│   ├── ros2/                          # ROS2 bag files
+│   └── training/                      # MAPPO training logs
+│
+└── README.md
+
+
+--------------------------------------------------------------------------------
+11. API & INTERFACE SPECIFICATIONS
+--------------------------------------------------------------------------------
+
+QGC INTERFACE (MAVLink v2)
+  Connection: UDP localhost:14550 (Vehicle 1 / Master)
+  Secondary:  UDP localhost:14551–14599 (Vehicles 2–50)
+  Streams:    HEARTBEAT, GLOBAL_POSITION_INT, ATTITUDE,
+              BATTERY_STATUS, SYS_STATUS, GPS_RAW_INT
+
+MASTER NODE ROS2 SERVICES
+  /swarm/change_formation   (swarmnet_msgs/srv/ChangeFormation)
+    Request:  formation_type (uint8), waypoint (PoseStamped)
+    Response: success (bool), assignment (DroneTarget[])
+
+  /swarm/emergency_land     (std_srvs/srv/Trigger)
+    Triggers PBFT EMERGENCY_LAND command
+
+  /swarm/get_status         (swarmnet_msgs/srv/GetSwarmStatus)
+    Response: all DroneState[], leader_id, formation_error_rms
+
+METRICS HTTP API (Flask, port 5001 inside ros2_nodes)
+  GET  /metrics/current     → JSON: all KPIs at current timestep
+  GET  /metrics/export      → CSV file download
+  POST /jammer/set          → Body: {intensity, gps_spoof, magnitude}
+  POST /formation/change    → Body: {type: "grid"|"V"|"circle"}
+  POST /drone/kill/<id>     → Simulate drone failure
+
+MAPPO TRAINING SCRIPT
+  python3 mappo/train.py \
+    --n-drones 50 \
+    --episodes 10000 \
+    --device mps \
+    --save-path /workspace/models/mappo_actor.pt \
+    --wind-speed 10 \
+    --jamming 0.3
+
+
+--------------------------------------------------------------------------------
+12. CONFIGURATION FILES
+--------------------------------------------------------------------------------
+
+config/swarm_config.yaml
+  swarm:
+    n_drones: 50
+    n_master: 1
+    base_mavlink_port: 14550
+    base_dds_port: 8888
+    arena_size_m: [100, 100, 50]
+    initial_altitude_m: 5.0
+    initial_grid_spacing_m: 2.0
+
+  formation:
+    min_spacing_m: 0.5
+    emergency_stop_m: 0.3
+    nominal_spacing_m: 2.0
+    transition_speed_ms: 1.0
+
+  ekf:
+    sigma_acc: 0.005
+    sigma_gyro: 0.001
+    sigma_baro: 0.1
+    sigma_flow: 0.02
+    sigma_gps_nominal: 0.5
+    gps_reject_threshold_sigma: 3.0
+
+  mpc:
+    horizon_steps: 10
+    dt_s: 0.05
+    q_pos: 10.0
+    q_vel: 1.0
+    r_thrust: 0.1
+    u_max_n: 15.0
+
+  orca:
+    tau_s: 1.0
+    safety_radius_m: 0.25
+    k_neighbors: 10
+    loop_rate_hz: 50
+
+  mappo:
+    obs_dim: 47
+    action_dim: 4
+    actor_hidden: [128, 128, 64]
+    critic_hidden: [512, 256, 128]
+    lr_actor: 3.0e-4
+    lr_critic: 1.0e-3
+    gamma: 0.99
+    gae_lambda: 0.95
+    clip_eps: 0.2
+    entropy_coef: 0.01
+    n_epochs: 10
+    batch_size: 2048
+    rollout_steps: 2000
+
+  pbft:
+    timeout_s: 2.0
+    max_byzantine: 16
+
+  wind:
+    speed_ms: 10.0
+    direction: [1.0, 0.0, 0.0]
+    turbulence_scale: 0.2
+
+  jamming:
+    intensity: 0.0
+    gps_spoof: false
+    spoof_magnitude_m: 0.0
+
+  random_seed: 42
+
+
+--------------------------------------------------------------------------------
+13. TESTING REQUIREMENTS
+--------------------------------------------------------------------------------
+
+UNIT TESTS (pytest)
+
+  test_ekf.py
+    - test_ekf_converges_without_wind()
+    - test_ekf_rejects_spoofed_gps()
+    - test_ekf_maintains_estimate_gps_denied()
+    - test_ekf_position_error_under_15ms_wind()
+
+  test_mpc.py
+    - test_mpc_reaches_target_in_calm()
+    - test_mpc_precompensates_known_wind()
+    - test_mpc_solves_in_under_50ms()
+    - test_mpc_respects_thrust_limits()
+
+  test_orca.py
+    - test_orca_no_violation_static_grid()
+    - test_orca_no_violation_formation_transition()
+    - test_orca_emergency_stop_at_30cm()
+    - test_orca_solves_in_under_5ms_k10()
+
+  test_mappo.py
+    - test_actor_output_in_action_bounds()
+    - test_actor_inference_under_40ms()
+    - test_critic_forward_pass()
+    - test_reward_positive_on_good_formation()
+    - test_reward_negative_on_collision()
+
+  test_pbft.py
+    - test_command_executes_on_quorum()
+    - test_command_rejected_below_quorum()
+    - test_byzantine_drone_command_rejected()
+    - test_view_change_on_primary_failure()
+    - test_pbft_commit_under_200ms_n50()
+
+  test_formation.py
+    - test_hungarian_optimal_assignment_n50()
+    - test_grid_positions_correct()
+    - test_v_formation_positions_correct()
+    - test_transition_no_collisions()
+
+INTEGRATION TEST
+  tests/test_integration.py
+    - Spawn 10 drones (reduced N for CI)
+    - Verify all appear on DDS /swarm/drone_state topics
+    - Kill drone 5 → verify formation rebalances in < 5s
+    - Enable 10 m/s wind → verify formation error < 15cm RMS
+    - Trigger PBFT emergency land → verify all drones land
+
+COVERAGE TARGET
+  pytest --cov=swarmnet_ros2 --cov-report=term-missing
+  Minimum 75% line coverage on all Python modules.
+  C++ modules: test via ROS2 launch test framework.
+
+
+--------------------------------------------------------------------------------
+14. PERFORMANCE BENCHMARKS
+--------------------------------------------------------------------------------
+
+BENCHMARK 1 — FORMATION ERROR vs WIND SPEED
+  N = 50, no jamming
+  Wind speeds: 0, 5, 10, 15 m/s
+  Controllers tested: PID (baseline), MPC, MAPPO
+  Metric: RMS formation error over 60s run
+  Runs: 5 per configuration (different random seeds)
+  Plot: bar chart, error ± std dev per controller per wind speed
+
+BENCHMARK 2 — COLLISION RATE vs JAMMING INTENSITY
+  N = 50, wind = 10 m/s
+  Jamming: 0%, 10%, 30%, 50%, 70%
+  Metric: ORCA violations (dist < 50cm) per 60s
+  Expected: zero violations at 0–30% jamming
+  Plot: line chart of violation count vs jamming %
+
+BENCHMARK 3 — MAPPO TRAINING CURVE
+  N = 50 (or 10 for fast iteration)
+  Metric: mean episode reward vs training episode number
+  Expected: monotonically increasing over 10,000 episodes
+  Plot: reward curve with rolling average
+
+BENCHMARK 4 — PBFT LATENCY vs N
+  N values: 10, 20, 30, 40, 50
+  Metric: time from command issue to commit (ms)
+  Expected: < 200ms for all N <= 50
+  Plot: box plot of latency per N
+
+BENCHMARK 5 — SYSTEM RESOURCE USAGE
+  Measure over 60s run at N=50, wind=10m/s, jamming=30%
+  Metrics: Docker container RAM (GB), CPU % per container
+  Expected: Total RAM < 14GB
+  Plot: time-series of resource usage
+
+ALL BENCHMARKS
+  Fixed seed: 42
+  Output: /logs/benchmarks/<timestamp>/
+  Auto-generates: CSV data + matplotlib PNG plots
+
+
+--------------------------------------------------------------------------------
+15. DEPLOYMENT & RUN INSTRUCTIONS
+--------------------------------------------------------------------------------
+
+PREREQUISITES (macOS M4 Pro)
+  1. Docker Desktop (Apple Silicon) — 12GB RAM, 8 CPU allocated
+  2. XQuartz — brew install --cask xquartz (restart Mac after)
+  3. VS Code + Remote Containers extension
+  4. QGroundControl — native macOS ARM64 build from qgroundcontrol.com
+
+FIRST-TIME SETUP
+  git clone https://github.com/yourusername/swarmnet_v2.git
+  cd swarmnet_v2
+  docker compose pull                   # Pull all images (~15GB total)
+
+LAUNCH SIMULATION
+  docker compose up -d                  # Start all containers
+  docker exec -it swarmnet_px4 bash     # Enter PX4 container
+  python3 /px4_config/scripts/drone_spawn.py --n 50
+
+LAUNCH ROS2 NODES
+  docker exec -it swarmnet_ros2 bash
+  source /opt/ros/humble/setup.bash
+  cd /ros2_ws
+  colcon build --packages-select swarmnet_msgs swarmnet_master \
+               swarmnet_follower swarmnet_comms swarmnet_metrics
+  source install/setup.bash
+  ros2 launch swarmnet_master master.launch.py n_drones:=50
+
+CONNECT QGC
+  Open QGroundControl on macOS
+  Application Settings → Comm Links → Add UDP → Port 14550
+  All 50 vehicles will appear on map
+
+LAUNCH RVIZ2
+  ros2 launch swarmnet_metrics rviz2.launch.py
+
+TRAIN MAPPO
+  docker exec -it swarmnet_ai bash
+  cd /workspace/mappo
+  python3 train.py --n-drones 10 --episodes 5000 --device mps
+  # After training: weights saved to /workspace/models/mappo_actor.pt
+
+RUN BENCHMARKS
+  docker exec -it swarmnet_ros2 bash
+  python3 -m swarmnet_metrics.plot_generator --benchmark all
+
+RUN TESTS
+  docker exec -it swarmnet_ros2 bash
+  pytest /ros2_ws/tests/ -v --cov=swarmnet_ros2
+
+STOP ALL CONTAINERS
+  docker compose down
+
+KILL ALL SITL PROCESSES (if stuck)
+  docker exec swarmnet_px4 pkill -f px4
+
+EXPECTED TERMINAL OUTPUT ON LAUNCH
+  [SPAWN] Launching drone 1 on port 14550 at pos (0.0, 0.0, 5.0)
+  [SPAWN] Launching drone 2 on port 14551 at pos (2.0, 0.0, 5.0)
+  ...
+  [SPAWN] Launching drone 50 on port 14599 at pos (6.0, 6.0, 5.0)
+  [MASTER] Formation manager initialized. N=50
+  [MASTER] Hungarian assignment complete in 0.8ms
+  [DDS] All 50 drones publishing /swarm/drone_state
+  [EKF] Drone 1: EKF converged. pos_error=0.02m
+  [ORCA] Spacing check: min_dist=1.98m (OK)
+  [QGC] 50 vehicles connected via MAVLink
+
+
+================================================================================
+END OF TECHNICAL REQUIREMENTS DOCUMENT
+SwarmNet v2.0 | Research-Level CS Project | August 2026
+================================================================================
