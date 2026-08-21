@@ -1,10 +1,3 @@
-"""
-gossip_agent.py - Periodic push gossip for Phase 2 state synchronization.
-
-The agent owns a local GossipStateTable, pushes it to a random peer fanout,
-and records local convergence when all expected drones have fresh entries.
-"""
-
 from __future__ import annotations
 
 import logging

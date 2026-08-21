@@ -1,10 +1,3 @@
-"""
-collector.py - Metrics collector for SwarmNet.
-
-Logs election, gossip, and formation events with timestamps. Phase 2 adds CSV
-export so gossip convergence data can be used in reports and benchmarks.
-"""
-
 from __future__ import annotations
 
 import csv

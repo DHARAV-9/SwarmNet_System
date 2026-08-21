@@ -1,5 +1,3 @@
-"""Tests for the Phase 4 Flask dashboard API."""
-
 from __future__ import annotations
 
 import csv
