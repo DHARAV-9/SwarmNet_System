@@ -1,0 +1,7 @@
+.env
+PX4-Autopilot/
+logs/
+models/
+build/
+install/
+log/
