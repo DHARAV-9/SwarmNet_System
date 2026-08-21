@@ -1,0 +1,16 @@
+swarm:
+  n_drones: 50
+  master_id: 1
+  base_mavlink_port: 14550
+  grid_width: 7
+  initial_grid_spacing_m: 2.0
+  initial_altitude_m: 5.0
+
+formation:
+  type: grid
+  hold_rate_hz: 20.0
+  target_yaw_rad: 0.0
+
+resource_limits:
+  total_ram_budget_gb: 14.0
+  sample_interval_s: 1.0

@@ -1,0 +1,66 @@
+name: swarmnet-v2
+
+services:
+  px4_sitl:
+    image: px4io/px4-dev-ros2-jammy
+    platform: ${PX4_PLATFORM:-linux/amd64}
+    container_name: swarmnet_px4
+    working_dir: /workspace/PX4-Autopilot
+    environment:
+      DISPLAY: ${DISPLAY:-host.docker.internal:0}
+      HEADLESS: ${HEADLESS:-0}
+      PX4_SIM_HOST_ADDR: 0.0.0.0
+      PX4_GZ_MODEL: x500
+      PX4_GZ_STANDALONE: 0
+    volumes:
+      - ${PX4_SOURCE_DIR:-./PX4-Autopilot}:/workspace/PX4-Autopilot
+      - ./px4_config:/px4_config:ro
+      - ./logs/px4:/workspace/PX4-Autopilot/logs
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    ports:
+      - "14550-14599:14550-14599/udp"
+      - "14540-14589:14540-14589/udp"
+    networks:
+      - swarm_net
+    command: ["bash", "-lc", "tail -f /dev/null"]
+    mem_limit: 9g
+    cpus: 5.0
+
+  ros2_nodes:
+    build: ./swarmnet_ros2
+    image: swarmnet/ros2-nodes:phase2
+    platform: ${ROS_PLATFORM:-linux/arm64}
+    container_name: swarmnet_ros2
+    environment:
+      ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-0}
+      RMW_IMPLEMENTATION: rmw_cyclonedds_cpp
+      CYCLONEDDS_URI: file:///ros2_ws/src/swarmnet/config/cyclone_config.xml
+    volumes:
+      - ./swarmnet_ros2:/ros2_ws/src/swarmnet
+      - ./logs/ros2:/ros2_ws/logs
+      - ./config:/ros2_ws/src/swarmnet/config:ro
+    depends_on:
+      - px4_sitl
+    networks:
+      - swarm_net
+    command: ["bash", "-lc", "tail -f /dev/null"]
+    mem_limit: 3g
+    cpus: 2.5
+
+  ai_trainer:
+    image: pytorch/pytorch:2.2.0
+    platform: ${AI_PLATFORM:-linux/arm64}
+    container_name: swarmnet_ai
+    volumes:
+      - ./mappo:/workspace/mappo
+      - ./models:/workspace/models
+      - ./logs/training:/workspace/logs
+    networks:
+      - swarm_net
+    command: ["bash", "-lc", "tail -f /dev/null"]
+    mem_limit: 1g
+    cpus: 0.5
+
+networks:
+  swarm_net:
+    driver: bridge
