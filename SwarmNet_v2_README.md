@@ -6,7 +6,6 @@
 > ORCA collision avoidance, EKF sensor fusion, and PBFT Byzantine fault tolerance.  
 > Runs entirely in Docker on macOS Apple Silicon — no physical drones required.
 
----
 
 [![Platform](https://img.shields.io/badge/platform-macOS%20Apple%20Silicon-black)](https://www.apple.com/mac/)
 [![Docker](https://img.shields.io/badge/docker-required-blue)](https://www.docker.com/)
@@ -15,7 +14,6 @@
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.x%20MPS-red)](https://pytorch.org/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
----
 
 ## What is SwarmNet v2.0?
 
@@ -28,12 +26,10 @@ The swarm operates with **50 cm minimum inter-drone spacing** under:
 
 **Vehicle 1** acts as the master drone, receiving missions from QGroundControl and commanding **Vehicles 2–50** via DDS topics. Each follower drone runs its own EKF, MPC, ORCA, and MAPPO actor pipeline — fully autonomous, no central bottleneck.
 
----
 
 ## Key Features
 
 | Feature | Technology | Detail |
-|---|---|---|
 | 50-drone SITL | PX4 v1.14 + Gazebo Harmonic | Full physics simulation |
 | AI swarm control | MAPPO (PyTorch, Apple MPS) | Multi-agent reinforcement learning |
 | Wind resilience | EKF + MPC | 15 m/s Von Kármán turbulence |
@@ -45,12 +41,10 @@ The swarm operates with **50 cm minimum inter-drone spacing** under:
 | 3D visualization | RViz2 | Inside VS Code Remote Container |
 | Metrics export | CSV + matplotlib | Publication-quality benchmark plots |
 
----
 
 ## System Requirements
 
 | Component | Minimum | Recommended |
-|---|---|---|
 | Mac chip | M1 | **M4 Pro** (tested) |
 | RAM | 16 GB | 16 GB unified |
 | Storage | 80 GB free | 120 GB free |
@@ -58,9 +52,8 @@ The swarm operates with **50 cm minimum inter-drone spacing** under:
 | Docker RAM allocation | 10 GB | **12 GB** |
 | Docker CPU allocation | 6 cores | **8 cores** |
 
-> ✅ Tested on: MacBook Pro M4 Pro, 16 GB, 512 GB SSD
+>  Tested on: MacBook Pro M4 Pro, 16 GB, 512 GB SSD
 
----
 
 ## Architecture Overview
 
@@ -84,7 +77,6 @@ The swarm operates with **50 cm minimum inter-drone spacing** under:
 └─────────────────────────────────────────────────────────────┘
 ```
 
----
 
 ## Algorithms Used
 
@@ -113,7 +105,6 @@ Simulates **15 virtual DDS channels**. Hops on jamming detection (RSSI < −85dB
 ### 7. Hungarian Algorithm
 Optimal O(N³) assignment of **50 formation positions to 50 drones** — minimizes total travel distance during formation transitions. Re-runs on every formation change or drone failure.
 
----
 
 ## Project Structure
 
