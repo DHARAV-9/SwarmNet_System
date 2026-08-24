@@ -184,7 +184,6 @@ swarmnet_v2/
 └── README.md
 ```
 
----
 
 ## Installation
 
@@ -240,7 +239,6 @@ cd swarmnet_v2
 docker compose pull
 ```
 
----
 
 ## Running the Simulation
 
@@ -308,7 +306,6 @@ All 50 vehicles will appear on the map — Vehicle 1 with the green Home (H) mar
 ros2 launch swarmnet_metrics rviz2.launch.py
 ```
 
----
 
 ## Training the MAPPO AI Controller
 
@@ -326,9 +323,8 @@ python3 train.py --n-drones 50 --episodes 10000 --device mps \
 
 Training progress is saved to `/workspace/logs/training/`. Best weights are saved automatically to `/workspace/models/mappo_actor.pt`.
 
-> 💡 **Apple MPS:** PyTorch uses your M4 Pro GPU via Metal Performance Shaders — roughly 3× faster than CPU training. No CUDA card needed.
+>  **Apple MPS:** PyTorch uses your M4 Pro GPU via Metal Performance Shaders — roughly 3× faster than CPU training. No CUDA card needed.
 
----
 
 ## Enabling Wind and Jamming
 
@@ -353,7 +349,6 @@ ros2 topic pub /swarm/jammer swarmnet_msgs/msg/JammerState \
   "{intensity: 0.0, gps_spoof: false, spoof_magnitude_m: 0.0}"
 ```
 
----
 
 ## Changing Formation
 
@@ -373,7 +368,6 @@ ros2 service call /swarm/change_formation \
 
 Formation types: `0` = Grid · `1` = V-shape · `2` = Circle · `3` = Line
 
----
 
 ## Emergency Commands
 
@@ -388,7 +382,6 @@ curl -X POST http://localhost:5001/drone/kill/15
 ros2 service call /swarm/get_status swarmnet_msgs/srv/GetSwarmStatus "{}"
 ```
 
----
 
 ## Running Tests
 
@@ -405,7 +398,6 @@ pytest --cov=swarmnet_ros2 --cov-report=term-missing /ros2_ws/tests/
 
 Target: **≥ 75% line coverage** on all Python modules.
 
----
 
 ## Exporting Benchmark Results
 
@@ -421,7 +413,6 @@ Outputs saved to `/logs/benchmarks/<timestamp>/`:
 - `pbft_latency_vs_n.csv` + `.png`
 - `system_resources.csv` + `.png`
 
----
 
 ## Docker Resource Reference
 
@@ -434,7 +425,6 @@ Outputs saved to `/logs/benchmarks/<timestamp>/`:
 
 > Docker Desktop must be allocated at least 12 GB RAM and 8 CPU cores.
 
----
 
 ## Stopping the Simulation
 
@@ -449,12 +439,9 @@ docker exec swarmnet_px4 pkill -f px4
 docker compose down --remove-orphans
 ```
 
----
-
 ## Upgrade from v1.0
 
 | Layer | v1.0 | v2.0 |
-|---|---|---|
 | Simulation | Pygame 2D dots | Gazebo Harmonic 3D physics |
 | Flight controller | Custom Python process | PX4 Autopilot v1.14 |
 | Middleware | ZeroMQ sockets | ROS2 Humble + DDS |
@@ -469,12 +456,10 @@ docker compose down --remove-orphans
 | Platform | Any OS | macOS M4 / Docker |
 | Language | Python only | Python + C++ (ROS2) |
 
----
 
 ## Performance Targets
 
 | Metric | Target | Condition |
-|---|---|---|
 | Formation error (RMS) | < 5 cm | 0 wind, 0 jamming |
 | Formation error (RMS) | < 15 cm | 15 m/s wind |
 | Formation error (RMS) | < 25 cm | 15 m/s wind + 50% jamming |
@@ -485,12 +470,10 @@ docker compose down --remove-orphans
 | Docker RAM usage | < 14 GB | N = 50 running |
 | MAPPO inference | < 40 ms | Per drone per tick |
 
----
 
 ## Algorithms Reference
 
 | Algorithm | Purpose | Complexity |
-|---|---|---|
 | MAPPO | AI swarm control | O(N) inference |
 | ORCA | Collision avoidance (50cm) | O(K) per drone |
 | EKF | Sensor fusion | O(D²) per sensor update |
@@ -500,7 +483,6 @@ docker compose down --remove-orphans
 | Hungarian | Formation assignment | O(N³) |
 | Raft | Leader election | O(N) messages |
 
----
 
 ## Troubleshooting
 
@@ -543,7 +525,6 @@ ros2 daemon stop && ros2 daemon start
 ros2 topic list | wc -l   # Should be ~200+ topics
 ```
 
----
 
 ## References
 
@@ -557,12 +538,9 @@ ros2 topic list | wc -l   # Should be ~200+ topics
 - PX4 Development Guide — [docs.px4.io](https://docs.px4.io)
 - ROS2 Humble Docs — [docs.ros.org/en/humble](https://docs.ros.org/en/humble/)
 
----
-
 ## Build Phases
 
 | Phase | Weeks | Goal | Deliverable |
-|---|---|---|---|
 | 1 | 1–2 | Docker + 1 drone in QGC | Single SITL drone flying |
 | 2 | 3–5 | 50 drones in QGC | All 50 visible on map |
 | 3 | 6–8 | EKF + MPC wind resist | Error < 15cm at 10 m/s |
@@ -570,23 +548,17 @@ ros2 topic list | wc -l   # Should be ~200+ topics
 | 5 | 12–14 | MAPPO training + deploy | AI beats MPC in benchmarks |
 | 6 | 15–16 | PBFT + FHSS + report | Full stress test + graphs |
 
----
 
 ## Author
 
-**[Your Name]**
-Roll No: [Your Roll Number]
-Department of Computer Science & Engineering
-[Your College / University]
+**DHARAV BHATT**
 August 2026
 
----
 
 ## License
 
 MIT License — free to use, modify, and distribute for academic and research purposes.
 
----
 
 *Built on top of SwarmNet v1.0 (Raft + Gossip + Reynolds + ZeroMQ + Pygame)*
 *v2.0 is a complete stack upgrade to industry-standard autonomous systems tooling.*
