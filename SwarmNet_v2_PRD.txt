@@ -1,26 +1,19 @@
-================================================================================
+
          SWARMNET v2.0 — PRODUCT REQUIREMENTS DOCUMENT (PRD)
          50-Drone Autonomous Swarm System
          AI-Based Control · Wind Resilient · Jam Hardened
          Version 2.0 | Research-Level Project
-================================================================================
 
 DOCUMENT INFO
--------------
 Document Type   : Product Requirements Document (PRD)
 Project Name    : SwarmNet v2.0
 Version         : 2.0 (major upgrade from SwarmNet v1.0)
-Author          : [Your Name]
-Roll No         : [Your Roll Number]
-Department      : Computer Science & Engineering
-Institution     : [Your College / University]
+Author          : Dharav Bhatt
 Date            : August 2026
 Status          : Draft v1.0
 Platform        : macOS (Apple M4 Pro) · Docker · PX4 SITL · ROS2 Humble
 
-================================================================================
 TABLE OF CONTENTS
-================================================================================
   1.  Executive Summary
   2.  Problem Statement
   3.  Upgrade from v1.0
@@ -37,12 +30,9 @@ TABLE OF CONTENTS
  12.  Milestones & Timeline
  13.  Risks & Mitigations
  14.  Out of Scope / Future Work
-================================================================================
 
 
---------------------------------------------------------------------------------
 1. EXECUTIVE SUMMARY
---------------------------------------------------------------------------------
 
 SwarmNet v2.0 is a research-level autonomous drone swarm system simulating
 50 quadrotor drones operating with a minimum inter-drone spacing of 50 cm
@@ -65,9 +55,7 @@ SwarmNet v2.0 is a direct, research-grade successor to SwarmNet v1.0
 to industry-standard autonomous systems tooling.
 
 
---------------------------------------------------------------------------------
 2. PROBLEM STATEMENT
---------------------------------------------------------------------------------
 
 SwarmNet v1.0 demonstrated distributed consensus (Raft), gossip-based state
 sync, and Reynolds flocking in a software simulation. However, it had
@@ -94,12 +82,9 @@ SwarmNet v2.0 addresses all six limitations, producing a simulation system
 that is directly transferable to real hardware with minimal changes.
 
 
---------------------------------------------------------------------------------
 3. UPGRADE FROM v1.0
---------------------------------------------------------------------------------
 
 COMPONENT          v1.0                        v2.0
---------------     -------------------------   -----------------------------
 Simulation         Pygame 2D dots              Gazebo Harmonic 3D physics
 Flight controller  Custom Python process       PX4 Autopilot v1.14
 Middleware         ZeroMQ sockets              ROS2 Humble + DDS (RTPS)
@@ -117,9 +102,7 @@ Language          Python only                 Python + C++ (ROS2 nodes)
 Spacing           No constraint               50 cm hard minimum
 
 
---------------------------------------------------------------------------------
 4. GOALS & OBJECTIVES
---------------------------------------------------------------------------------
 
 PRIMARY GOALS
 
@@ -158,9 +141,7 @@ RESEARCH OBJECTIVES
       fault coverage, latency overhead, and message complexity.
 
 
---------------------------------------------------------------------------------
 5. TARGET USERS
---------------------------------------------------------------------------------
 
 PRIMARY USER
   - CS / Robotics student developing and evaluating the system
@@ -177,9 +158,7 @@ CONCEPTUAL END USERS (production context)
   - Infrastructure inspection teams (bridge, pipeline, tower inspection)
 
 
---------------------------------------------------------------------------------
 6. SCOPE
---------------------------------------------------------------------------------
 
 IN SCOPE
   - 50-drone PX4 SITL simulation in Gazebo Harmonic via Docker on macOS
@@ -207,9 +186,7 @@ OUT OF SCOPE
   - Multi-swarm coordination (multiple groups of 50)
 
 
---------------------------------------------------------------------------------
 7. CORE CHALLENGES
---------------------------------------------------------------------------------
 
 CHALLENGE 1 — 50 CM SPACING IN DYNAMIC FLIGHT
   Flying 50 drones within 50 cm of each other is an extreme precision
@@ -245,13 +222,10 @@ CHALLENGE 4 — DOCKER ON APPLE SILICON
   for 50 MAVLink streams, and resource allocation tuning for unified
   memory architecture.
 
-
---------------------------------------------------------------------------------
 8. FEATURES & REQUIREMENTS
---------------------------------------------------------------------------------
 
 8.1 FUNCTIONAL REQUIREMENTS
------------------------------
+
 
 FR-01  50-DRONE SITL DEPLOYMENT
   System must spawn exactly 50 PX4 SITL instances in Gazebo Harmonic.
@@ -383,7 +357,6 @@ FR-13  METRICS & BENCHMARKING
 
 
 8.2 NON-FUNCTIONAL REQUIREMENTS
----------------------------------
 
 NFR-01  PERFORMANCE
   Formation position error < 5cm RMS at 0 wind, 0 jamming.
@@ -427,9 +400,7 @@ NFR-07  SAFETY
   No drone may enter OFFBOARD mode without valid setpoint stream.
 
 
---------------------------------------------------------------------------------
 9. USER STORIES
---------------------------------------------------------------------------------
 
 US-01  As a student, I want to launch all 50 drones with one terminal
        command so that I can quickly set up the demo environment.
@@ -467,9 +438,7 @@ US-10  As a student, I want to kill any follower drone mid-flight and
        so I can demonstrate fault recovery.
 
 
---------------------------------------------------------------------------------
 10. CONSTRAINTS & ASSUMPTIONS
---------------------------------------------------------------------------------
 
 CONSTRAINTS
   C1. Hardware: MacBook M4 Pro, 16GB RAM, 512GB SSD. No GPU cluster.
@@ -489,10 +458,7 @@ ASSUMPTIONS
   A7. Optical flow sensor provides valid XY velocity up to 10 m/s wind.
   A8. PBFT used only for mission-critical commands, not position updates.
 
-
---------------------------------------------------------------------------------
 11. SUCCESS METRICS
---------------------------------------------------------------------------------
 
   M1. All 50 drones spawn and appear in QGroundControl       [PASS/FAIL]
   M2. Formation error < 5cm RMS (0 wind, 0 jamming)          [MEASURED]
@@ -506,9 +472,8 @@ ASSUMPTIONS
   M10. All benchmark results exportable to CSV + PNG plots    [PASS/FAIL]
 
 
---------------------------------------------------------------------------------
 12. MILESTONES & TIMELINE
---------------------------------------------------------------------------------
+
 
   Week 1–2    Environment setup
                - Docker Desktop configured (12GB RAM, 8 CPU)
@@ -556,10 +521,7 @@ ASSUMPTIONS
                - Final report written
                Deliverable: Complete system + benchmarks + report
 
-
---------------------------------------------------------------------------------
 13. RISKS & MITIGATIONS
---------------------------------------------------------------------------------
 
   R1. Docker RAM exhaustion at 50 drones
       Mitigation: Cap each PX4 instance to 200MB via Docker cgroups.
@@ -590,9 +552,7 @@ ASSUMPTIONS
       (< 1 per second). Position updates go via DDS directly.
 
 
---------------------------------------------------------------------------------
 14. OUT OF SCOPE / FUTURE WORK
---------------------------------------------------------------------------------
 
   - Physical drone hardware deployment (ArduPilot / Crazyflie / Pixhawk)
   - Real RF communication hardware (ESP-NOW, ZigBee, 900MHz)
@@ -606,7 +566,5 @@ ASSUMPTIONS
   - Sim-to-real transfer experiments
 
 
-================================================================================
 END OF PRODUCT REQUIREMENTS DOCUMENT
 SwarmNet v2.0 | Research-Level CS Project | August 2026
-================================================================================
