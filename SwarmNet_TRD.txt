@@ -1,11 +1,9 @@
-================================================================================
+
          SWARMNET — TECHNICAL REQUIREMENTS DOCUMENT (TRD)
          Autonomous Drone Swarm Simulation using Distributed Consensus Algorithms
          Version 1.0 | CS Final Year / Semester Project
-================================================================================
 
 DOCUMENT INFO
--------------
 Document Type   : Technical Requirements Document (TRD)
 Project Name    : SwarmNet
 Author          : [Your Name]
@@ -17,9 +15,8 @@ Status          : Draft v1.0
 Companion Doc   : SwarmNet_PRD.txt
 
 
-================================================================================
 TABLE OF CONTENTS
-================================================================================
+
   1.  System Architecture
   2.  Technology Stack
   3.  Module Breakdown
@@ -36,12 +33,9 @@ TABLE OF CONTENTS
  10.  Testing Requirements
  11.  Performance Benchmarks
  12.  Deployment & Run Instructions
-================================================================================
 
 
---------------------------------------------------------------------------------
 1. SYSTEM ARCHITECTURE
---------------------------------------------------------------------------------
 
 SwarmNet uses a fully decentralized peer-to-peer architecture. There is no
 central broker or coordinator. Each drone is a self-contained process.
@@ -99,9 +93,8 @@ LAYER DIAGRAM (text)
   +--------------------------------------------------+
 
 
---------------------------------------------------------------------------------
+
 2. TECHNOLOGY STACK
---------------------------------------------------------------------------------
 
   Language         Python 3.10+
   Messaging        ZeroMQ (pyzmq 25+)          pip install pyzmq
@@ -119,9 +112,7 @@ INSTALL COMMAND (all dependencies):
   pip install pyzmq pygame numpy flask matplotlib pytest pytest-cov
 
 
---------------------------------------------------------------------------------
 3. MODULE BREAKDOWN
---------------------------------------------------------------------------------
 
   swarmnet/
   |
@@ -174,12 +165,10 @@ INSTALL COMMAND (all dependencies):
   +-- README.md
 
 
---------------------------------------------------------------------------------
 4. ALGORITHM SPECIFICATIONS
---------------------------------------------------------------------------------
 
 4.1 RAFT CONSENSUS
--------------------
+
 
 STATES
   Each DroneNode is in exactly one state at any time:
@@ -231,7 +220,6 @@ RAFT CONSTANTS (config.ini)
 
 
 4.2 GOSSIP PROTOCOL
---------------------
 
 PURPOSE
   Disseminate each drone's local state to the entire swarm without
@@ -268,7 +256,6 @@ GOSSIP CONSTANTS
 
 
 4.3 REYNOLDS FLOCKING
-----------------------
 
 Each drone computes a new velocity vector every FLOCKING_TICK ms
 (default: 50 ms) using three weighted steering forces.
@@ -318,7 +305,6 @@ FLOCKING CONSTANTS
 
 
 4.4 CONTRACT NET TASK ALLOCATION
-----------------------------------
 
 PURPOSE
   Distribute tasks among drones via a distributed auction without a
@@ -343,14 +329,12 @@ TASK STATES
   FAILED        Drone died mid-task; leader re-announces
 
 
---------------------------------------------------------------------------------
 5. COMMUNICATION DESIGN
---------------------------------------------------------------------------------
 
 ZMQEROMQ SOCKET TYPES USED
 
   Pattern           Socket Pair         Usage
-  -----------       -----------         -----
+
   PUSH / PULL       PUSH → PULL         Unicast RPC (vote requests, heartbeats,
                                         AppendEntries)
   PUB / SUB         PUB → SUB           Broadcast (state for visualizer,
@@ -432,9 +416,7 @@ FAULT SIMULATION
   Dropped messages are logged for metrics.
 
 
---------------------------------------------------------------------------------
 6. DATA STRUCTURES
---------------------------------------------------------------------------------
 
 DroneState (dataclass in state.py)
   drone_id       : int
@@ -476,9 +458,7 @@ MetricsRecord (in collector.py)
   swarm_size     : int
 
 
---------------------------------------------------------------------------------
 7. API & INTERFACE SPECIFICATIONS
---------------------------------------------------------------------------------
 
 FLASK DASHBOARD ROUTES
 
@@ -508,9 +488,7 @@ LAUNCHER CLI
     --no-dash     Skip Flask dashboard process
 
 
---------------------------------------------------------------------------------
 8. CONFIGURATION (config.ini)
---------------------------------------------------------------------------------
 
 [NETWORK]
 BASE_PORT               = 5600
@@ -550,9 +528,7 @@ EXPORT_CSV              = True
 LOG_LEVEL               = INFO
 
 
---------------------------------------------------------------------------------
 9. FILE & FOLDER STRUCTURE
---------------------------------------------------------------------------------
 
 swarmnet/
 |
@@ -611,9 +587,7 @@ swarmnet/
 +-- .gitignore
 
 
---------------------------------------------------------------------------------
 10. TESTING REQUIREMENTS
---------------------------------------------------------------------------------
 
 UNIT TESTS (pytest)
 
@@ -662,9 +636,7 @@ INTEGRATION TEST
   (Automated via tests/test_integration.py using subprocess and time.)
 
 
---------------------------------------------------------------------------------
 11. PERFORMANCE BENCHMARKS
---------------------------------------------------------------------------------
 
 BENCHMARK 1 — ELECTION TIME vs N
   N values tested: 3, 5, 7, 10, 15, 20
@@ -697,9 +669,7 @@ ALL BENCHMARKS
   Generate matplotlib plots (PNG) with exporter.py.
 
 
---------------------------------------------------------------------------------
 12. DEPLOYMENT & RUN INSTRUCTIONS
---------------------------------------------------------------------------------
 
 PREREQUISITES
   Python 3.10 or higher
@@ -750,7 +720,5 @@ EXPECTED OUTPUT ON LAUNCH
   [FLASK]   Dashboard running at http://localhost:5000
 
 
-================================================================================
 END OF TECHNICAL REQUIREMENTS DOCUMENT
-SwarmNet v1.0 | CS Student Project | June 2026
-================================================================================
+SwarmNet v1.0 | June 2026
