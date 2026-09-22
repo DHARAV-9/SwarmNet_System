@@ -99,4 +99,5 @@ python3 scripts/profile_resources.py --duration 60 --budget-gb 14
 
 Phase 2 is accepted only when all 50 vehicles remain visible and stable in the
 grid, no PX4 process exits, and the profiling command reports peak RAM below
-14 GiB.
+14 GiB.<img width="1024" height="1024" alt="home-automation-integration-living-room" src="https://github.com/user-attachments/assets/25110aa2-13a1-4330-ae08-69e1ac4072cb" />
+
