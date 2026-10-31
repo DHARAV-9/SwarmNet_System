@@ -43,6 +43,11 @@ After two failed attempts stop and inspect the evidence.
 The older instructions below describe the pre-repair scaffold and are
 unverified. Do not use the old Phase 2 launcher while the repair gate is open.
 
+Repair checkpoint: Step 1 containers started healthy; Step 2 built all three
+ROS2 packages and discovered `master_node` and `follower_node`. The state
+topic contract is `/swarm/drone_<id>/state`. Flight and measured telemetry
+remain unverified; see the evidence-linked report above.
+
 Phase 1 brings up one PX4 SITL X500 drone in Gazebo, connects it to native
 macOS QGroundControl, and prepares the three-container network used by later
 swarm phases.

@@ -32,7 +32,7 @@ services:
       retries: 3
 
   ros2_nodes:
-    image: ${ROS_IMAGE:-swarmnet/ros2-nodes@sha256:a36ac86fb34c495581a053a361fae8014755f2bbf6d366552ea6e933cf52110e}
+    image: ${ROS_IMAGE:-swarmnet/ros2-nodes@sha256:428618639cda845890386ef1b5e38604309ce3652c488022addae296942b8deb}
     pull_policy: never
     platform: linux/arm64
     container_name: swarmnet_ros2

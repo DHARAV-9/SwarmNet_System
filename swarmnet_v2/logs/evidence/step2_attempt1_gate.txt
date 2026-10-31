@@ -1,0 +1,25 @@
+UTC: 2026-10-31T17:32:42.597353+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: bash -lc 'set -e; docker compose up -d --no-build --wait; docker compose exec -T ros2_nodes bash -lc "set -e; source /opt/ros/humble/setup.bash; cd /ros2_ws; colcon build --packages-select swarmnet_msgs swarmnet_master swarmnet_follower; source install/setup.bash; ros2 pkg executables swarmnet_master; ros2 pkg executables swarmnet_follower; test -s /usr/share/GeographicLib/geoids/egm96-5.pgm"'
+
+ Container swarmnet_px4  Running
+ Container swarmnet_ros2  Recreate
+ Container swarmnet_ros2  Recreated
+ Container swarmnet_ros2  Starting
+ Container swarmnet_ros2  Started
+ Container swarmnet_ros2  Waiting
+ Container swarmnet_px4  Waiting
+ Container swarmnet_px4  Healthy
+ Container swarmnet_ros2  Healthy
+Starting >>> swarmnet_msgs
+Finished <<< swarmnet_msgs [12.3s]
+Starting >>> swarmnet_follower
+Finished <<< swarmnet_follower [0.29s]
+Starting >>> swarmnet_master
+Finished <<< swarmnet_master [0.25s]
+
+Summary: 3 packages finished [13.0s]
+swarmnet_master master_node
+swarmnet_follower follower_node
+
+EXIT_STATUS: 0

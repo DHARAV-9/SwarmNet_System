@@ -1,6 +1,7 @@
 # SwarmNet V2 repair evidence
 
-Step 1 passed on attempt 2. Steps 2–8 have not started at this checkpoint.
+Step 1 passed on attempt 2. Step 2 passed its first gate attempt.
+Steps 3–8 have not started at this checkpoint.
 No flight or telemetry claim is verified.
 
 ## Selected stack
@@ -19,7 +20,8 @@ Code stays in `swarmnet_v2/`. The source audit is
 
 Base images are pinned by registry manifest digest. Runtime Compose also pins
 the custom images: PX4 `sha256:904f450277bc59147303be7cc0ba0006adcc8c14ea20a4c7c5efe13caf0cfeff`
-and ROS2 `sha256:a36ac86fb34c495581a053a361fae8014755f2bbf6d366552ea6e933cf52110e`.
+and ROS2 `sha256:428618639cda845890386ef1b5e38604309ce3652c488022addae296942b8deb`
+(updated in Step 2 to include the required EGM96 geoid dataset).
 These images were built locally, not pushed to a public registry. Rebuilds use
 `docker-compose.build.yml`; the gate saves local image content IDs in `.env.lock`.
 APT/Python dependency versions are not a fully vendored reproducible lock.
@@ -50,7 +52,7 @@ in QGC require Step 3 and remain unverified.
 | Step | Status | Evidence / reason |
 | --- | --- | --- |
 | 1 | Passed on attempt 2 | [Attempt 2](../swarmnet_v2/logs/evidence/step1_attempt2_gate.txt) |
-| 2 | Not started | Step 1 gate required |
+| 2 | Passed on attempt 1 | [Container build/discovery](../swarmnet_v2/logs/evidence/step2_attempt1_gate.txt) |
 | 3 | Not started | Step 2 gate required |
 | 4 | Not started | Step 3 gate required |
 | 5 | Not started | Step 4 gate required |
@@ -90,8 +92,35 @@ RTF, flight RAM, flight CPU, tracking error and separation: **not measured**.
 
 ## Known defects awaiting their ordered steps
 
-ROS2 package metadata and numeric topic tokens, fabricated follower telemetry,
-arming/OFFBOARD lifecycle, frame origins, per-instance PX4 state/routing,
+Fabricated follower telemetry, arming/OFFBOARD lifecycle, frame origins,
+per-instance PX4 state/routing,
 XRCE integration, metrics, scale tests, and the remaining document corrections
 are still unresolved. Passing Step 1 would establish only image/container
 readiness, not flying vehicles or working ROS2 application packages.
+
+## Step 2 result
+
+The native ROS2 image rebuilt with `/usr/share/GeographicLib/geoids/egm96-5.pgm`:
+[image build](../swarmnet_v2/logs/evidence/step2_attempt1_build.txt).
+Both Python packages now install executables under `lib/<package>` and export
+`ament_python`; the message package exports `ament_cmake`.
+The container command reported:
+
+```text
+Summary: 3 packages finished [13.0s]
+swarmnet_master master_node
+swarmnet_follower follower_node
+EXIT_STATUS: 0
+```
+
+The state topic contract is `/swarm/drone_<id>/state`, also corrected in the
+PRD/TRD and verifier. Five host naming tests passed:
+[tests](../swarmnet_v2/logs/evidence/step2_host_tests.txt).
+This gate verifies building and executable discovery, not real telemetry.
+
+## Commit history note
+
+Step 1 changes were committed externally during this repair as `1a14d28`
+(`bug_fix`). The requested Step 1 commit command found a clean worktree.
+That existing commit was preserved without rewriting history. Subsequent
+repair commits use the requested `fix(step N):` prefix.
