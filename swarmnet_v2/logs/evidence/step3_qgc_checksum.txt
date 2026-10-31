@@ -1,0 +1,7 @@
+UTC: 2026-10-31T17:46:31.253920+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: shasum -a 256 /private/tmp/SwarmNet-QGroundControl-5.1.5.dmg
+
+3af1c44ee5f5c9a3357e28293dee1b7da4da7d9ac278ad09a3fa963f737bcaa8  /private/tmp/SwarmNet-QGroundControl-5.1.5.dmg
+
+EXIT_STATUS: 0

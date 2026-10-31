@@ -1,0 +1,234 @@
+UTC: 2026-10-31T17:47:46.884894+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose exec -T px4_sitl bash -lc 'sed -n "1,100p" ROMFS/px4fmu_common/init.d-posix/rcS; cat build/px4_sitl_default/rootfs/gz_env.sh; grep -n -A4 -B2 "vehicle_status\|vehicle_local_position\|vehicle_land_detected" src/modules/uxrce_dds_client/dds_topics.yaml; sed -n "1,80p" Tools/simulation/gz/worlds/default.sdf'
+
+#!/bin/sh
+
+# Un comment and use set +e to ignore and set -e to enable 'exit on error control'
+set +e
+# Un comment the line below to help debug scripts by printing a trace of the script commands
+#set -x
+
+# PX4 commands need the 'px4-' prefix in bash.
+# (px4-alias.sh is expected to be in the PATH)
+# shellcheck disable=SC1091
+. px4-alias.sh
+
+#search path for sourcing px4-rc.*
+PATH="$PATH:${R}etc/init.d-posix"
+
+#
+# Main SITL startup script
+#
+
+# check for ekf2 replay
+# shellcheck disable=SC2154
+if [ "$replay_mode" = "ekf2" ]
+then
+	. ${R}etc/init.d-posix/rc.replay
+	exit 0
+fi
+
+# initialize script variables
+set VEHICLE_TYPE                none
+set LOGGER_ARGS                 ""
+set LOGGER_BUF                  1000
+
+set RUN_MINIMAL_SHELL           no
+
+set SYS_AUTOSTART=0
+
+if [ "$PX4_SIM_MODEL" = "shell" ]
+then
+	set RUN_MINIMAL_SHELL yes
+
+elif [ -n "$PX4_SYS_AUTOSTART" ]
+then
+	echo "env SYS_AUTOSTART: ${PX4_SYS_AUTOSTART}"
+	SYS_AUTOSTART=${PX4_SYS_AUTOSTART}
+
+elif [ "$PX4_SIM_MODEL" = "none" ] || [ -z $PX4_SIM_MODEL ]
+then
+	# no airframe selected
+	SYS_AUTOSTART=0
+
+elif [ -n "$PX4_SIM_MODEL" ]
+then
+	# Find the matching Autostart ID (file name has the form: [0-9]+_${PX4_SIM_MODEL})
+	# TODO: unify with rc.autostart generation
+	# shellcheck disable=SC2012
+	REQUESTED_AUTOSTART=$(ls "${R}etc/init.d-posix/airframes" | sed -n 's/^\([0-9][0-9]*\)_'${PX4_SIM_MODEL}'$/\1/p')
+	if [ -z "$REQUESTED_AUTOSTART" ]; then
+		echo "ERROR [init] Unknown model $PX4_SIM_MODEL (not found by name on ${R}etc/init.d-posix/airframes)"
+		exit 1
+	else
+		SYS_AUTOSTART=$REQUESTED_AUTOSTART
+		echo "INFO  [init] found model autostart file as SYS_AUTOSTART=$REQUESTED_AUTOSTART"
+	fi
+fi
+
+# Load parameters
+set PARAM_FILE parameters.bson
+set PARAM_BACKUP_FILE parameters_backup.bson
+
+param select $PARAM_FILE
+if [ -f $PARAM_FILE ]; then
+
+	if ! param import
+	then
+		echo "ERROR [init] param import failed"
+
+		bsondump $PARAM_FILE
+
+		# try to make a backup copy
+		cp $PARAM_FILE param_import_fail.bson
+
+		# try importing from backup file
+		if [ -f $PARAM_BACKUP_FILE ]
+		then
+			echo "[init] importing from parameter backup"
+
+			# dump current backup file contents for comparison
+			bsondump $PARAM_BACKUP_FILE
+
+			param import $PARAM_BACKUP_FILE
+
+			# overwrite invalid $PARAM_FILE with backup
+			cp $PARAM_BACKUP_FILE $PARAM_FILE
+		fi
+
+		param status
+	fi
+
+elif [ -f $PARAM_BACKUP_FILE ]; then
+	echo "ERROR [init] primary param file $PARAM_FILE unavailable, using backup $PARAM_BACKUP_FILE"
+#!/usr/bin/env bash
+# -----------------------------------------------------------------------
+# Gazebo Environment Configuration
+# -----------------------------------------------------------------------
+# GZ_SIM_RESOURCE_PATH: Where Gazebo looks for models and worlds
+# GZ_SIM_SYSTEM_PLUGIN_PATH: Where Gazebo looks for plugin libraries
+# GZ_SIM_SERVER_CONFIG_PATH: Custom Gazebo server configuration file
+#
+# See Gazebo docs
+# https://gazebosim.org/api/sim/8/resources.html
+# https://gazebosim.org/api/sim/8/server_config.html
+# -----------------------------------------------------------------------
+
+export PX4_GZ_MODELS=/opt/PX4-Autopilot/Tools/simulation/gz/models
+export PX4_GZ_WORLDS=/opt/PX4-Autopilot/Tools/simulation/gz/worlds
+export PX4_GZ_PLUGINS=/opt/PX4-Autopilot/build/px4_sitl_default/src/modules/simulation/gz_plugins
+export PX4_GZ_SERVER_CONFIG=/opt/PX4-Autopilot/src/modules/simulation/gz_bridge/server.config
+
+export GZ_SIM_RESOURCE_PATH=$GZ_SIM_RESOURCE_PATH:$PX4_GZ_MODELS:$PX4_GZ_WORLDS
+export GZ_SIM_SYSTEM_PLUGIN_PATH=$GZ_SIM_SYSTEM_PLUGIN_PATH:$PX4_GZ_PLUGINS
+export GZ_SIM_SERVER_CONFIG_PATH=$PX4_GZ_SERVER_CONFIG
+45-  #   type: px4_msgs::msg::VehicleAngularVelocity
+46-
+47:  - topic: /fmu/out/vehicle_land_detected
+48-    type: px4_msgs::msg::VehicleLandDetected
+49-
+50-  - topic: /fmu/out/vehicle_attitude
+51-    type: px4_msgs::msg::VehicleAttitude
+--
+63-    type: px4_msgs::msg::SensorGps
+64-
+65:  - topic: /fmu/out/vehicle_local_position
+66-    type: px4_msgs::msg::VehicleLocalPosition
+67-
+68-  - topic: /fmu/out/vehicle_odometry
+69-    type: px4_msgs::msg::VehicleOdometry
+70-
+71:  - topic: /fmu/out/vehicle_status
+72-    type: px4_msgs::msg::VehicleStatus
+73-
+74-  - topic: /fmu/out/airspeed_validated
+75-    type: px4_msgs::msg::AirspeedValidated
+76-
+77:  - topic: /fmu/out/vtol_vehicle_status
+78-    type: px4_msgs::msg::VtolVehicleStatus
+79-
+80-  - topic: /fmu/out/home_position
+81-    type: px4_msgs::msg::HomePosition
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<sdf version="1.9">
+  <world name="default">
+    <physics type="ode">
+      <max_step_size>0.004</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+      <real_time_update_rate>250</real_time_update_rate>
+    </physics>
+    <gravity>0 0 -9.8</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type="adiabatic"/>
+    <scene>
+      <grid>false</grid>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>true</shadows>
+    </scene>
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>1 1</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode/>
+            </friction>
+            <bounce/>
+            <contact/>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>500 500</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.8 1</ambient>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.8 0.8 0.8 1</specular>
+          </material>
+        </visual>
+        <pose>0 0 0 0 -0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 -0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+        </inertial>
+        <enable_wind>false</enable_wind>
+      </link>
+      <pose>0 0 0 0 -0 0</pose>
+      <self_collide>false</self_collide>
+    </model>
+    <light name="sunUTC" type="directional">
+      <pose>0 0 500 0 -0 0</pose>
+      <cast_shadows>true</cast_shadows>
+      <intensity>1</intensity>
+      <direction>0.001 0.625 -0.78</direction>
+      <diffuse>0.904 0.904 0.904 1</diffuse>
+      <specular>0.271 0.271 0.271 1</specular>
+      <attenuation>
+        <range>2000</range>
+        <linear>0</linear>
+        <constant>1</constant>
+        <quadratic>0</quadratic>
+      </attenuation>
+      <spot>
+
+EXIT_STATUS: 0

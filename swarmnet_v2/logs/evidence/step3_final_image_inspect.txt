@@ -1,0 +1,7 @@
+UTC: 2026-10-31T17:54:24.150167+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker image inspect swarmnet/ros2-nodes:humble-arm64 --format '{{json .RepoDigests}} {{.Id}} {{.Architecture}}'
+
+["swarmnet/ros2-nodes@sha256:55ae9de19acc5eb467120926c4d80c7cca5862208367fdf5b7ee4ac61616dda3"] sha256:55ae9de19acc5eb467120926c4d80c7cca5862208367fdf5b7ee4ac61616dda3 arm64
+
+EXIT_STATUS: 0

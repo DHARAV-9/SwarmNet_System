@@ -1,0 +1,122 @@
+UTC: 2026-10-31T17:49:02.419334+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose exec -T px4_sitl bash -lc 'test -r /swarmnet/scripts/capture_evidence.py && bash -n /px4_config/scripts/spawn_one_drone.sh && sh -n /px4_config/scripts/swarm_startup.sh && build/px4_sitl_default/bin/px4 -h; grep -n -A60 -B5 "rootfs" platforms/posix/src/px4/common/main.cpp | tail -100'
+
+Usage for Server/daemon process: 
+
+    px4 [-h|-d] [-s <startup_file>] [-t <test_data_directory>] [<rootfs_directory>] [-i <instance>] [-w <working_directory>]
+
+    -s <startup_file>      shell script to be used as startup (default=etc/init.d-posix/rcS)
+    <rootfs_directory>     directory where startup files and mixers are located,
+                           (if not given, CWD is used)
+    -i <instance>          px4 instance id to run multiple instances [0...N], default=0
+    -w <working_directory> directory to change to
+    -h                     help/usage information
+    -d                     daemon mode, don't start pxh shell
+
+Usage for client: 
+
+    px4-MODULE [--instance <instance>] command using symlink.
+        e.g.: px4-commander status
+441-		return ret;
+442-
+443-	} else {
+444-		PX4_DEBUG("Successfully created symlink %s -> %s", src_path.c_str(), dest_path.c_str());
+445-	}
+446-
+447-	return PX4_OK;
+448-}
+449-
+450-int create_dirs()
+451-{
+452-	std::string current_path = pwd();
+453-
+454-	std::vector<std::string> dirs{"log", "eeprom"};
+455-
+456-	for (const auto &dir : dirs) {
+457-		PX4_DEBUG("mkdir: %s", dir.c_str());;
+458-		std::string dir_path = current_path + "/" + dir;
+459-
+460-		if (dir_exists(dir_path)) {
+461-			continue;
+462-		}
+463-
+464-		// create dirs
+465-		int ret = mkdir(dir_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
+466-
+467-		if (ret != OK) {
+468-			PX4_WARN("failed creating new dir: %s", dir_path.c_str());
+469-			return ret;
+470-
+--
+617-
+618-void print_usage()
+619-{
+620-	printf("Usage for Server/daemon process: \n");
+621-	printf("\n");
+622:	printf("    px4 [-h|-d] [-s <startup_file>] [-t <test_data_directory>] [<rootfs_directory>] [-i <instance>] [-w <working_directory>]\n");
+623-	printf("\n");
+624-	printf("    -s <startup_file>      shell script to be used as startup (default=etc/init.d-posix/rcS)\n");
+625:	printf("    <rootfs_directory>     directory where startup files and mixers are located,\n");
+626-	printf("                           (if not given, CWD is used)\n");
+627-	printf("    -i <instance>          px4 instance id to run multiple instances [0...N], default=0\n");
+628-	printf("    -w <working_directory> directory to change to\n");
+629-	printf("    -h                     help/usage information\n");
+630-	printf("    -d                     daemon mode, don't start pxh shell\n");
+631-	printf("\n");
+632-	printf("Usage for client: \n");
+633-	printf("\n");
+634-	printf("    px4-MODULE [--instance <instance>] command using symlink.\n");
+635-	printf("        e.g.: px4-commander status\n");
+636-}
+637-
+638-int get_server_running(int instance, bool *is_server_running)
+639-{
+640-	const std::string file_lock_path = std::string(LOCK_FILE_PATH) + '-' + std::to_string(instance);
+641-	int fd = open(file_lock_path.c_str(), O_RDWR | O_CREAT, 0666);
+642-
+643-	if (fd < 0) {
+644-		PX4_ERR("%s: failed to create lock file: %s, reason=%s", __func__, file_lock_path.c_str(), strerror(errno));
+645-		return PX4_ERROR;
+646-	}
+647-
+648-	int status = PX4_OK;
+649-	struct flock lock;
+650-	memset(&lock, 0, sizeof(struct flock));
+651-
+652-	// Exclusive write lock, cover the entire file (regardless of size)
+653-	lock.l_type = F_WRLCK;
+654-	lock.l_whence = SEEK_SET;
+655-
+656-	if (fcntl(fd, F_GETLK, &lock) < 0) {
+657-		PX4_ERR("%s: failed to get check for lock on file: %s, reason=%s", __func__, file_lock_path.c_str(), strerror(errno));
+658-		status = PX4_ERROR;
+659-
+660-	} else {
+661-		// F_GETLK will set l_type to F_UNLCK if no one had a lock on the file. Otherwise,
+662-		// it means that the server is running and has a lock on the file
+663-		if (lock.l_type != F_UNLCK) {
+664-			*is_server_running = true;
+665-
+666-		} else {
+667-			*is_server_running = false;
+668-		}
+669-	}
+670-
+671-	close(fd);
+672-
+673-	return status;
+674-}
+675-
+676-int set_server_running(int instance)
+677-{
+678-	const std::string file_lock_path = std::string(LOCK_FILE_PATH) + '-' + std::to_string(instance);
+679-	int fd = open(file_lock_path.c_str(), O_RDWR | O_CREAT, 0666);
+680-
+681-	if (fd < 0) {
+682-		PX4_ERR("%s: failed to create lock file: %s, reason=%s", __func__, file_lock_path.c_str(), strerror(errno));
+683-		return PX4_ERROR;
+684-	}
+685-
+
+EXIT_STATUS: 0

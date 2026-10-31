@@ -1,0 +1,11 @@
+Observation type: native UI inspection, not command stdout
+Observer: Codex via cua_repl
+Date: 2026-10-31 UTC
+Application: /private/tmp/swarmnet-qgc-515/QGroundControl.app
+Method: getApp, getAXStateAndScreenshot, dismiss initial preferences,
+        getAXState, getScreenshot
+Visible connection banner: Disconnected - Click to manually connect
+No connected vehicle was observed. This is NOT successful telemetry evidence.
+The initial Preferences dialog was dismissed without changing its defaults.
+The Qt UI did not expose usable accessibility elements after the click;
+the resulting screenshot confirmed the disconnected main flight view.

@@ -19,6 +19,8 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./px4_config:/px4_config:ro
+      - ./scripts:/swarmnet/scripts:ro
+      - ./logs/evidence:/evidence
       - ./logs/px4:/var/log/swarmnet/px4
     networks:
       - swarm_net
@@ -45,6 +47,8 @@ services:
       - ./swarmnet_ros2:/ros2_ws/src/swarmnet
       - ./logs/ros2:/ros2_ws/logs
       - ./config:/ros2_ws/src/swarmnet/config:ro
+      - ./scripts:/swarmnet/scripts:ro
+      - ./logs/evidence:/evidence
     networks:
       - swarm_net
     command: ["sleep", "infinity"]

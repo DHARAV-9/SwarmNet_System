@@ -1,0 +1,9 @@
+UTC: 2026-10-31T17:50:51.067213+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose ps
+
+NAME            IMAGE                                                                                       COMMAND                  SERVICE      CREATED          STATUS                        PORTS
+swarmnet_px4    swarmnet/px4-sitl@sha256:904f450277bc59147303be7cc0ba0006adcc8c14ea20a4c7c5efe13caf0cfeff   "sleep infinity"         px4_sitl     2 minutes ago    Up About a minute (healthy)   
+swarmnet_ros2   sha256:428618639cda845890386ef1b5e38604309ce3652c488022addae296942b8deb                     "/ros_entrypoint.sh …"   ros2_nodes   18 minutes ago   Up 18 minutes (healthy)       
+
+EXIT_STATUS: 0

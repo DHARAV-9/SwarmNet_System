@@ -1,0 +1,20 @@
+UTC: 2026-10-31T17:49:39.480635+00:00
+CWD: /opt/PX4-Autopilot
+COMMAND: bash /px4_config/scripts/spawn_one_drone.sh
+
+INFO  [px4] instance: 0
+
+______  __   __    ___ 
+| ___ \ \ \ / /   /   |
+| |_/ /  \ V /   / /| |
+|  __/   /   \  / /_| |
+| |     / /^\ \ \___  |
+\_|     \/   \/     |_/
+
+px4 starting.
+
+INFO  [px4] startup script: /bin/sh /px4_config/scripts/swarm_startup.sh 0
+/px4_config/scripts/swarm_startup.sh: 2: .: cannot open etc/init.d-posix/rcS: No such file
+ERROR [px4] Startup script returned with return value: 512
+
+EXIT_STATUS: 255

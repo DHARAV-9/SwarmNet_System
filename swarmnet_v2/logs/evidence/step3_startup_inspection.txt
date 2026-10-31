@@ -1,0 +1,198 @@
+UTC: 2026-10-31T17:36:15.542111+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose exec -T px4_sitl bash -lc 'set -e; sed -n "1,200p" ROMFS/px4fmu_common/init.d-posix/px4-rc.simulator; cat ROMFS/px4fmu_common/init.d-posix/px4-rc.mavlink; tail -n 110 ROMFS/px4fmu_common/init.d-posix/rcS; build/px4_sitl_default/bin/px4 -h'
+
+#!/bin/sh
+# shellcheck disable=SC2154
+
+# Simulator IMU data provided at 250 Hz
+param set-default IMU_INTEG_RATE 250
+
+# For simulation, allow registering modes while armed for developer convenience
+param set-default COM_MODE_ARM_CHK 1
+
+if [ "$PX4_SIMULATOR" = "sihsim" ] || [ "$(param show -q SYS_AUTOSTART)" -eq "0" ]; then
+    # Run SIH
+    . px4-rc.sihsim
+
+elif [ "$PX4_SIMULATOR" = "gz" ] || [ "$(param show -q SIM_GZ_EN)" = "1" ]; then
+    # Run Gazebo (gz)
+    . px4-rc.gzsim
+
+elif [ "$PX4_SIM_MODEL" = "jmavsim_iris" ] || [ "$(param show -q SYS_AUTOSTART)" -eq "10017" ]; then
+    # Run jMAVSim
+    . px4-rc.jmavsim
+
+else
+    # Run simulator_mavlink module for interface with gazebo-classic
+    . px4-rc.mavlinksim
+fi
+#!/bin/sh
+# shellcheck disable=SC2154
+
+udp_offboard_port_local=$((14580+px4_instance))
+udp_offboard_port_remote=$((14540+px4_instance))
+[ "$px4_instance" -gt 9 ] && udp_offboard_port_remote=14549 # use the same ports for more than 10 instances to avoid port overlaps
+udp_onboard_payload_port_local=$((14280+px4_instance))
+udp_onboard_payload_port_remote=$((14030+px4_instance))
+udp_onboard_gimbal_port_local=$((13030+px4_instance))
+udp_onboard_gimbal_port_remote=$((13280+px4_instance))
+udp_gcs_port_local=$((18570+px4_instance))
+
+# GCS link
+mavlink start -x -u $udp_gcs_port_local -r 4000000 -f
+mavlink stream -r 50 -s POSITION_TARGET_LOCAL_NED -u $udp_gcs_port_local
+mavlink stream -r 50 -s LOCAL_POSITION_NED -u $udp_gcs_port_local
+mavlink stream -r 50 -s GLOBAL_POSITION_INT -u $udp_gcs_port_local
+mavlink stream -r 50 -s ATTITUDE -u $udp_gcs_port_local
+mavlink stream -r 50 -s ATTITUDE_QUATERNION -u $udp_gcs_port_local
+mavlink stream -r 50 -s ATTITUDE_TARGET -u $udp_gcs_port_local
+mavlink stream -r 50 -s SERVO_OUTPUT_RAW_0 -u $udp_gcs_port_local
+mavlink stream -r 20 -s RC_CHANNELS -u $udp_gcs_port_local
+mavlink stream -r 10 -s OPTICAL_FLOW_RAD -u $udp_gcs_port_local
+
+# API/Offboard link
+mavlink start -x -u $udp_offboard_port_local -r 4000000 -f -m onboard -o $udp_offboard_port_remote
+
+# Onboard link to camera
+mavlink start -x -u $udp_onboard_payload_port_local -r 4000 -f -m onboard -o $udp_onboard_payload_port_remote
+
+# Onboard link to gimbal
+mavlink start -x -u $udp_onboard_gimbal_port_local -r 400000 -f -m gimbal -o $udp_onboard_gimbal_port_remote
+
+# To display for SIH sitl
+if [ "$PX4_SIMULATOR" = "sihsim" ]; then
+	udp_sihsim_port_local=$((19450+px4_instance))
+	udp_sihsim_port_remote=$((19410+px4_instance))
+	mavlink start -x -u $udp_sihsim_port_local -r 400000 -m custom -o $udp_sihsim_port_remote
+	mavlink stream -r 200 -s HIL_ACTUATOR_CONTROLS -u  $udp_sihsim_port_local
+	mavlink stream -r 25 -s HIL_STATE_QUATERNION -u  $udp_sihsim_port_local
+fi
+system_power_simulator start
+
+tone_alarm start
+rc_update start
+manual_control start
+sensors start
+commander start
+
+#
+# state estimator selection
+if param compare -s EKF2_EN 1
+then
+	ekf2 start &
+fi
+
+if param compare -s LPE_EN 1
+then
+	local_position_estimator start
+fi
+
+if param compare -s ATT_EN 1
+then
+	attitude_estimator_q start
+fi
+
+if ! pwm_out_sim start -m sim
+then
+	tune_control play error
+fi
+
+#
+# Configure vehicle type specific parameters.
+# Note: rc.vehicle_setup is the entry point for all vehicle type specific setup.
+. ${R}etc/init.d/rc.vehicle_setup
+
+navigator start
+
+# Try to start the UXRCE-DDS Client with UDP transport if module exists
+uxrce_dds_ns=""
+if [ "$px4_instance" -ne "0" ]
+then
+	# for multi intances setup, add namespace prefix
+	uxrce_dds_ns="-n px4_$px4_instance"
+fi
+if [ -n "$PX4_UXRCE_DDS_NS" ]
+then
+	# Override namespace if environment variable is defined
+	uxrce_dds_ns="-n $PX4_UXRCE_DDS_NS"
+fi
+if [ -n "$ROS_DOMAIN_ID" ]
+then
+	# Match UXRCE_DDS_DOM_ID with ROS_DOMAIN_ID, if defined
+	param set UXRCE_DDS_DOM_ID $ROS_DOMAIN_ID
+else
+	param set UXRCE_DDS_DOM_ID 0
+fi
+uxrce_dds_port=8888
+if [ -n "$PX4_UXRCE_DDS_PORT" ]
+then
+	# Override port if environment variable is defined
+	uxrce_dds_port="$PX4_UXRCE_DDS_PORT"
+fi
+
+uxrce_dds_client start -t udp -h 127.0.0.1 -p $uxrce_dds_port $uxrce_dds_ns
+
+if param greater -s MNT_MODE_IN -1
+then
+	gimbal start
+fi
+
+if param greater -s TRIG_MODE 0
+then
+	camera_trigger start
+	camera_feedback start
+fi
+
+if param compare -s IMU_GYRO_FFT_EN 1
+then
+	gyro_fft start
+fi
+
+if param compare -s IMU_GYRO_CAL_EN 1
+then
+	gyro_calibration start
+fi
+
+payload_deliverer start
+
+if param compare -s ICE_EN 1
+then
+	internal_combustion_engine_control start
+fi
+
+#user defined mavlink streams for instances can be in PATH
+. px4-rc.mavlink
+
+# execute autostart post script if any
+[ -e "$autostart_file".post ] && . "$autostart_file".post
+
+# Run script to start logging
+if param compare -s EKF2_EN 1
+then
+	set LOGGER_ARGS "-p ekf2_timestamps"
+else
+	set LOGGER_ARGS "-p vehicle_attitude"
+fi
+. ${R}etc/init.d/rc.logging
+
+mavlink boot_complete
+replay trystart
+Usage for Server/daemon process: 
+
+    px4 [-h|-d] [-s <startup_file>] [-t <test_data_directory>] [<rootfs_directory>] [-i <instance>] [-w <working_directory>]
+
+    -s <startup_file>      shell script to be used as startup (default=etc/init.d-posix/rcS)
+    <rootfs_directory>     directory where startup files and mixers are located,
+                           (if not given, CWD is used)
+    -i <instance>          px4 instance id to run multiple instances [0...N], default=0
+    -w <working_directory> directory to change to
+    -h                     help/usage information
+    -d                     daemon mode, don't start pxh shell
+
+Usage for client: 
+
+    px4-MODULE [--instance <instance>] command using symlink.
+        e.g.: px4-commander status
+
+EXIT_STATUS: 0

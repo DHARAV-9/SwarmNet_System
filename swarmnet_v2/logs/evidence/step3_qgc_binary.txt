@@ -1,0 +1,9 @@
+UTC: 2026-10-31T17:46:31.217367+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: file /private/tmp/swarmnet-qgc-515/QGroundControl.app/Contents/MacOS/QGroundControl
+
+/private/tmp/swarmnet-qgc-515/QGroundControl.app/Contents/MacOS/QGroundControl: Mach-O universal binary with 2 architectures: [x86_64h:Mach-O 64-bit executable x86_64h] [arm64]
+/private/tmp/swarmnet-qgc-515/QGroundControl.app/Contents/MacOS/QGroundControl (for architecture x86_64h):	Mach-O 64-bit executable x86_64h
+/private/tmp/swarmnet-qgc-515/QGroundControl.app/Contents/MacOS/QGroundControl (for architecture arm64):	Mach-O 64-bit executable arm64
+
+EXIT_STATUS: 0

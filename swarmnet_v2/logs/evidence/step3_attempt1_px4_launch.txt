@@ -1,0 +1,8 @@
+UTC: 2026-10-31T17:48:16.089834+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose exec -T px4_sitl bash -lc 'python3 /swarmnet/scripts/capture_evidence.py /evidence/step3_attempt1_vehicle_runtime.txt -- bash /px4_config/scripts/spawn_one_drone.sh'
+
+python3: can't open file '/swarmnet/scripts/capture_evidence.py': [Errno 2] No such file or directory
+
+
+EXIT_STATUS: 2

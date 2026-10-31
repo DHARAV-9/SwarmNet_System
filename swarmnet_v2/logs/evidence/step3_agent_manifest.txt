@@ -1,0 +1,10 @@
+UTC: 2026-10-31T17:36:15.821283+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker manifest inspect --verbose eprosima/micro-xrce-dds-agent:2.4.3
+
+errors:
+denied: requested access to the resource is denied
+unauthorized: authentication required
+
+
+EXIT_STATUS: 1

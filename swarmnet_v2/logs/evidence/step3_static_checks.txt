@@ -1,0 +1,6 @@
+UTC: 2026-10-31T17:40:40.665027+00:00
+CWD: /Users/dharavbhatt/swaram_net
+COMMAND: bash -lc 'bash -n swarmnet_v2/px4_config/scripts/spawn_one_drone.sh && sh -n swarmnet_v2/px4_config/scripts/swarm_startup.sh && ./venv/bin/python -m py_compile swarmnet_v2/scripts/flight_cycle.py && git diff --check'
+
+
+EXIT_STATUS: 0

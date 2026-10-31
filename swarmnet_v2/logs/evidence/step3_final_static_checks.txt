@@ -1,0 +1,8 @@
+UTC: 2026-10-31T17:50:50.978996+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: bash -lc 'set -e; bash -n px4_config/scripts/spawn_one_drone.sh scripts/step3_start.sh; sh -n px4_config/scripts/swarm_startup.sh; ../venv/bin/python -c "import ast; from pathlib import Path; ast.parse(Path(\"scripts/flight_cycle.py\").read_text()); print(\"flight_cycle.py: syntax valid, flight unverified\")"; git diff --check'
+
+flight_cycle.py: syntax valid, flight unverified
+swarmnet_v2/swarmnet_ros2/Dockerfile:38: new blank line at EOF.
+
+EXIT_STATUS: 2

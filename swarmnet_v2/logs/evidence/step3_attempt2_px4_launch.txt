@@ -1,0 +1,27 @@
+UTC: 2026-10-31T17:49:39.339370+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose exec -T px4_sitl python3 /swarmnet/scripts/capture_evidence.py /evidence/step3_attempt2_vehicle_runtime.txt -- bash /px4_config/scripts/spawn_one_drone.sh
+
+UTC: 2026-10-31T17:49:39.480635+00:00
+CWD: /opt/PX4-Autopilot
+COMMAND: bash /px4_config/scripts/spawn_one_drone.sh
+
+INFO  [px4] instance: 0
+
+______  __   __    ___ 
+| ___ \ \ \ / /   /   |
+| |_/ /  \ V /   / /| |
+|  __/   /   \  / /_| |
+| |     / /^\ \ \___  |
+\_|     \/   \/     |_/
+
+px4 starting.
+
+INFO  [px4] startup script: /bin/sh /px4_config/scripts/swarm_startup.sh 0
+/px4_config/scripts/swarm_startup.sh: 2: .: cannot open etc/init.d-posix/rcS: No such file
+ERROR [px4] Startup script returned with return value: 512
+
+EXIT_STATUS: 255
+
+
+EXIT_STATUS: 255

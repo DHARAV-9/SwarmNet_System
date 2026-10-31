@@ -1,7 +1,8 @@
 # SwarmNet V2 repair evidence
 
 Step 1 passed on attempt 2. Step 2 passed its first gate attempt.
-Steps 3–8 have not started at this checkpoint.
+Step 3 stopped after two failed launch attempts, as required by the repair plan.
+Steps 4–8 have not started because Step 3 did not pass.
 No flight or telemetry claim is verified.
 
 ## Selected stack
@@ -53,7 +54,7 @@ in QGC require Step 3 and remain unverified.
 | --- | --- | --- |
 | 1 | Passed on attempt 2 | [Attempt 2](../swarmnet_v2/logs/evidence/step1_attempt2_gate.txt) |
 | 2 | Passed on attempt 1 | [Container build/discovery](../swarmnet_v2/logs/evidence/step2_attempt1_gate.txt) |
-| 3 | Not started | Step 2 gate required |
+| 3 | Failed twice; stopped | [Attempt 1](../swarmnet_v2/logs/evidence/step3_attempt1_px4_launch.txt), [attempt 2](../swarmnet_v2/logs/evidence/step3_attempt2_px4_launch.txt) |
 | 4 | Not started | Step 3 gate required |
 | 5 | Not started | Step 4 gate required |
 | 6 | Not started | Step 5 gate required |
@@ -97,6 +98,63 @@ per-instance PX4 state/routing,
 XRCE integration, metrics, scale tests, and the remaining document corrections
 are still unresolved. Passing Step 1 would establish only image/container
 readiness, not flying vehicles or working ROS2 application packages.
+
+## Step 3 result — stopped, not passed
+
+Two launch attempts failed. No further flight attempts or later repair steps
+were performed after the second failure.
+
+1. Attempt 1 exited **2** before PX4 ran:
+   `python3: can't open file '/swarmnet/scripts/capture_evidence.py': [Errno 2] No such file or directory`.
+   The existing container had not been recreated with the new read-only script
+   mount. Recreating only the PX4 service succeeded; a subsequent preflight
+   confirmed the script was readable and both shell scripts parsed.
+   [Recreation](../swarmnet_v2/logs/evidence/step3_attempt1_mount_repair.txt),
+   [preflight](../swarmnet_v2/logs/evidence/step3_launch_preflight.txt).
+2. Attempt 2 launched PX4 instance 0, then exited **255**:
+   `/px4_config/scripts/swarm_startup.sh: 2: .: cannot open etc/init.d-posix/rcS: No such file`.
+   PX4 also reported `Startup script returned with return value: 512`.
+   The launcher supplied the compiled rootfs positional argument and a separate
+   instance working directory, but the wrapper's relative rcS path did not
+   resolve. The correct startup root/path contract remains to be repaired.
+   [PX4's own output](../swarmnet_v2/logs/evidence/step3_attempt2_vehicle_runtime.txt).
+
+Written but **unverified**: startup commands for system ID, non-overlapping
+MAVLink endpoints and XRCE namespace; first-instance/standalone selection;
+and the telemetry-driven arm/OFFBOARD/takeoff/hover/land/disarm script.
+The failure occurred before these startup commands were consumed. Do not
+interpret their presence in source as proof of working routing or lifecycle.
+
+The native source image containing Micro XRCE-DDS Agent v2.4.3
+(`73622810d984349b80bbac0ef55fc0b694d62222`) and PX4 messages from release/1.16
+(`392e831c1f659429ca83902e66820d7094591410`) built successfully in the initial
+layout: [build](../swarmnet_v2/logs/evidence/step3_attempt1_image_build.txt).
+A corrected workspace-location image rebuild was started before the failed
+launches and completed successfully (exit 0, `px4_msgs` built in 91 seconds).
+Its build manifest digest is
+`sha256:55ae9de19acc5eb467120926c4d80c7cca5862208367fdf5b7ee4ac61616dda3`;
+it is a build artifact, not the currently activated runtime image. Its output is in
+[workspace build](../swarmnet_v2/logs/evidence/step3_workspace_image_build.txt).
+The Compose runtime ROS image remains pinned to the verified **Step 2 image**;
+the Step 3 agent image has not been activated or verified communicating with
+PX4. Transitive source dependencies and APT packages are not fully locked.
+
+Official QGroundControl **v5.1.5** was downloaded, SHA256 checked against its
+release asset, mounted read-only and launched. Its executable contains ARM64.
+The observed UI said **Disconnected**; no vehicle telemetry was demonstrated.
+It runs from `/private/tmp/swarmnet-qgc-515/QGroundControl.app`, not a permanent
+installation. [Checksum](../swarmnet_v2/logs/evidence/step3_qgc_checksum.txt),
+[architecture](../swarmnet_v2/logs/evidence/step3_qgc_binary.txt),
+[launch](../swarmnet_v2/logs/evidence/step3_qgc_launch.txt).
+The disconnected UI observation is recorded separately as a human-readable
+[UI inspection](../swarmnet_v2/logs/evidence/step3_qgc_ui_observation.txt),
+not misrepresented as command stdout or successful vehicle telemetry.
+
+Highest verified N: **no flying vehicle**. No arm, takeoff, hover, landing,
+disarm, RTF or flight resource measurement was collected. In particular,
+**N=10 did not demonstrate a 60-second hover**. The next authorized repair
+should first fix and prove rcS/rootfs resolution, then activate the agent
+image and retry the Step 3 gate; Steps 4–8 remain blocked behind that gate.
 
 ## Step 2 result
 

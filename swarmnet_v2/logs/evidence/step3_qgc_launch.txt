@@ -1,0 +1,6 @@
+UTC: 2026-10-31T17:46:51.693300+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: open /private/tmp/swarmnet-qgc-515/QGroundControl.app
+
+
+EXIT_STATUS: 0

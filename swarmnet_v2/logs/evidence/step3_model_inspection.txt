@@ -1,0 +1,265 @@
+UTC: 2026-10-31T17:37:20.752388+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose exec -T px4_sitl bash -lc 'find build/px4_sitl_default -name gz_env.sh -print; ls Tools/simulation/gz; sed -n "1,180p" src/modules/simulation/gz_bridge/CMakeLists.txt; sed -n "1,100p" ROMFS/px4fmu_common/init.d-posix/rcS'
+
+build/px4_sitl_default/rootfs/gz_env.sh
+LICENSE
+README.md
+fuel_upload.sh
+models
+sdf_parsing
+server.config
+simulation-gazebo
+tests
+tools
+worlds
+############################################################################
+#
+#   Copyright (c) 2025 PX4 Development Team. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in
+#    the documentation and/or other materials provided with the
+#    distribution.
+# 3. Neither the name PX4 nor the names of its contributors may be
+#    used to endorse or promote products derived from this software
+#    without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+# OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+# AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+############################################################################
+
+if(NOT DEFINED ENV{GZ_DISTRO} OR NOT "$ENV{GZ_DISTRO}" STREQUAL "harmonic")
+    find_package(gz-transport NAMES gz-transport14 gz-transport13)
+else()
+    find_package(gz-transport NAMES gz-transport13)
+endif()
+
+file(GLOB gz_worlds ${PX4_SOURCE_DIR}/Tools/simulation/gz/worlds/*.sdf)
+file(GLOB gz_airframes ${PX4_SOURCE_DIR}/ROMFS/px4fmu_common/init.d-posix/airframes/*_gz_*)
+
+if (gz-transport_FOUND)
+	px4_add_module(
+		MODULE modules__simulation__gz_bridge
+		MAIN gz_bridge
+		COMPILE_FLAGS
+			${MAX_CUSTOM_OPT_LEVEL}
+		SRCS
+			GZBridge.cpp
+			GZBridge.hpp
+			GZMixingInterfaceESC.cpp
+			GZMixingInterfaceESC.hpp
+			GZMixingInterfaceServo.cpp
+			GZMixingInterfaceServo.hpp
+			GZMixingInterfaceWheel.cpp
+			GZMixingInterfaceWheel.hpp
+			GZGimbal.cpp
+			GZGimbal.hpp
+		DEPENDS
+			mixer_module
+			px4_work_queue
+			gz-transport${gz-transport_VERSION_MAJOR}::core
+		MODULE_CONFIG
+			module.yaml
+	)
+
+    target_include_directories(modules__simulation__gz_bridge
+        PUBLIC
+            ${PX4_GZ_MSGS_BINARY_DIR}
+    )
+
+	target_include_directories(modules__simulation__gz_bridge PUBLIC px4_gz_msgs)
+	target_link_libraries(modules__simulation__gz_bridge PUBLIC px4_gz_msgs)
+
+	px4_add_git_submodule(TARGET git_gz PATH "${PX4_SOURCE_DIR}/Tools/simulation/gz")
+	include(ExternalProject)
+	ExternalProject_Add(gz
+		SOURCE_DIR ${PX4_SOURCE_DIR}/Tools/simulation/gz
+		CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+		BINARY_DIR ${PX4_BINARY_DIR}/build_gz
+		INSTALL_COMMAND ""
+		DEPENDS git_gz
+		USES_TERMINAL_CONFIGURE true
+		USES_TERMINAL_BUILD true
+		EXCLUDE_FROM_ALL true
+	)
+
+	# Below we setup the build targets for our worlds and models
+	# Syntax: gz_<model_name>_<world_name>
+	# Example: gz_x500_flow_forest
+	foreach(gz_airframe IN LISTS gz_airframes)
+		set(model_name)
+		string(REGEX REPLACE ".*_gz_" "" model_name ${gz_airframe})
+
+		foreach(world ${gz_worlds})
+			get_filename_component("world_name" ${world} NAME_WE)
+
+			if(world_name STREQUAL "default")
+				add_custom_target(gz_${model_name}
+					COMMAND ${CMAKE_COMMAND} -E env PX4_SIM_MODEL=gz_${model_name} GZ_IP=127.0.0.1 $<TARGET_FILE:px4>
+					WORKING_DIRECTORY ${SITL_WORKING_DIR}
+					USES_TERMINAL
+					DEPENDS px4 px4_gz_plugins
+				)
+			else()
+				add_custom_target(gz_${model_name}_${world_name}
+					COMMAND ${CMAKE_COMMAND} -E env PX4_SIM_MODEL=gz_${model_name} PX4_GZ_WORLD=${world_name} GZ_IP=127.0.0.1 $<TARGET_FILE:px4>
+					WORKING_DIRECTORY ${SITL_WORKING_DIR}
+					USES_TERMINAL
+					DEPENDS px4 px4_gz_plugins
+				)
+			endif()
+		endforeach()
+	endforeach()
+
+	# Setup the environment variables: PX4_GZ_MODELS, PX4_GZ_WORLDS, GZ_SIM_RESOURCE_PATH
+	configure_file(gz_env.sh.in ${PX4_BINARY_DIR}/rootfs/gz_env.sh)
+
+else()
+	# Create fallback targets that provide helpful error messages when Gazebo dependencies are missing
+	foreach(gz_airframe IN LISTS gz_airframes)
+		set(model_name)
+		string(REGEX REPLACE ".*_gz_" "" model_name ${gz_airframe})
+
+		foreach(world ${gz_worlds})
+			get_filename_component("world_name" ${world} NAME_WE)
+
+			if(world_name STREQUAL "default")
+				add_custom_target(gz_${model_name}
+					COMMAND ${CMAKE_COMMAND} -E echo "ERROR: Gazebo simulation dependencies not found!"
+					COMMAND ${CMAKE_COMMAND} -E echo "  - For installation instructions, see: https://gazebosim.org/docs/harmonic/install_ubuntu/"
+					COMMAND ${CMAKE_COMMAND} -E false
+					VERBATIM
+				)
+			else()
+				add_custom_target(gz_${model_name}_${world_name}
+					COMMAND ${CMAKE_COMMAND} -E echo "ERROR: Gazebo simulation dependencies not found!"
+					COMMAND ${CMAKE_COMMAND} -E echo "  - For installation instructions, see: https://gazebosim.org/docs/harmonic/install_ubuntu/"
+					COMMAND ${CMAKE_COMMAND} -E false
+					VERBATIM
+				)
+			endif()
+		endforeach()
+	endforeach()
+
+	message(STATUS "Gazebo simulation bridge module disabled: missing dependencies")
+endif()
+#!/bin/sh
+
+# Un comment and use set +e to ignore and set -e to enable 'exit on error control'
+set +e
+# Un comment the line below to help debug scripts by printing a trace of the script commands
+#set -x
+
+# PX4 commands need the 'px4-' prefix in bash.
+# (px4-alias.sh is expected to be in the PATH)
+# shellcheck disable=SC1091
+. px4-alias.sh
+
+#search path for sourcing px4-rc.*
+PATH="$PATH:${R}etc/init.d-posix"
+
+#
+# Main SITL startup script
+#
+
+# check for ekf2 replay
+# shellcheck disable=SC2154
+if [ "$replay_mode" = "ekf2" ]
+then
+	. ${R}etc/init.d-posix/rc.replay
+	exit 0
+fi
+
+# initialize script variables
+set VEHICLE_TYPE                none
+set LOGGER_ARGS                 ""
+set LOGGER_BUF                  1000
+
+set RUN_MINIMAL_SHELL           no
+
+set SYS_AUTOSTART=0
+
+if [ "$PX4_SIM_MODEL" = "shell" ]
+then
+	set RUN_MINIMAL_SHELL yes
+
+elif [ -n "$PX4_SYS_AUTOSTART" ]
+then
+	echo "env SYS_AUTOSTART: ${PX4_SYS_AUTOSTART}"
+	SYS_AUTOSTART=${PX4_SYS_AUTOSTART}
+
+elif [ "$PX4_SIM_MODEL" = "none" ] || [ -z $PX4_SIM_MODEL ]
+then
+	# no airframe selected
+	SYS_AUTOSTART=0
+
+elif [ -n "$PX4_SIM_MODEL" ]
+then
+	# Find the matching Autostart ID (file name has the form: [0-9]+_${PX4_SIM_MODEL})
+	# TODO: unify with rc.autostart generation
+	# shellcheck disable=SC2012
+	REQUESTED_AUTOSTART=$(ls "${R}etc/init.d-posix/airframes" | sed -n 's/^\([0-9][0-9]*\)_'${PX4_SIM_MODEL}'$/\1/p')
+	if [ -z "$REQUESTED_AUTOSTART" ]; then
+		echo "ERROR [init] Unknown model $PX4_SIM_MODEL (not found by name on ${R}etc/init.d-posix/airframes)"
+		exit 1
+	else
+		SYS_AUTOSTART=$REQUESTED_AUTOSTART
+		echo "INFO  [init] found model autostart file as SYS_AUTOSTART=$REQUESTED_AUTOSTART"
+	fi
+fi
+
+# Load parameters
+set PARAM_FILE parameters.bson
+set PARAM_BACKUP_FILE parameters_backup.bson
+
+param select $PARAM_FILE
+if [ -f $PARAM_FILE ]; then
+
+	if ! param import
+	then
+		echo "ERROR [init] param import failed"
+
+		bsondump $PARAM_FILE
+
+		# try to make a backup copy
+		cp $PARAM_FILE param_import_fail.bson
+
+		# try importing from backup file
+		if [ -f $PARAM_BACKUP_FILE ]
+		then
+			echo "[init] importing from parameter backup"
+
+			# dump current backup file contents for comparison
+			bsondump $PARAM_BACKUP_FILE
+
+			param import $PARAM_BACKUP_FILE
+
+			# overwrite invalid $PARAM_FILE with backup
+			cp $PARAM_BACKUP_FILE $PARAM_FILE
+		fi
+
+		param status
+	fi
+
+elif [ -f $PARAM_BACKUP_FILE ]; then
+	echo "ERROR [init] primary param file $PARAM_FILE unavailable, using backup $PARAM_BACKUP_FILE"
+
+EXIT_STATUS: 0

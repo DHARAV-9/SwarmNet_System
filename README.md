@@ -1,5 +1,10 @@
 # SwarmNet v2 — Phases 1–2
 
+> Repair status (2026-10-31): Steps 1–2 passed; Step 3 stopped after two
+> failed launches. No flight is verified. The instructions below predate
+> the repair; use [the evidence report](docs/REPAIR_REPORT.md) and
+> [current repair notes](swarmnet_v2/README.md), not the old demo claims.
+
 Phase 1 brings up one PX4 SITL X500 drone in Gazebo, connects it to native
 macOS QGroundControl, and prepares the three-container network used by later
 swarm phases.

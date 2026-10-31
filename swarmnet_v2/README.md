@@ -48,6 +48,12 @@ ROS2 packages and discovered `master_node` and `follower_node`. The state
 topic contract is `/swarm/drone_<id>/state`. Flight and measured telemetry
 remain unverified; see the evidence-linked report above.
 
+**Stopped at Step 3 after two failed launch attempts.** The first attempt
+lacked the script mount; after container recreation, PX4 failed to resolve
+`etc/init.d-posix/rcS` from the startup wrapper. No vehicle flew and QGC
+remained disconnected. Steps 4–8 have not started. The new `step3_start.sh`
+and `flight_cycle.py` are unverified; do not treat them as working demos.
+
 Phase 1 brings up one PX4 SITL X500 drone in Gazebo, connects it to native
 macOS QGroundControl, and prepares the three-container network used by later
 swarm phases.

@@ -1,0 +1,12 @@
+UTC: 2026-10-31T17:48:51.300002+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose up -d --no-build --wait px4_sitl
+
+ Container swarmnet_px4  Recreate
+ Container swarmnet_px4  Recreated
+ Container swarmnet_px4  Starting
+ Container swarmnet_px4  Started
+ Container swarmnet_px4  Waiting
+ Container swarmnet_px4  Healthy
+
+EXIT_STATUS: 0
