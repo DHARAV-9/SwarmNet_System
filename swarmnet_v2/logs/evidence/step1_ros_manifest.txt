@@ -1,0 +1,257 @@
+UTC: 2026-10-31T17:00:36.868856+00:00
+CWD: /Users/dharavbhatt/swaram_net
+COMMAND: docker manifest inspect --verbose ros:humble-ros-base-jammy
+
+[
+	{
+		"Ref": "docker.io/library/ros:humble-ros-base-jammy@sha256:a3f4de78e42cca693a543ece5798aedcf1cae0171fe71c334a047332cc72ef93",
+		"Descriptor": {
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"digest": "sha256:a3f4de78e42cca693a543ece5798aedcf1cae0171fe71c334a047332cc72ef93",
+			"size": 2908,
+			"platform": {
+				"architecture": "amd64",
+				"os": "linux"
+			}
+		},
+		"Raw": "ewogICJzY2hlbWFWZXJzaW9uIjogMiwKICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5vY2kuaW1hZ2UubWFuaWZlc3QudjEranNvbiIsCiAgImNvbmZpZyI6IHsKICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5jb25maWcudjEranNvbiIsCiAgICAiZGlnZXN0IjogInNoYTI1NjowOWU2MDkxZDk2N2I4MmJlZTQ2ZDU4ZGZhYTFkMTQ4MDVhOWU5YzM0NzM2ZWVhNmFlZGE5YjVhMGE4YmM4YjdjIiwKICAgICJzaXplIjogNTM4OAogIH0sCiAgImxheWVycyI6IFsKICAgIHsKICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQub2NpLmltYWdlLmxheWVyLnYxLnRhcitnemlwIiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6MDYyNmQzY2MzMTZjOWZlYTNkNDg5MWUyZWMxOWI4ZjM3MWZlMjJmZmI5MTU2MjJmNjA3MmEyZWUyY2E5MDE3ZiIsCiAgICAgICJzaXplIjogMjk3NTI0ODgKICAgIH0sCiAgICB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5sYXllci52MS50YXIrZ3ppcCIsCiAgICAgICJkaWdlc3QiOiAic2hhMjU2OjM1YzU0OWJkODkxMDU2NDg2MGMwNWIzOTdjMmY1MDc5OTc3YmE1Nzg2NjU2OGI0MDUxMmU2ZDU5MDBiNjhhZWIiLAogICAgICAic2l6ZSI6IDEyMTQ5MDkKICAgIH0sCiAgICB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5sYXllci52MS50YXIrZ3ppcCIsCiAgICAgICJkaWdlc3QiOiAic2hhMjU2OjZiZmZmMzc1ZDQwOTYwN2RiNjFiOWE2NjY3ZDA0NGYwYWE0NmVmMmEzY2JkYTI4NmNhODQyZDMyYzQ2Yjc1ODUiLAogICAgICAic2l6ZSI6IDU5NTI2OTYKICAgIH0sCiAgICB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5sYXllci52MS50YXIrZ3ppcCIsCiAgICAgICJkaWdlc3QiOiAic2hhMjU2OmE3YmYwNzQ5ODZmM2Y3Zjk3NmRhNWJmNmQwNGFkMjNlMjNjMGQxMDVjNWIxZDg1NTA3YjQ1ODAxMmExOGNiNDIiLAogICAgICAic2l6ZSI6IDk3OTg3CiAgICB9LAogICAgewogICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5vY2kuaW1hZ2UubGF5ZXIudjEudGFyK2d6aXAiLAogICAgICAiZGlnZXN0IjogInNoYTI1NjphMzIwZWU3ZTNjNWM5NzEwOWY4NDZjMzM0NjU1MGU1ZDRlMTU0NDY4NGUzYzAwMGU3YjdjYWNhMDkxOWE5ZGNhIiwKICAgICAgInNpemUiOiAxMDUyMjY3OTQKICAgIH0sCiAgICB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5sYXllci52MS50YXIrZ3ppcCIsCiAgICAgICJkaWdlc3QiOiAic2hhMjU2OjdjZDA2MzE4Y2ZhMzRkNGU5MWNiYmFlNDkwYjMxZmI3Yjk1MTc3MjEyODEwODBkZmQ1NDNhZjFlZjUzZDMyYjIiLAogICAgICAic2l6ZSI6IDE5NwogICAgfSwKICAgIHsKICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQub2NpLmltYWdlLmxheWVyLnYxLnRhcitnemlwIiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6NTRkNTgxZWE5MDBjZWI2NjkzNjIxMzY2ZjNlNGFkMTVmOGNmYTVlYmMwNmZiNjNhZDBkZDMzYzQ3ZTA0Mjg3YSIsCiAgICAgICJzaXplIjogOTgyMDE2ODMKICAgIH0sCiAgICB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5sYXllci52MS50YXIrZ3ppcCIsCiAgICAgICJkaWdlc3QiOiAic2hhMjU2Ojc4ZTYzNDk1MGNjZDIxYWJlZjgzNDY0NzJiZmZjZWI5M2VlZDlkNmRkOGIyYWQwMDNjMTQ5M2Q1MWEzY2Y4NWQiLAogICAgICAic2l6ZSI6IDM3MzE3MQogICAgfSwKICAgIHsKICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQub2NpLmltYWdlLmxheWVyLnYxLnRhcitnemlwIiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6MzdmMTU4MTQwZWZjMjc4MTI5YTFjNTg1YWQ4ZmVmNTc4ZTYwMDU5YmNhZTdmNDYzNWZiZWY1NzA0YWI1YjFlMiIsCiAgICAgICJzaXplIjogMjY3MwogICAgfSwKICAgIHsKICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQub2NpLmltYWdlLmxheWVyLnYxLnRhcitnemlwIiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6MzhkNWU2OWRkZDI2YTFlMTZjNjZhNjE1MTM4MTMxOTE0NTc1ZWU5NTE4ZGViODBiMmNkYmE2NDk4MWQ2NGE0MCIsCiAgICAgICJzaXplIjogMjMzNTAyMDkKICAgIH0KICBdLAogICJhbm5vdGF0aW9ucyI6IHsKICAgICJjb20uZG9ja2VyLm9mZmljaWFsLWltYWdlcy5iYXNoYnJldy5hcmNoIjogImFtZDY0IiwKICAgICJvcmcub3BlbmNvbnRhaW5lcnMuaW1hZ2UuYmFzZS5kaWdlc3QiOiAic2hhMjU2OmRkZDRjODgzNTU1NmJlZmM2ZTFiZGU5N2ZkZmI1ZTIyY2IxZGM2MjhkYjQ3N2JmOTM0NWUwZmM0ZjUzNzhlMWQiLAogICAgIm9yZy5vcGVuY29udGFpbmVycy5pbWFnZS5iYXNlLm5hbWUiOiAicm9zOmh1bWJsZS1yb3MtY29yZS1qYW1teSIsCiAgICAib3JnLm9wZW5jb250YWluZXJzLmltYWdlLmNyZWF0ZWQiOiAiMjAyNi0xMC0yN1QwMDozMTozN1oiLAogICAgIm9yZy5vcGVuY29udGFpbmVycy5pbWFnZS5yZXZpc2lvbiI6ICIyMGUzYmE2ODViYjM1M2EzYzAwYmU5YmEwMWMxYjdhNjgyM2M5NDcyIiwKICAgICJvcmcub3BlbmNvbnRhaW5lcnMuaW1hZ2Uuc291cmNlIjogImh0dHBzOi8vZ2l0aHViLmNvbS9vc3JmL2RvY2tlcl9pbWFnZXMuZ2l0IzIwZTNiYTY4NWJiMzUzYTNjMDBiZTliYTAxYzFiN2E2ODIzYzk0NzI6cm9zL2h1bWJsZS91YnVudHUvamFtbXkvcm9zLWJhc2UiLAogICAgIm9yZy5vcGVuY29udGFpbmVycy5pbWFnZS51cmwiOiAiaHR0cHM6Ly9odWIuZG9ja2VyLmNvbS9fL3JvcyIsCiAgICAib3JnLm9wZW5jb250YWluZXJzLmltYWdlLnZlcnNpb24iOiAiaHVtYmxlLXJvcy1iYXNlIgogIH0KfQ==",
+		"OCIManifest": {
+			"schemaVersion": 2,
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"config": {
+				"mediaType": "application/vnd.oci.image.config.v1+json",
+				"digest": "sha256:09e6091d967b82bee46d58dfaa1d14805a9e9c34736eea6aeda9b5a0a8bc8b7c",
+				"size": 5388
+			},
+			"layers": [
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:0626d3cc316c9fea3d4891e2ec19b8f371fe22ffb915622f6072a2ee2ca9017f",
+					"size": 29752488
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:35c549bd8910564860c05b397c2f5079977ba57866568b40512e6d5900b68aeb",
+					"size": 1214909
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:6bfff375d409607db61b9a6667d044f0aa46ef2a3cbda286ca842d32c46b7585",
+					"size": 5952696
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:a7bf074986f3f7f976da5bf6d04ad23e23c0d105c5b1d85507b458012a18cb42",
+					"size": 97987
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:a320ee7e3c5c97109f846c3346550e5d4e1544684e3c000e7b7caca0919a9dca",
+					"size": 105226794
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:7cd06318cfa34d4e91cbbae490b31fb7b9517721281080dfd543af1ef53d32b2",
+					"size": 197
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:54d581ea900ceb6693621366f3e4ad15f8cfa5ebc06fb63ad0dd33c47e04287a",
+					"size": 98201683
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:78e634950ccd21abef8346472bffceb93eed9d6dd8b2ad003c1493d51a3cf85d",
+					"size": 373171
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:37f158140efc278129a1c585ad8fef578e60059bcae7f4635fbef5704ab5b1e2",
+					"size": 2673
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:38d5e69ddd26a1e16c66a615138131914575ee9518deb80b2cdba64981d64a40",
+					"size": 23350209
+				}
+			],
+			"annotations": {
+				"com.docker.official-images.bashbrew.arch": "amd64",
+				"org.opencontainers.image.base.digest": "sha256:ddd4c8835556befc6e1bde97fdfb5e22cb1dc628db477bf9345e0fc4f5378e1d",
+				"org.opencontainers.image.base.name": "ros:humble-ros-core-jammy",
+				"org.opencontainers.image.created": "2026-10-27T00:31:37Z",
+				"org.opencontainers.image.revision": "20e3ba685bb353a3c00be9ba01c1b7a6823c9472",
+				"org.opencontainers.image.source": "https://github.com/osrf/docker_images.git#20e3ba685bb353a3c00be9ba01c1b7a6823c9472:ros/humble/ubuntu/jammy/ros-base",
+				"org.opencontainers.image.url": "https://hub.docker.com/_/ros",
+				"org.opencontainers.image.version": "humble-ros-base"
+			}
+		}
+	},
+	{
+		"Ref": "docker.io/library/ros:humble-ros-base-jammy@sha256:0af631e3bd2cb9e8a20326e46c825cb591abcd485d991ebd49eca23550e951d6",
+		"Descriptor": {
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"digest": "sha256:0af631e3bd2cb9e8a20326e46c825cb591abcd485d991ebd49eca23550e951d6",
+			"size": 842,
+			"platform": {
+				"architecture": "unknown",
+				"os": "unknown"
+			}
+		},
+		"Raw": "ewogICJzY2hlbWFWZXJzaW9uIjogMiwKICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5vY2kuaW1hZ2UubWFuaWZlc3QudjEranNvbiIsCiAgImNvbmZpZyI6IHsKICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5jb25maWcudjEranNvbiIsCiAgICAiZGlnZXN0IjogInNoYTI1Njo1M2E3OTY4MDI5NTJiMDg4YjVkMjk4MDIxMWMxMDljNTkxY2M4NjcyZGY3YWZjYjlkNDQ5MDU1MjY4ZWZjZTlhIiwKICAgICJzaXplIjogMjQxCiAgfSwKICAibGF5ZXJzIjogWwogICAgewogICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5pbi10b3RvK2pzb24iLAogICAgICAiZGlnZXN0IjogInNoYTI1NjpiNDEyMjFhMGM1NTQwNzRjZTE0NWYwMzI2YzYwOGQyOGI5NzliMDc4NzY5MDEyZTk0NGJjZDRiMGFkODMxNjAyIiwKICAgICAgInNpemUiOiAyMzk1NzQ1OSwKICAgICAgImFubm90YXRpb25zIjogewogICAgICAgICJpbi10b3RvLmlvL3ByZWRpY2F0ZS10eXBlIjogImh0dHBzOi8vc3BkeC5kZXYvRG9jdW1lbnQiCiAgICAgIH0KICAgIH0sCiAgICB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmluLXRvdG8ranNvbiIsCiAgICAgICJkaWdlc3QiOiAic2hhMjU2OmZkMTdkOWU5NDE1MTRkYmUwNzYwOGE2YTcxNDBjYjUyNjE2ZGYzNTA1OTViNmY4NTU3YWYyZGZjMTdjYWFlNzIiLAogICAgICAic2l6ZSI6IDE2MzQ4LAogICAgICAiYW5ub3RhdGlvbnMiOiB7CiAgICAgICAgImluLXRvdG8uaW8vcHJlZGljYXRlLXR5cGUiOiAiaHR0cHM6Ly9zbHNhLmRldi9wcm92ZW5hbmNlL3YwLjIiCiAgICAgIH0KICAgIH0KICBdCn0=",
+		"OCIManifest": {
+			"schemaVersion": 2,
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"config": {
+				"mediaType": "application/vnd.oci.image.config.v1+json",
+				"digest": "sha256:53a796802952b088b5d2980211c109c591cc8672df7afcb9d449055268efce9a",
+				"size": 241
+			},
+			"layers": [
+				{
+					"mediaType": "application/vnd.in-toto+json",
+					"digest": "sha256:b41221a0c554074ce145f0326c608d28b979b078769012e944bcd4b0ad831602",
+					"size": 23957459,
+					"annotations": {
+						"in-toto.io/predicate-type": "https://spdx.dev/Document"
+					}
+				},
+				{
+					"mediaType": "application/vnd.in-toto+json",
+					"digest": "sha256:fd17d9e941514dbe07608a6a7140cb52616df350595b6f8557af2dfc17caae72",
+					"size": 16348,
+					"annotations": {
+						"in-toto.io/predicate-type": "https://slsa.dev/provenance/v0.2"
+					}
+				}
+			]
+		}
+	},
+	{
+		"Ref": "docker.io/library/ros:humble-ros-base-jammy@sha256:48435c01f2876ff519a0d07edf8dd3ab29a8106c907965c64385a14c76470d6b",
+		"Descriptor": {
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"digest": "sha256:48435c01f2876ff519a0d07edf8dd3ab29a8106c907965c64385a14c76470d6b",
+			"size": 2910,
+			"platform": {
+				"architecture": "arm64",
+				"os": "linux",
+				"variant": "v8"
+			}
+		},
+		"Raw": "ewogICJzY2hlbWFWZXJzaW9uIjogMiwKICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5vY2kuaW1hZ2UubWFuaWZlc3QudjEranNvbiIsCiAgImNvbmZpZyI6IHsKICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5jb25maWcudjEranNvbiIsCiAgICAiZGlnZXN0IjogInNoYTI1NjpjZmRhOTU4YzI4YTkzMjMxZGVhYWYyZGQ0NGQ4YmE4YjQ2ZTcxZWMwNDE2ZmJhMzhjNWNiNjAzZjM3ZGY0YjIzIiwKICAgICJzaXplIjogNTQwNQogIH0sCiAgImxheWVycyI6IFsKICAgIHsKICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQub2NpLmltYWdlLmxheWVyLnYxLnRhcitnemlwIiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6NzcxZWVkNzNlZTgyYzc5MTZkZjE5N2MwZmQ3ZWYzYWM0ZWVkY2I5YTYzMThiMTBkMjY1Mjk0OGM2YzRjYTA4ZiIsCiAgICAgICJzaXplIjogMjc2ODQ2MDcKICAgIH0sCiAgICB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5sYXllci52MS50YXIrZ3ppcCIsCiAgICAgICJkaWdlc3QiOiAic2hhMjU2OmRhMzdmYjM1M2ZmYjg3ZmQwMDNjYWFhOTYwYzMxMjk0NTc2Nzk0MTEyMGY5Y2UyMTg5ODQxZDdmMjQwODFlNWEiLAogICAgICAic2l6ZSI6IDEyMTQ4NDEKICAgIH0sCiAgICB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5sYXllci52MS50YXIrZ3ppcCIsCiAgICAgICJkaWdlc3QiOiAic2hhMjU2OmY0MTZjZjgzYjc2N2MxYjFhMDFmZjliNWEzZGRiNTY3MjlhZGViNjA0MjlkMmUyYmY1ZGExYjBmZWQwNmY4ODUiLAogICAgICAic2l6ZSI6IDU5MTAzNTAKICAgIH0sCiAgICB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5sYXllci52MS50YXIrZ3ppcCIsCiAgICAgICJkaWdlc3QiOiAic2hhMjU2OmY2N2Y2OTU1YWVmNGEyY2UxOGQwZDhiNGNhMTRjNjI0NDJmZjIyOWU1NTk1ZmE5MTQ4ZmNkYWViODllYzg1OTUiLAogICAgICAic2l6ZSI6IDk3ODkwCiAgICB9LAogICAgewogICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5vY2kuaW1hZ2UubGF5ZXIudjEudGFyK2d6aXAiLAogICAgICAiZGlnZXN0IjogInNoYTI1NjpiMDU2N2Y3ODY5YThiNzE1Yjc2ODczNzYzZGQzZDI3YTFiOWY2NDA4ZTI0YTUxMGRmMmIxYTVmMWE0MTdkMjMwIiwKICAgICAgInNpemUiOiAxMDMwMzU2MDgKICAgIH0sCiAgICB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5sYXllci52MS50YXIrZ3ppcCIsCiAgICAgICJkaWdlc3QiOiAic2hhMjU2OmI4ODZmMzU3ZjIyN2Y2MzcxNmU1Y2RhYmMzOTQ5ZWVjMjBhZGEyYTFjZjA3ZmVlOGFlOWM5OWY5ZGUxMDI2NDgiLAogICAgICAic2l6ZSI6IDE5NwogICAgfSwKICAgIHsKICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQub2NpLmltYWdlLmxheWVyLnYxLnRhcitnemlwIiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6YjgxZWM1NWE1NWZmMTY2NDJkOTQyMDBkN2FkZTJlNTI1NjAzNmM0Mjc4NjkwMDAwYTQxYjc3ZThiMmIyYWY2ZSIsCiAgICAgICJzaXplIjogOTU4MzkwNzcKICAgIH0sCiAgICB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5sYXllci52MS50YXIrZ3ppcCIsCiAgICAgICJkaWdlc3QiOiAic2hhMjU2OmY5ZjM5YjFjMGU4YjMyNzJiNDBmY2JkN2NkYzk0NjJmYmNkMDdmYzNkOTI1ODNmOTU1NWUxMzVjNGZhM2FlOTciLAogICAgICAic2l6ZSI6IDM3MzE2OQogICAgfSwKICAgIHsKICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQub2NpLmltYWdlLmxheWVyLnYxLnRhcitnemlwIiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6OTI2OTQwODY2ZDFlYmU1ODkzMWE3MzgyZGUyOWNhNmUwYjg0ZTQ3YTg4MjBiOWJmMmEyNTg5MDYyYjdlZTEzNSIsCiAgICAgICJzaXplIjogMjY1MgogICAgfSwKICAgIHsKICAgICAgIm1lZGlhVHlwZSI6ICJhcHBsaWNhdGlvbi92bmQub2NpLmltYWdlLmxheWVyLnYxLnRhcitnemlwIiwKICAgICAgImRpZ2VzdCI6ICJzaGEyNTY6YjBlNjAzZjFiZjU2NWU1Y2NmN2JiMjE4NDk5MDgxODgzOTc5ZWIxNzMwMzU3OWI1MWE2ZmU2Zjg0YzY5NzFlMiIsCiAgICAgICJzaXplIjogMjI3NTQ4MTgKICAgIH0KICBdLAogICJhbm5vdGF0aW9ucyI6IHsKICAgICJjb20uZG9ja2VyLm9mZmljaWFsLWltYWdlcy5iYXNoYnJldy5hcmNoIjogImFybTY0djgiLAogICAgIm9yZy5vcGVuY29udGFpbmVycy5pbWFnZS5iYXNlLmRpZ2VzdCI6ICJzaGEyNTY6NjcxY2M0YjY2MTUwYmFjY2Q4Yjg2ZjQ3YjllZDIyZjJmZTE3NTc5NmRhYWE5ZDY3OTUzN2Q2NTM3NDk4OGJjMiIsCiAgICAib3JnLm9wZW5jb250YWluZXJzLmltYWdlLmJhc2UubmFtZSI6ICJyb3M6aHVtYmxlLXJvcy1jb3JlLWphbW15IiwKICAgICJvcmcub3BlbmNvbnRhaW5lcnMuaW1hZ2UuY3JlYXRlZCI6ICIyMDI2LTEwLTI3VDAwOjMxOjE5WiIsCiAgICAib3JnLm9wZW5jb250YWluZXJzLmltYWdlLnJldmlzaW9uIjogIjIwZTNiYTY4NWJiMzUzYTNjMDBiZTliYTAxYzFiN2E2ODIzYzk0NzIiLAogICAgIm9yZy5vcGVuY29udGFpbmVycy5pbWFnZS5zb3VyY2UiOiAiaHR0cHM6Ly9naXRodWIuY29tL29zcmYvZG9ja2VyX2ltYWdlcy5naXQjMjBlM2JhNjg1YmIzNTNhM2MwMGJlOWJhMDFjMWI3YTY4MjNjOTQ3Mjpyb3MvaHVtYmxlL3VidW50dS9qYW1teS9yb3MtYmFzZSIsCiAgICAib3JnLm9wZW5jb250YWluZXJzLmltYWdlLnVybCI6ICJodHRwczovL2h1Yi5kb2NrZXIuY29tL18vcm9zIiwKICAgICJvcmcub3BlbmNvbnRhaW5lcnMuaW1hZ2UudmVyc2lvbiI6ICJodW1ibGUtcm9zLWJhc2UiCiAgfQp9",
+		"OCIManifest": {
+			"schemaVersion": 2,
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"config": {
+				"mediaType": "application/vnd.oci.image.config.v1+json",
+				"digest": "sha256:cfda958c28a93231deaaf2dd44d8ba8b46e71ec0416fba38c5cb603f37df4b23",
+				"size": 5405
+			},
+			"layers": [
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:771eed73ee82c7916df197c0fd7ef3ac4eedcb9a6318b10d2652948c6c4ca08f",
+					"size": 27684607
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:da37fb353ffb87fd003caaa960c312945767941120f9ce2189841d7f24081e5a",
+					"size": 1214841
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:f416cf83b767c1b1a01ff9b5a3ddb56729adeb60429d2e2bf5da1b0fed06f885",
+					"size": 5910350
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:f67f6955aef4a2ce18d0d8b4ca14c62442ff229e5595fa9148fcdaeb89ec8595",
+					"size": 97890
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:b0567f7869a8b715b76873763dd3d27a1b9f6408e24a510df2b1a5f1a417d230",
+					"size": 103035608
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:b886f357f227f63716e5cdabc3949eec20ada2a1cf07fee8ae9c99f9de102648",
+					"size": 197
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:b81ec55a55ff16642d94200d7ade2e5256036c4278690000a41b77e8b2b2af6e",
+					"size": 95839077
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:f9f39b1c0e8b3272b40fcbd7cdc9462fbcd07fc3d92583f9555e135c4fa3ae97",
+					"size": 373169
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:926940866d1ebe58931a7382de29ca6e0b84e47a8820b9bf2a2589062b7ee135",
+					"size": 2652
+				},
+				{
+					"mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+					"digest": "sha256:b0e603f1bf565e5ccf7bb218499081883979eb17303579b51a6fe6f84c6971e2",
+					"size": 22754818
+				}
+			],
+			"annotations": {
+				"com.docker.official-images.bashbrew.arch": "arm64v8",
+				"org.opencontainers.image.base.digest": "sha256:671cc4b66150baccd8b86f47b9ed22f2fe175796daaa9d679537d65374988bc2",
+				"org.opencontainers.image.base.name": "ros:humble-ros-core-jammy",
+				"org.opencontainers.image.created": "2026-10-27T00:31:19Z",
+				"org.opencontainers.image.revision": "20e3ba685bb353a3c00be9ba01c1b7a6823c9472",
+				"org.opencontainers.image.source": "https://github.com/osrf/docker_images.git#20e3ba685bb353a3c00be9ba01c1b7a6823c9472:ros/humble/ubuntu/jammy/ros-base",
+				"org.opencontainers.image.url": "https://hub.docker.com/_/ros",
+				"org.opencontainers.image.version": "humble-ros-base"
+			}
+		}
+	},
+	{
+		"Ref": "docker.io/library/ros:humble-ros-base-jammy@sha256:24f8687be8c76b829679e8bfaac03a1a30abb1def0da644a4bce8e676eb8be02",
+		"Descriptor": {
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"digest": "sha256:24f8687be8c76b829679e8bfaac03a1a30abb1def0da644a4bce8e676eb8be02",
+			"size": 842,
+			"platform": {
+				"architecture": "unknown",
+				"os": "unknown"
+			}
+		},
+		"Raw": "ewogICJzY2hlbWFWZXJzaW9uIjogMiwKICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5vY2kuaW1hZ2UubWFuaWZlc3QudjEranNvbiIsCiAgImNvbmZpZyI6IHsKICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLm9jaS5pbWFnZS5jb25maWcudjEranNvbiIsCiAgICAiZGlnZXN0IjogInNoYTI1Njo0NWI3OWFmYzkzNjlhNGQ3MTFmYzNjMDA0MWZkZTViYTc1NWI5Y2JhYTY4YmJkODAxMjU4MmQyZWRmYjc3MzA4IiwKICAgICJzaXplIjogMjQxCiAgfSwKICAibGF5ZXJzIjogWwogICAgewogICAgICAibWVkaWFUeXBlIjogImFwcGxpY2F0aW9uL3ZuZC5pbi10b3RvK2pzb24iLAogICAgICAiZGlnZXN0IjogInNoYTI1NjowMDQ5ZGIzYzBhMDNhYTY1YzJiZjJmMjQxNzFkNzNiM2E1ZTI5MjMwYmQ0YzlhMzM0NzY5NmUzY2M0ZjJmNTY5IiwKICAgICAgInNpemUiOiAyMzk3MDQ3NiwKICAgICAgImFubm90YXRpb25zIjogewogICAgICAgICJpbi10b3RvLmlvL3ByZWRpY2F0ZS10eXBlIjogImh0dHBzOi8vc3BkeC5kZXYvRG9jdW1lbnQiCiAgICAgIH0KICAgIH0sCiAgICB7CiAgICAgICJtZWRpYVR5cGUiOiAiYXBwbGljYXRpb24vdm5kLmluLXRvdG8ranNvbiIsCiAgICAgICJkaWdlc3QiOiAic2hhMjU2OjdkN2JiMDNiMjMxZWI3NDRkNmI5NzZiMmUwYjAwNGFmZTk5ZmY4YzM5MzNhMzVmYmU1NzlhNmVjOGUzNWJjZGMiLAogICAgICAic2l6ZSI6IDE2NDg0LAogICAgICAiYW5ub3RhdGlvbnMiOiB7CiAgICAgICAgImluLXRvdG8uaW8vcHJlZGljYXRlLXR5cGUiOiAiaHR0cHM6Ly9zbHNhLmRldi9wcm92ZW5hbmNlL3YwLjIiCiAgICAgIH0KICAgIH0KICBdCn0=",
+		"OCIManifest": {
+			"schemaVersion": 2,
+			"mediaType": "application/vnd.oci.image.manifest.v1+json",
+			"config": {
+				"mediaType": "application/vnd.oci.image.config.v1+json",
+				"digest": "sha256:45b79afc9369a4d711fc3c0041fde5ba755b9cbaa68bbd8012582d2edfb77308",
+				"size": 241
+			},
+			"layers": [
+				{
+					"mediaType": "application/vnd.in-toto+json",
+					"digest": "sha256:0049db3c0a03aa65c2bf2f24171d73b3a5e29230bd4c9a3347696e3cc4f2f569",
+					"size": 23970476,
+					"annotations": {
+						"in-toto.io/predicate-type": "https://spdx.dev/Document"
+					}
+				},
+				{
+					"mediaType": "application/vnd.in-toto+json",
+					"digest": "sha256:7d7bb03b231eb744d6b976b2e0b004afe99ff8c3933a35fbe579a6ec8e35bcdc",
+					"size": 16484,
+					"annotations": {
+						"in-toto.io/predicate-type": "https://slsa.dev/provenance/v0.2"
+					}
+				}
+			]
+		}
+	}
+]
+
+EXIT_STATUS: 0

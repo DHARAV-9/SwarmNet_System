@@ -1,0 +1,7 @@
+UTC: 2026-10-31T17:00:11.595338+00:00
+CWD: /Users/dharavbhatt/swaram_net
+COMMAND: docker info --format 'CPUs={{.NCPU}} Memory={{.MemTotal}} Architecture={{.Architecture}}'
+
+CPUs=10 Memory=8218034176 Architecture=aarch64
+
+EXIT_STATUS: 0

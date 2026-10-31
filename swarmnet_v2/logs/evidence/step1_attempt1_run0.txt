@@ -1,0 +1,7 @@
+UTC: 2026-10-31T17:02:25.455521+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker run --rm --platform linux/arm64 ubuntu:22.04@sha256:a8fb2ba88181746111cbbe2969826d6546b71226785b196c93d2c3445a25000d bash -lc 'uname -m; test "$(dpkg --print-architecture)" = arm64'
+
+aarch64
+
+EXIT_STATUS: 0

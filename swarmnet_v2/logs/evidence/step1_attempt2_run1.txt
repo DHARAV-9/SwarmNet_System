@@ -1,0 +1,7 @@
+UTC: 2026-10-31T17:10:13.633219+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker run --rm --platform linux/arm64 ros:humble-ros-base-jammy@sha256:48435c01f2876ff519a0d07edf8dd3ab29a8106c907965c64385a14c76470d6b bash -lc 'uname -m; test "$(dpkg --print-architecture)" = arm64'
+
+aarch64
+
+EXIT_STATUS: 0

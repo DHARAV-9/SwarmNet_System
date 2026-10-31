@@ -1,0 +1,20 @@
+UTC: 2026-10-31T17:19:31.628571+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose --env-file /Users/dharavbhatt/swaram_net/swarmnet_v2/.env.lock up -d --no-build --pull never --wait
+
+ Network swarmnet-v2_swarm_net  Creating
+ Network swarmnet-v2_swarm_net  Created
+ Container swarmnet_ros2  Creating
+ Container swarmnet_px4  Creating
+ Container swarmnet_px4  Created
+ Container swarmnet_ros2  Created
+ Container swarmnet_ros2  Starting
+ Container swarmnet_px4  Starting
+ Container swarmnet_px4  Started
+ Container swarmnet_ros2  Started
+ Container swarmnet_px4  Waiting
+ Container swarmnet_ros2  Waiting
+ Container swarmnet_px4  Healthy
+ Container swarmnet_ros2  Healthy
+
+EXIT_STATUS: 0

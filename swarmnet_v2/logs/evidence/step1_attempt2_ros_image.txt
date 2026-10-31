@@ -1,0 +1,92 @@
+UTC: 2026-10-31T17:19:31.369615+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker image inspect swarmnet/ros2-nodes:humble-arm64
+
+[
+    {
+        "Id": "sha256:a36ac86fb34c495581a053a361fae8014755f2bbf6d366552ea6e933cf52110e",
+        "RepoTags": [
+            "swarmnet/ros2-nodes:humble-arm64"
+        ],
+        "RepoDigests": [
+            "swarmnet/ros2-nodes@sha256:a36ac86fb34c495581a053a361fae8014755f2bbf6d366552ea6e933cf52110e"
+        ],
+        "Parent": "",
+        "Comment": "buildkit.dockerfile.v0",
+        "Created": "2026-10-31T17:07:04.685352135Z",
+        "DockerVersion": "",
+        "Author": "",
+        "Config": {
+            "Hostname": "",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "LANG=C.UTF-8",
+                "LC_ALL=C.UTF-8",
+                "ROS_DISTRO=humble"
+            ],
+            "Cmd": [
+                "bash"
+            ],
+            "Image": "",
+            "Volumes": null,
+            "WorkingDir": "/ros2_ws",
+            "Entrypoint": [
+                "/ros_entrypoint.sh"
+            ],
+            "OnBuild": null,
+            "Labels": {
+                "com.docker.compose.project": "swarmnet-v2",
+                "com.docker.compose.service": "ros2_nodes",
+                "com.docker.compose.version": "2.35.1",
+                "org.opencontainers.image.version": "22.04"
+            },
+            "Shell": [
+                "/bin/bash",
+                "-c"
+            ]
+        },
+        "Architecture": "arm64",
+        "Os": "linux",
+        "Size": 274763216,
+        "GraphDriver": {
+            "Data": null,
+            "Name": "overlayfs"
+        },
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:28453be5ba7182cf839572413996637dd1ffa0fe02db825a6098dd22cf128352",
+                "sha256:67954a7c57434ea5ef215d406b53355ce5883aca2b975b2600f87cb848850b95",
+                "sha256:cc55872d442e697507f49943e8c8cd91cbccea249632cd659d56439d712f2137",
+                "sha256:cc2f3d112596f49f6ebe598b52e031840dab675168a3dc3dacfa13ed6fbd3506",
+                "sha256:4c007712b9645cc9dd5f1bd6a6a2b634d5b80c5d34b9bb5ab65dde1b0c9deb12",
+                "sha256:0f392e41af3b900cd6b5963e136ede592b24bd617a049a854e818e5bdbf8d256",
+                "sha256:50d6bdef19e4534ef4541e3a1c2610a030f00848eb1508c03f31ba510c6566f2",
+                "sha256:671fe482499907d257feb145413a5bfd03ecc0a1db8c343470cb94993baf91f8",
+                "sha256:392d885ec6bfe60acc560a6fbd4409b15ac06e724db7e78e24ebde5ad2369ffc",
+                "sha256:5f081ced599919187f30cfb88b96cba038eef1b1c238836295d50ac780521207",
+                "sha256:3b80aef615e54d662acfc728ac578b3d4542245b192cff9a68cf40f24358e158",
+                "sha256:96c6ade3af0439ef89ba9dc45a96be31e865353e1995a0b6b1f1a3db9b695702",
+                "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "2026-10-31T17:10:14.333139375Z"
+        },
+        "Descriptor": {
+            "mediaType": "application/vnd.oci.image.index.v1+json",
+            "digest": "sha256:a36ac86fb34c495581a053a361fae8014755f2bbf6d366552ea6e933cf52110e",
+            "size": 856
+        }
+    }
+]
+
+EXIT_STATUS: 0

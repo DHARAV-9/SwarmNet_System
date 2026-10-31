@@ -1,0 +1,612 @@
+SWARMNET V2.0 — TECHNICAL AUDIT
+Audit date: October 31, 2026
+Repository: /Users/dharavbhatt/swaram_net
+
+SwarmNet V2 is an early implementation scaffold, not a demonstrated 50-drone system. Neither Phase 1 nor Phase 2 meets its acceptance criteria. Phases 3–6 are not implemented.
+
+My earlier replies calling Phase 2 “implemented” overstated its readiness. Generating 50 configurations and passing grid tests does not establish that 50 PX4 vehicles spawn, communicate, or hover.
+
+This audit inspected the checkout, ran tests and coverage, queried Docker, attempted the ROS2 build, inspected image registry manifests, and checked primary documentation. No application code was changed during the audit.
+
+CURRENT STATUS, FILLED HONESTLY
+=============================
+
+Current week:
+  Unknown project start date. October 31 is 10 weeks after the August 22 V2 commit; that does not establish your academic project week.
+
+Current phase:
+  Phase 1 integration/repair; Phase 2 scaffold written.
+
+Things that run today:
+  Host-side Python tests and Compose configuration validation.
+
+Written but untested in ROS2/PX4:
+  PX4 process launcher, master publisher, follower setpoints, MAVROS launch, resource profiler.
+
+Not started:
+  Wind model, custom EKF/MPC, ORCA, Hungarian assignment, MAPPO, PBFT, FHSS/GPS-spoof simulation, V2 benchmark pipeline.
+
+Current blockers:
+  Invalid/unavailable images, architecture mismatch, overlapping ports, missing PX4 checkout and ROS2 packaging/runtime defects.
+
+Maximum drones successfully run:
+  Unverified. Zero running SwarmNet vehicles observed during this audit.
+
+Docker allocation:
+  10 CPUs, 8,218,034,176 bytes, approximately 7.65 GiB RAM.
+
+Gazebo real-time factor:
+  Not measured.
+
+WHAT THE TERMINAL ACTUALLY ESTABLISHED
+-------------------------------------
+
+- docker compose ps: no SwarmNet containers.
+- docker stats --no-stream: unrelated containers are running; SwarmNet resource use is not measurable.
+- Required PX4, ROS2 and PyTorch images are absent locally.
+- colcon build through Compose could not execute: service "ros2_nodes" is not running.
+- Host colcon is unavailable.
+- Combined tests: 68 passed, 0 failed — 65 V1 tests and only 3 V2 tests.
+- V2 coverage across launcher, profiler and node source: 21%. Master/follower node coverage: 0%.
+- Combined selected V1/V2 coverage: 45%. This is not evidence of an 80% whole-project coverage result.
+- No TODO, FIXME, placeholder, stub, or pass matches in V2. Missing functionality exists despite the absence of these markers.
+- Git working tree is clean. Local main and local origin/main point to 91cd479; the V2 scaffold was committed in 346e18f, August 22. No later commits were found. Remote freshness was not checked by fetching.
+
+A. PHASE COMPLETION
+===================
+
+Percentages below estimate implemented scope, not measured acceptance.
+
+Phase 1: Docker + one drone
+  Estimated scope implemented: 20%
+  Evidence: Compose/scripts exist; Docker works, but image configuration fails and no flight evidence exists.
+  Status: Partial.
+
+Phase 2: 50-drone grid
+  Estimated scope implemented: 15%
+  Evidence: Configuration generator, grid math and ROS2 skeleton exist; no successful ROS2 build or hover measurement.
+  Status: Partial.
+
+Phase 3: Wind + EKF + MPC
+  Estimated scope implemented: 0%
+  Evidence: Required implementations absent.
+  Status: Not started.
+
+Phase 4: ORCA + Hungarian + presets
+  Estimated scope implemented: 0%
+  Evidence: Static grid generator only; no assignment optimizer or avoidance.
+  Status: Not started.
+
+Phase 5: MAPPO + comparison
+  Estimated scope implemented: 0%
+  Evidence: No training environment, networks, training code or weights.
+  Status: Not started.
+
+Phase 6: FHSS + PBFT + stress/report
+  Estimated scope implemented: 0%
+  Evidence: Implementations and results absent.
+  Status: Not started.
+
+Accepted flight milestones: 0/6.
+
+ACTUAL V2 TREE
+--------------
+
+The implementation is under swarmnet_v2/, not the proposed v2/. V1 remains in swarmnet/; documents remain at the repository root.
+
+swarmnet_v2/
+├── .env.example, .gitignore, README.md, docker-compose.yml
+├── config/
+│   ├── cyclone_config.xml
+│   └── swarm_config.yaml
+├── px4_config/scripts/
+│   ├── drone_spawn.py
+│   └── spawn_one_drone.sh
+├── scripts/
+│   ├── phase1-doctor.sh
+│   ├── phase1-verify.sh
+│   ├── phase2-start.sh
+│   ├── phase2-verify.sh
+│   └── profile_resources.py
+├── swarmnet_ros2/
+│   ├── Dockerfile
+│   ├── swarmnet_msgs/
+│   │   ├── CMakeLists.txt, package.xml
+│   │   └── msg/{DroneState,DroneTarget,FormationTargets}.msg
+│   ├── swarmnet_master/
+│   │   ├── package.xml, setup.py, resource/swarmnet_master
+│   │   ├── launch/{swarm_grid,mavros_fleet}.launch.py
+│   │   └── swarmnet_master/{__init__,formation,master_node}.py
+│   └── swarmnet_follower/
+│       ├── package.xml, setup.py, resource/swarmnet_follower
+│       └── swarmnet_follower/{__init__,follower_node}.py
+└── tests/
+    ├── test_drone_spawn.py
+    └── test_formation.py
+
+No zero-byte files were found. ROS package resource markers contain a newline; they are intentionally minimal.
+
+MISSING TRD FILES AND ARTIFACTS
+------------------------------
+
+Paths below are relative to swarmnet_v2/.
+
+PX4/Gazebo:
+  px4_config/worlds/swarmnet_world.world
+  px4_config/worlds/wind_plugin_config.yaml
+  px4_config/models/x500_swarmnet/
+  px4_config/scripts/formation_init.py
+
+Messages:
+  swarmnet_ros2/swarmnet_msgs/msg/PBFTMessage.msg
+  swarmnet_ros2/swarmnet_msgs/msg/JammerState.msg
+
+Master:
+  formation_manager.py
+  health_monitor.py
+  mission_receiver.py
+
+Follower C++:
+  src/follower_node.cpp
+  src/ekf_node.cpp
+  src/mpc_node.cpp
+  src/orca_node.cpp
+  Package CMakeLists.txt
+
+Follower Python:
+  mappo_actor_node.py
+  state_publisher.py
+  comms_watchdog.py
+
+Communications:
+  Entire swarmnet_comms/ package:
+    dds_bridge.py
+    jamming_detector.py
+    fhss_sim.py
+    pbft_node.py
+    package.xml
+
+Metrics:
+  Entire swarmnet_metrics/ package:
+    metric_collector.py
+    csv_exporter.py
+    plot_generator.py
+    package.xml
+
+MAPPO:
+  Entire mappo/:
+    env.py
+    actor.py
+    critic.py
+    train.py
+    rollout.py
+    reward.py
+    config.yaml
+
+Weights:
+  models/mappo_actor.pt
+
+Tests:
+  test_ekf.py
+  test_mpc.py
+  test_orca.py
+  test_mappo.py
+  test_pbft.py
+  test_integration.py
+
+Local prerequisites/results:
+  .env, PX4-Autopilot/, V2 logs/ absent in this checkout.
+
+The Python follower is an alternative to the specified C++ follower, not evidence that the planned C++ control implementation exists.
+
+B. REQUIREMENTS TRACEABILITY
+============================
+
+FR-01: 50 SITL vehicles — Partial
+  Evidence: swarmnet_v2/px4_config/scripts/drone_spawn.py:53 generates 50 records; spawning and effective IDs/ports unverified.
+
+FR-02: Master control — Partial
+  Evidence: swarmnet_v2/swarmnet_ros2/swarmnet_master/swarmnet_master/master_node.py:13 publishes static targets; mission reception, Hungarian assignment, health handling and consensus absent.
+
+FR-03: Followers — Partial
+  Evidence: swarmnet_v2/swarmnet_ros2/swarmnet_follower/swarmnet_follower/follower_node.py:14 streams setpoints; actual flight, watchdog and control pipeline absent/unverified.
+
+FR-04: EKF — Not met
+  Evidence: No custom estimator or estimator tests.
+
+FR-05: MPC — Not met
+  Evidence: No controller or solver.
+
+FR-06: ORCA — Not met
+  Evidence: No avoidance implementation.
+
+FR-07: MAPPO — Not met
+  Evidence: Training, inference and weights absent.
+
+FR-08: Wind — Not met
+  Evidence: World/plugin absent.
+
+FR-09: Jamming/spoofing — Not met
+  Evidence: Fault models and responses absent.
+
+FR-10: PBFT — Not met
+  Evidence: No V2 consensus implementation.
+
+FR-11: QGC integration — Unverified
+  Evidence: No connected vehicle, telemetry capture or flight log.
+
+FR-12: RViz2 — Not met
+  Evidence: No marker publisher, RViz configuration or launch.
+
+FR-13: Metrics — Partial
+  Evidence: Docker profiler exists; flight, estimator, controller and benchmark metrics absent.
+
+NFR-01: Accuracy/spacing — Unverified
+  Evidence: No measured trajectories or collision results.
+
+NFR-02: Latency — Unverified
+  Evidence: No timing measurements.
+
+NFR-03: Scalability — Not met
+  Evidence: No 50-vehicle run; generator explicitly rejects N > 50, conflicting with N=100 requirement.
+
+NFR-04: Fault tolerance — Not met
+  Evidence: No V2 PBFT/Raft integration, watchdog or rebalance implementation.
+
+NFR-05: Reproducibility — Partial
+  Evidence: Deterministic grid; images/PX4 unpinned, YAML not wired into runtime, no seeded experiments.
+
+NFR-06: Portability — Not met
+  Evidence: Configured ARM64 platforms conflict with checked image manifests.
+
+NFR-07: Safety behavior — Not met
+  Evidence: No emergency priority, collision stop or master-loss handling.
+
+C. SUCCESS METRICS
+==================
+
+M1: 50 vehicles in QGC
+  Measured value: Not measured.
+
+M2: Calm formation RMS <5 cm
+  Measured value: Not measured.
+
+M3: Formation RMS <15 cm at 15 m/s
+  Measured value: Not measured.
+
+M4: Zero ORCA violations over 60 s
+  Measured value: Not measured.
+
+M5: Hold 10 s after total communication loss
+  Measured value: Not measured.
+
+M6: MAPPO improvement over 10,000 episodes
+  Measured value: Not measured.
+
+M7: Reject Byzantine commands
+  Measured value: Not measured.
+
+M8: View change <200 ms
+  Measured value: Not measured.
+
+M9: N=50 Docker RAM <14 GB
+  Measured value: Not measured.
+
+M10: All benchmarks export CSV/PNG
+  Measured value: Not demonstrated; only Docker CSV profiler implemented.
+
+D. TOP FIVE RISKS
+=================
+
+Scores use likelihood × impact on a 1–5 scale.
+
+1. Measurements falsely indicate success because targets are published as telemetry.
+   Score: 5 × 5 = 25.
+   Mitigation: Subscribe to actual pose, velocity, battery and connection state; compare against independent Gazebo truth.
+
+2. Current stack cannot launch because images, ports and ROS packaging are broken.
+   Score: 5 × 5 = 25.
+   Mitigation: Repair a pinned one-drone configuration before attempting any swarm.
+
+3. Scope exceeds available development time.
+   Score: 5 × 5 = 25.
+   Mitigation: Freeze a 5–10-drone baseline and select one research contribution.
+
+4. N=50 exceeds practical compute budget or loses real-time behavior.
+   Score: 4 × 5 = 20.
+   Mitigation: Headless scale sweep at N=1,2,5,10,20,50; measure RTF, memory and deadlines.
+
+5. Tight-spacing/wind guarantees fail under dynamics and estimation error.
+   Score: 4 × 5 = 20.
+   Mitigation: Start at 2 m spacing and calm conditions; introduce disturbances and measure failure boundaries.
+
+E. TECHNICAL-VALIDITY FINDINGS
+============================
+
+1. TELEMETRY CURRENTLY FABRICATES A HEALTHY FORMATION
+----------------------------------------------------
+
+The follower's publish_state() copies the target into x/y/z, sets battery to 100, and sets alive=True.
+
+Evidence:
+  swarmnet_v2/swarmnet_ros2/swarmnet_follower/swarmnet_follower/follower_node.py:75
+
+It subscribes to no actual vehicle state. A monitor could report perfect formation even with PX4 disconnected. These messages must be labeled desired targets or replaced with measured telemetry.
+
+2. A ROS2 TOPIC NAME IS INVALID
+------------------------------
+
+/swarm/drone_state/1 has a numeric final token. ROS2 name tokens cannot start with digits. Use /swarm/drone_state/drone_1 or /drone_1/state. This affects both the PRD/TRD topic design and the follower implementation. Runtime exception text remains unverified because ROS2 could not start.
+
+Source: ROS2 naming rules
+https://design.ros2.org/articles/topic_and_service_names.html
+
+3. IMAGE CHECKS FAILED
+---------------------
+
+px4io/px4-dev-ros2-jammy:latest
+  Registry result: Access denied/repository unavailable; exact public availability unresolved.
+
+osrf/ros:humble-desktop
+  Registry result: Exists; checked manifest is linux/amd64, conflicting with configured ARM64.
+
+pytorch/pytorch:2.2.0
+  Registry result: Not found.
+
+pytorch/pytorch:2.2.0-cuda11.8-cudnn8-runtime
+  Registry result: Exists; linux/amd64, not ARM64.
+
+These were manifest checks. Successful full pulls and container execution remain unverified. Replace invalid references, verify architecture, then pin working digests.
+
+4. DOCKER PORTS OVERLAP
+----------------------
+
+Compose lines 21–22 publish both 14550–14599 and 14540–14589. They overlap on 40 host UDP ports.
+
+Evidence:
+  swarmnet_v2/docker-compose.yml:20
+
+Compose syntax validation does not prove those bindings can start. Define non-overlapping endpoints and separate GCS traffic from offboard/MAVROS traffic.
+
+5. MAVLINK ROUTING IS NOT ESTABLISHED
+-----------------------------------
+
+The launcher exports MAV_SYS_ID and MAVLINK_REMOTE_PORT, but there is no checked PX4 startup script proving these environment variables are consumed. Printed configuration is not effective firmware configuration.
+
+The MAVROS launch points at ports described as QGC ports. PX4 normally distinguishes GCS and offboard endpoints; QGC can receive multiple system IDs on its default listening port. Fifty manually configured QGC links are not inherently required. Container-to-host telemetry also needs an explicit reachable destination.
+
+Source: PX4 port documentation
+https://docs.px4.io/v1.14/en/simulation/
+
+6. PX4/GAZEBO STARTUP IS INCOMPLETE
+---------------------------------
+
+All instances inherit PX4_GZ_STANDALONE=0. The official multi-vehicle example starts the Gazebo server with the first instance and connects later instances using standalone mode. The launcher also gives every PX4 process the same working directory without explicit per-instance storage isolation.
+
+No code arms vehicles or requests OFFBOARD mode. Spawning a model at z=5 is not powered hover.
+
+Source: PX4 multi-vehicle procedure
+https://docs.px4.io/main/en/sim_gazebo_gz/multi_vehicle_simulation
+
+7. ROS2 BUILDS AND EXECUTABLE DISCOVERY ARE UNVERIFIED
+----------------------------------------------------
+
+Both Python packages lack setup.cfg and explicit ament_python build-type exports. Their installation/discovery needs repair and a real colcon build/ros2 run test. The MAVROS image also lacks the GeographicLib dataset installation normally needed for its geoid conversion.
+
+8. GLOBAL AND VEHICLE-LOCAL COORDINATES ARE CONFLATED
+--------------------------------------------------
+
+The same world-grid coordinates are sent directly to MAVROS local-position targets. Each vehicle's local origin can differ. Define and test world ENU, local ENU and PX4 NED transformations before measuring formation error.
+
+9. PX4 V1.14 + HARMONIC IS NOT THE DOCUMENTED BASELINE
+----------------------------------------------------
+
+PX4 v1.14 documents Garden support. PX4 v1.16 release notes identify Harmonic as the replacement supported release. Choose a documented compatible combination and pin it; the README currently clones unpinned PX4 main.
+
+Sources:
+  v1.14 Gazebo documentation:
+  https://docs.px4.io/v1.14/en/sim_gazebo_gz/
+  v1.16 release notes:
+  https://docs.px4.io/v1.16/en/releases/1.16
+
+10. XRCE-DDS IS ABSENT
+---------------------
+
+There is no agent service/process, px4_msgs integration or tested client namespace/key configuration. One shared agent can serve multiple clients; a port per drone is not inherently necessary. Message definitions must match the selected PX4 release.
+
+Source: PX4 XRCE-DDS documentation
+https://docs.px4.io/main/en/middleware/uxrce_dds
+
+11. MPS TRAINING MUST MOVE OUT OF THIS LINUX CONTAINER DESIGN
+----------------------------------------------------------
+
+PyTorch MPS uses macOS Metal. Ordinary Linux containers on Docker Desktop do not provide that MPS training environment. Run training natively on macOS, or use CPU/Linux CUDA hardware elsewhere. PYTORCH_ENABLE_MPS_FALLBACK=1 does not add Metal access. Docker's other host-assisted inference features do not establish generic PyTorch MPS training support.
+
+Sources:
+  PyTorch MPS:
+  https://docs.pytorch.org/docs/stable/notes/mps.html
+  Docker GPU support:
+  https://docs.docker.com/desktop/features/gpu/
+
+12. RESOURCE LIMITS ARE NOT PERFORMANCE EVIDENCE
+----------------------------------------------
+
+Compose caps total 13 GiB, but Docker currently has only 7.65 GiB allocated. Neither number establishes actual workload consumption. Leaving only 2 GB for macOS on a 16 GB machine is an aggressive assumption.
+
+RTF must be measured. A controller “20 Hz” in wall time and a simulator running below real time also require an explicit timebase policy.
+
+13. ACCURACY AND ORCA GUARANTEES ARE OVERSTATED
+--------------------------------------------
+
+±2 cm needs a defined reference, error statistic, noise model and test duration. Perfect simulated sensors can make it trivial; noisy sensors and wind can make it unattainable.
+
+ORCA provides collision-free conditions under its motion assumptions; it does not automatically guarantee safety for thrust-limited quadrotors in gusts. A 0.25 m collision radius and 0.50 m center spacing leave zero geometric clearance. A 0.30 m emergency threshold would already be inside those collision bodies.
+
+Source: Original ORCA project
+https://gamma-web.iacs.umd.edu/ORCA/
+
+14. PBFT SPECIFICATION NEEDS CORRECTION BEFORE IMPLEMENTATION
+----------------------------------------------------------
+
+- f=floor((N−1)/3), not generally floor(N/3).
+- With 50 voters and f=16, quorums of 33 can intersect in only 16 nodes—all potentially faulty. Use a justified quorum such as 34, or a specified 49-voter configuration.
+- Two all-to-all phases cost roughly 4,900 deliveries, plus pre-prepare/client traffic—not approximately 2,500 total. DDS publish calls and network deliveries are different metrics.
+- A 2-second failure timeout contradicts end-to-end view change below 200 ms.
+- “No proposal for 2 seconds” is not sufficient failure detection during idle periods.
+- HMAC uses shared secrets, not a private-key signature scheme; identity/key ownership must be defined.
+
+The 200 ms claim is unverified.
+
+Source: Original PBFT paper
+https://www.scs.stanford.edu/nyu/03sp/sched/bfs.pdf
+
+15. OTHER DOCUMENT CORRECTIONS
+-----------------------------
+
+- 7×7 has 49 positions. Current vehicle 50 is at (-6,8), forming an extra row.
+- The “15-dimensional EKF” listed state actually has 13 components.
+- Define the compression of ten neighbor velocities before claiming a 47-dimensional observation.
+- DDS channel/domain switching is a communication-fault abstraction, not physical RF FHSS.
+- “Tested on M4 Pro”, “~3× faster”, latency figures and precision claims should be labeled targets/unverified until results exist.
+- phase2-verify.sh checks topic presence and prints a checklist; it does not validate measured hovering, all 50 heartbeats, or crashes. UDP nc is not a MAVLink acceptance test.
+
+F. NEXT SEVEN DAYS
+=================
+
+This is approximately 36–48 focused hours. Stop scaling if the prior acceptance test fails.
+
+Paths below are relative to:
+  /Users/dharavbhatt/swaram_net/swarmnet_v2
+
+1. FREEZE STACK AND SCOPE — 3–4 HOURS
+
+   Exact files or commands:
+     Edit docker-compose.yml, swarmnet_ros2/Dockerfile, .env.example.
+     docker manifest inspect --verbose <chosen-image>
+     docker compose config
+
+   Done when:
+     Every selected image/tag resolves with the intended architecture; PX4/Gazebo versions recorded.
+
+2. REPAIR ROS2 PACKAGING/NAMES — 3–4 HOURS
+
+   Exact files or commands:
+     Add both Python setup.cfg files; fix package.xml, follower topic names.
+     Run the ROS2 build command below.
+
+   Done when:
+     Three packages build; ros2 pkg executables finds both nodes.
+
+3. DEMONSTRATE ONE VEHICLE — 6–8 HOURS
+
+   Exact files or commands:
+     Repair spawn_one_drone.sh, Docker ports and host MAVLink destination.
+     docker compose exec px4_sitl bash /px4_config/scripts/spawn_one_drone.sh
+
+   Done when:
+     QGC receives real telemetry; arm, take off, hover, land and disarm captured in logs.
+
+4. REPLACE FABRICATED TELEMETRY — 5–6 HOURS
+
+   Exact files or commands:
+     Edit follower_node.py; add measured pose/state subscriptions, freshness checks and frame transforms.
+
+   Done when:
+     Reported state follows the aircraft and becomes unavailable when telemetry stops.
+
+5. MAKE TWO VEHICLES INDEPENDENT — 5–7 HOURS
+
+   Exact files or commands:
+     Repair drone_spawn.py, mavros_fleet.launch.py; launch with N_DRONES=2.
+
+   Done when:
+     Two actual IDs, independent state/storage/endpoints; both hold targets without cross-control.
+
+6. ADD MEASUREMENT RECORDER — 5–6 HOURS
+
+   Exact files or commands:
+     Create swarmnet_metrics/; record Gazebo truth, estimated pose, target, sim/wall timestamps.
+
+   Done when:
+     RMS error, minimum separation, RTF and stale-state results derive from real recordings.
+
+7. SCALE AND PROFILE — 5–7 HOURS
+
+   Exact files or commands:
+     After prior fixes, test N=5 then 10.
+     python3 scripts/profile_resources.py --duration 60 --output logs/resources_n10.csv
+
+   Done when:
+     Sustained hover with recorded RTF/resources; larger N attempted only with measured headroom.
+
+8. UPDATE EVIDENCE/TESTS — 4–6 HOURS
+
+   Exact files or commands:
+     ../venv/bin/python -m pytest tests -v
+     Update README.md and an experiment log.
+
+   Done when:
+     Documentation distinguishes tested behavior from goals; tests exercise telemetry and lifecycle failures.
+
+ROS2 BUILD COMMAND AFTER FIXING THE IMAGE CONFIGURATION
+------------------------------------------------------
+
+docker compose build ros2_nodes
+docker compose up -d ros2_nodes
+docker compose exec -T ros2_nodes bash -lc \
+  'source /opt/ros/humble/setup.bash &&
+   cd /ros2_ws &&
+   colcon build --packages-select swarmnet_msgs swarmnet_master swarmnet_follower'
+
+G. SCOPE DECISION
+=================
+
+Your remaining weeks are unknown. The complete original plan is too large to responsibly promise from the current state, particularly if approximately six weeks remain in the intended 16-week schedule.
+
+My recommended defensible project is:
+
+- 5–10 PX4 drones with measured headless Gazebo performance.
+- PX4's existing estimator and position controller as the baseline.
+- Static formation plus Hungarian assignment.
+- One research extension: wind recovery OR communication-loss resilience.
+- Repeated experiments, real telemetry and documented limits.
+
+Defer custom EKF, custom MPC, MAPPO, PBFT and simulated FHSS unless the baseline is accepted early. Choose at most one later extension.
+
+If distributed consensus is your main research interest, benchmark PBFT separately with simulated replicas and connect it to low-rate mission commands. If control learning is the main interest, train a small MAPPO environment natively and treat PX4 transfer as a separate validation step.
+
+Keep N=50 as a scaling experiment, not a graduation dependency.
+
+H. REPORT READINESS
+===================
+
+You still need V2 experimental results, not screenshots alone.
+
+Reproducible environment table:
+  Hardware, Docker allocation, image digests, PX4/Gazebo/ROS versions, commit, world and sensor settings.
+
+Scale/performance graphs:
+  N versus RTF, RAM, CPU, deadline misses and startup failures.
+
+Formation accuracy:
+  Truth/estimate/target trajectories; per-drone and fleet RMS, p95 and maximum error.
+
+Separation/safety:
+  Minimum pairwise distance over time, threshold violations, model dimensions.
+
+Disturbance response:
+  Wind step/gust versus error and recovery time; repeated trials.
+
+Communication faults:
+  Delivery rate/outage duration versus tracking error and recovery.
+
+Timing distributions:
+  Controller, communication and optional consensus p50/p95/p99 latency.
+
+Research comparison:
+  Same scenarios/seeds for baseline and proposed method; uncertainty/error bars.
+
+Limitations table:
+  Maximum demonstrated N, unsupported features, failed runs, model assumptions.
+
+For every claimed improvement, record multiple runs, raw data, configuration and the exact commit. At present, the project is ready for an implementation-progress report, not a report claiming successful 50-drone resilient flight.

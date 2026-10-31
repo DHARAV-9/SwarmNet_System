@@ -1,0 +1,9 @@
+UTC: 2026-10-31T17:19:42.854210+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker stats --no-stream swarmnet_px4 swarmnet_ros2
+
+CONTAINER ID   NAME            CPU %     MEM USAGE / LIMIT   MEM %     NET I/O         BLOCK I/O     PIDS
+940a0518f340   swarmnet_px4    0.02%     880KiB / 5GiB       0.02%     1.88kB / 126B   164kB / 0B    2
+11b83845378f   swarmnet_ros2   0.00%     9.305MiB / 1.5GiB   0.61%     1.84kB / 126B   11.7MB / 0B   2
+
+EXIT_STATUS: 0

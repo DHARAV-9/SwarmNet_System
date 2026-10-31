@@ -2,35 +2,41 @@ name: swarmnet-v2
 
 services:
   px4_sitl:
-    image: px4io/px4-dev-ros2-jammy
-    platform: ${PX4_PLATFORM:-linux/amd64}
+    image: ${PX4_IMAGE:-swarmnet/px4-sitl@sha256:904f450277bc59147303be7cc0ba0006adcc8c14ea20a4c7c5efe13caf0cfeff}
+    pull_policy: never
+    platform: linux/arm64
     container_name: swarmnet_px4
-    working_dir: /workspace/PX4-Autopilot
+    init: true
+    working_dir: /opt/PX4-Autopilot
     environment:
-      DISPLAY: ${DISPLAY:-host.docker.internal:0}
-      HEADLESS: ${HEADLESS:-0}
-      PX4_SIM_HOST_ADDR: 0.0.0.0
-      PX4_GZ_MODEL: x500
-      PX4_GZ_STANDALONE: 0
+      PX4_DIR: /opt/PX4-Autopilot
+      HEADLESS: "1"
+      QGC_HOST: host.docker.internal
+      QGC_PORT: "14550"
+      SWARM_OFFBOARD_LOCAL_BASE: "15000"
+      SWARM_OFFBOARD_REMOTE_BASE: "16000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
-      - ${PX4_SOURCE_DIR:-./PX4-Autopilot}:/workspace/PX4-Autopilot
       - ./px4_config:/px4_config:ro
-      - ./logs/px4:/workspace/PX4-Autopilot/logs
-      - /tmp/.X11-unix:/tmp/.X11-unix
-    ports:
-      - "14550-14599:14550-14599/udp"
-      - "14540-14589:14540-14589/udp"
+      - ./logs/px4:/var/log/swarmnet/px4
     networks:
       - swarm_net
-    command: ["bash", "-lc", "tail -f /dev/null"]
-    mem_limit: 9g
-    cpus: 5.0
+    command: ["sleep", "infinity"]
+    mem_limit: 5g
+    cpus: 3.0
+    healthcheck:
+      test: ["CMD-SHELL", "test -x /opt/PX4-Autopilot/build/px4_sitl_default/bin/px4 && getent hosts host.docker.internal"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   ros2_nodes:
-    build: ./swarmnet_ros2
-    image: swarmnet/ros2-nodes:phase2
-    platform: ${ROS_PLATFORM:-linux/arm64}
+    image: ${ROS_IMAGE:-swarmnet/ros2-nodes@sha256:a36ac86fb34c495581a053a361fae8014755f2bbf6d366552ea6e933cf52110e}
+    pull_policy: never
+    platform: linux/arm64
     container_name: swarmnet_ros2
+    init: true
     environment:
       ROS_DOMAIN_ID: ${ROS_DOMAIN_ID:-0}
       RMW_IMPLEMENTATION: rmw_cyclonedds_cpp
@@ -39,27 +45,16 @@ services:
       - ./swarmnet_ros2:/ros2_ws/src/swarmnet
       - ./logs/ros2:/ros2_ws/logs
       - ./config:/ros2_ws/src/swarmnet/config:ro
-    depends_on:
-      - px4_sitl
     networks:
       - swarm_net
-    command: ["bash", "-lc", "tail -f /dev/null"]
-    mem_limit: 3g
-    cpus: 2.5
-
-  ai_trainer:
-    image: pytorch/pytorch:2.2.0
-    platform: ${AI_PLATFORM:-linux/arm64}
-    container_name: swarmnet_ai
-    volumes:
-      - ./mappo:/workspace/mappo
-      - ./models:/workspace/models
-      - ./logs/training:/workspace/logs
-    networks:
-      - swarm_net
-    command: ["bash", "-lc", "tail -f /dev/null"]
-    mem_limit: 1g
-    cpus: 0.5
+    command: ["sleep", "infinity"]
+    mem_limit: 1536m
+    cpus: 1.0
+    healthcheck:
+      test: ["CMD-SHELL", ". /opt/ros/humble/setup.sh && python3 -c 'import rclpy'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 networks:
   swarm_net:

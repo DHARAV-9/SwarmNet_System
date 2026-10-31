@@ -1,0 +1,6 @@
+UTC: 2026-10-31T17:03:36.299679+00:00
+CWD: /Users/dharavbhatt/swaram_net
+COMMAND: bash -lc 'git diff --check && ./venv/bin/python -m py_compile swarmnet_v2/scripts/capture_evidence.py swarmnet_v2/scripts/step1_gate.py'
+
+
+EXIT_STATUS: 0

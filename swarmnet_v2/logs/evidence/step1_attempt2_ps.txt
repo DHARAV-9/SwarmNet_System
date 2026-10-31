@@ -1,0 +1,9 @@
+UTC: 2026-10-31T17:19:42.672981+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose --env-file /Users/dharavbhatt/swaram_net/swarmnet_v2/.env.lock ps
+
+NAME            IMAGE                                                                     COMMAND                  SERVICE      CREATED          STATUS                    PORTS
+swarmnet_px4    sha256:904f450277bc59147303be7cc0ba0006adcc8c14ea20a4c7c5efe13caf0cfeff   "sleep infinity"         px4_sitl     11 seconds ago   Up 10 seconds (healthy)   
+swarmnet_ros2   sha256:a36ac86fb34c495581a053a361fae8014755f2bbf6d366552ea6e933cf52110e   "/ros_entrypoint.sh …"   ros2_nodes   11 seconds ago   Up 10 seconds (healthy)   
+
+EXIT_STATUS: 0

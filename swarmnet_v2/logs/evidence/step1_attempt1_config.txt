@@ -1,0 +1,6 @@
+UTC: 2026-10-31T17:02:11.056709+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose config --quiet
+
+
+EXIT_STATUS: 0

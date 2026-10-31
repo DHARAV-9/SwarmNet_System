@@ -1,6 +1,11 @@
 .env
 PX4-Autopilot/
 logs/
+!logs/
+logs/*
+!logs/evidence/
+!logs/evidence/*.txt
+.env.lock
 models/
 build/
 install/

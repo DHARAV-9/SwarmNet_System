@@ -1,5 +1,48 @@
 # SwarmNet v2 — Phases 1–2
 
+## Ordered repair in progress
+
+The audit is at `../docs/SwarmNet_v2_Audit_2026-10-31.txt`. Code stays in
+`swarmnet_v2/`. Earlier phase scaffolding does not demonstrate working flight.
+Follow `../docs/REPAIR_REPORT.md` for the current gate and evidence.
+
+Step 1 selects PX4 **v1.16.0** (commit
+`6ea3539157ca358c70a515878b77077af7d4611d`), Gazebo **Harmonic**, ROS2
+**Humble**, and native Linux ARM64. Both Dockerfiles pin their Ubuntu 22.04
+or ROS Humble base to an ARM64 manifest digest. PX4 is built in the image;
+do not bind an unpinned host checkout over `/opt/PX4-Autopilot`.
+
+MAPPO training will run natively on macOS in a later step. There is no
+PyTorch/MPS service in Compose. Linux containers do not provide Apple Metal.
+
+The current Docker allocation measured during repair is 10 CPUs and
+7.65 GiB RAM. Service caps total 6.5 GiB (PX4 5 GiB, ROS2 1.5 GiB) and four
+CPUs. For later experiments, consider 10 GiB Docker RAM on a 16 GB Mac,
+leaving more than 5 GB for macOS; scale only after measurements. No Docker
+Desktop allocation has been changed automatically.
+
+The endpoint plan has no overlapping host publications: PX4 sends QGC
+telemetry to `host.docker.internal:14550` on macOS; PX4 offboard local ports
+are `15000+i` and ROS2 listening ports are `16000+i`, inside the bridge.
+No host UDP ranges are published. These settings are a plan until Step 3
+configures PX4's MAVLink startup and verifies real traffic.
+
+Run the recorded Step 1 gate from the repository root:
+
+```bash
+./venv/bin/python swarmnet_v2/scripts/step1_gate.py --attempt 1
+```
+
+It saves command outputs in `logs/evidence/step1_*.txt`, pulls and runs both
+base images, builds sequentially, records built image content IDs in
+`.env.lock`, and starts the services with those IDs. Base manifest digests
+and local Docker image IDs are distinct; the lock identifies local builds,
+not images published to a registry. The gate must pass before Step 2.
+After two failed attempts stop and inspect the evidence.
+
+The older instructions below describe the pre-repair scaffold and are
+unverified. Do not use the old Phase 2 launcher while the repair gate is open.
+
 Phase 1 brings up one PX4 SITL X500 drone in Gazebo, connects it to native
 macOS QGroundControl, and prepares the three-container network used by later
 swarm phases.

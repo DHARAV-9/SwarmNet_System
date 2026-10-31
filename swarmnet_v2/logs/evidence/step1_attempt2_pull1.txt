@@ -1,0 +1,10 @@
+UTC: 2026-10-31T17:10:12.139079+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker pull --platform linux/arm64 ros:humble-ros-base-jammy@sha256:48435c01f2876ff519a0d07edf8dd3ab29a8106c907965c64385a14c76470d6b
+
+docker.io/library/ros@sha256:48435c01f2876ff519a0d07edf8dd3ab29a8106c907965c64385a14c76470d6b: Pulling from library/ros
+Digest: sha256:48435c01f2876ff519a0d07edf8dd3ab29a8106c907965c64385a14c76470d6b
+Status: Image is up to date for ros@sha256:48435c01f2876ff519a0d07edf8dd3ab29a8106c907965c64385a14c76470d6b
+docker.io/library/ros:humble-ros-base-jammy@sha256:48435c01f2876ff519a0d07edf8dd3ab29a8106c907965c64385a14c76470d6b
+
+EXIT_STATUS: 0

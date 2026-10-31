@@ -1,0 +1,10 @@
+UTC: 2026-10-31T17:10:09.343604+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker pull --platform linux/arm64 ubuntu:22.04@sha256:a8fb2ba88181746111cbbe2969826d6546b71226785b196c93d2c3445a25000d
+
+docker.io/library/ubuntu@sha256:a8fb2ba88181746111cbbe2969826d6546b71226785b196c93d2c3445a25000d: Pulling from library/ubuntu
+Digest: sha256:a8fb2ba88181746111cbbe2969826d6546b71226785b196c93d2c3445a25000d
+Status: Image is up to date for ubuntu@sha256:a8fb2ba88181746111cbbe2969826d6546b71226785b196c93d2c3445a25000d
+docker.io/library/ubuntu:22.04@sha256:a8fb2ba88181746111cbbe2969826d6546b71226785b196c93d2c3445a25000d
+
+EXIT_STATUS: 0

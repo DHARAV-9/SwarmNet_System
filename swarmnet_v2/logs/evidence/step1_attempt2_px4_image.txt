@@ -1,0 +1,88 @@
+UTC: 2026-10-31T17:19:31.179415+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker image inspect swarmnet/px4-sitl:v1.16.0-arm64
+
+[
+    {
+        "Id": "sha256:904f450277bc59147303be7cc0ba0006adcc8c14ea20a4c7c5efe13caf0cfeff",
+        "RepoTags": [
+            "swarmnet/px4-sitl:v1.16.0-arm64"
+        ],
+        "RepoDigests": [
+            "swarmnet/px4-sitl@sha256:904f450277bc59147303be7cc0ba0006adcc8c14ea20a4c7c5efe13caf0cfeff"
+        ],
+        "Parent": "",
+        "Comment": "buildkit.dockerfile.v0",
+        "Created": "2026-10-31T17:18:23.394268754Z",
+        "DockerVersion": "",
+        "Author": "",
+        "Config": {
+            "Hostname": "",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "DEBIAN_FRONTEND=noninteractive",
+                "PX4_DIR=/opt/PX4-Autopilot",
+                "CMAKE_BUILD_PARALLEL_LEVEL=2"
+            ],
+            "Cmd": [
+                "sleep",
+                "infinity"
+            ],
+            "ArgsEscaped": true,
+            "Image": "",
+            "Volumes": null,
+            "WorkingDir": "/opt/PX4-Autopilot",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {
+                "com.docker.compose.project": "swarmnet-v2",
+                "com.docker.compose.service": "px4_sitl",
+                "com.docker.compose.version": "2.35.1",
+                "org.opencontainers.image.revision": "6ea3539157ca358c70a515878b77077af7d4611d",
+                "org.opencontainers.image.version": "PX4-v1.16.0-gazebo-harmonic"
+            },
+            "Shell": [
+                "/bin/bash",
+                "-o",
+                "pipefail",
+                "-c"
+            ]
+        },
+        "Architecture": "arm64",
+        "Os": "linux",
+        "Size": 1763260534,
+        "GraphDriver": {
+            "Data": null,
+            "Name": "overlayfs"
+        },
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:28453be5ba7182cf839572413996637dd1ffa0fe02db825a6098dd22cf128352",
+                "sha256:07756f970aa8d5a18e564350ef7e4ab285d4c2d57ca6199a33822a1c7e2a06e7",
+                "sha256:4d5a2190285722d18d25bc144a1b66294c97e7af6bf84858fe5892d6f4613cdf",
+                "sha256:d5cd7e7f5e62f003380cae4d5b5e77945a6983adfc7e9899eb1e4704d8f80a13",
+                "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+                "sha256:962d41ccce126fdde34fe5dd6eaa17f5613956a5cfa0ca00143fac6f610f763d"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "2026-10-31T17:19:16.403343209Z"
+        },
+        "Descriptor": {
+            "mediaType": "application/vnd.oci.image.index.v1+json",
+            "digest": "sha256:904f450277bc59147303be7cc0ba0006adcc8c14ea20a4c7c5efe13caf0cfeff",
+            "size": 856
+        }
+    }
+]
+
+EXIT_STATUS: 0

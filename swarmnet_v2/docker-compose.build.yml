@@ -1,0 +1,10 @@
+name: swarmnet-v2
+services:
+  px4_sitl:
+    image: swarmnet/px4-sitl:v1.16.0-arm64
+    platform: linux/arm64
+    build: ./docker/px4
+  ros2_nodes:
+    image: swarmnet/ros2-nodes:humble-arm64
+    platform: linux/arm64
+    build: ./swarmnet_ros2

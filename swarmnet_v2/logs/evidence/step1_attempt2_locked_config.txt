@@ -1,0 +1,99 @@
+UTC: 2026-10-31T17:19:31.421387+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose --env-file /Users/dharavbhatt/swaram_net/swarmnet_v2/.env.lock config
+
+name: swarmnet-v2
+services:
+  px4_sitl:
+    build:
+      context: /Users/dharavbhatt/swaram_net/swarmnet_v2/docker/px4
+      dockerfile: Dockerfile
+    cpus: 3
+    command:
+      - sleep
+      - infinity
+    container_name: swarmnet_px4
+    environment:
+      HEADLESS: "1"
+      PX4_DIR: /opt/PX4-Autopilot
+      QGC_HOST: host.docker.internal
+      QGC_PORT: "14550"
+      SWARM_OFFBOARD_LOCAL_BASE: "15000"
+      SWARM_OFFBOARD_REMOTE_BASE: "16000"
+    extra_hosts:
+      - host.docker.internal=host-gateway
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - test -x /opt/PX4-Autopilot/build/px4_sitl_default/bin/px4 && getent hosts host.docker.internal
+      timeout: 5s
+      interval: 10s
+      retries: 3
+    image: sha256:904f450277bc59147303be7cc0ba0006adcc8c14ea20a4c7c5efe13caf0cfeff
+    init: true
+    mem_limit: "5368709120"
+    networks:
+      swarm_net: null
+    platform: linux/arm64
+    volumes:
+      - type: bind
+        source: /Users/dharavbhatt/swaram_net/swarmnet_v2/px4_config
+        target: /px4_config
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /Users/dharavbhatt/swaram_net/swarmnet_v2/logs/px4
+        target: /var/log/swarmnet/px4
+        bind:
+          create_host_path: true
+    working_dir: /opt/PX4-Autopilot
+  ros2_nodes:
+    build:
+      context: /Users/dharavbhatt/swaram_net/swarmnet_v2/swarmnet_ros2
+      dockerfile: Dockerfile
+    cpus: 1
+    command:
+      - sleep
+      - infinity
+    container_name: swarmnet_ros2
+    environment:
+      CYCLONEDDS_URI: file:///ros2_ws/src/swarmnet/config/cyclone_config.xml
+      RMW_IMPLEMENTATION: rmw_cyclonedds_cpp
+      ROS_DOMAIN_ID: "0"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - . /opt/ros/humble/setup.sh && python3 -c 'import rclpy'
+      timeout: 5s
+      interval: 10s
+      retries: 3
+    image: sha256:a36ac86fb34c495581a053a361fae8014755f2bbf6d366552ea6e933cf52110e
+    init: true
+    mem_limit: "1610612736"
+    networks:
+      swarm_net: null
+    platform: linux/arm64
+    volumes:
+      - type: bind
+        source: /Users/dharavbhatt/swaram_net/swarmnet_v2/swarmnet_ros2
+        target: /ros2_ws/src/swarmnet
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /Users/dharavbhatt/swaram_net/swarmnet_v2/logs/ros2
+        target: /ros2_ws/logs
+        bind:
+          create_host_path: true
+      - type: bind
+        source: /Users/dharavbhatt/swaram_net/swarmnet_v2/config
+        target: /ros2_ws/src/swarmnet/config
+        read_only: true
+        bind:
+          create_host_path: true
+networks:
+  swarm_net:
+    name: swarmnet-v2_swarm_net
+    driver: bridge
+
+EXIT_STATUS: 0

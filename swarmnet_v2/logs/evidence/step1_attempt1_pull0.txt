@@ -1,0 +1,13 @@
+UTC: 2026-10-31T17:02:11.278576+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker pull --platform linux/arm64 ubuntu:22.04@sha256:a8fb2ba88181746111cbbe2969826d6546b71226785b196c93d2c3445a25000d
+
+docker.io/library/ubuntu@sha256:a8fb2ba88181746111cbbe2969826d6546b71226785b196c93d2c3445a25000d: Pulling from library/ubuntu
+771eed73ee82: Pulling fs layer
+771eed73ee82: Download complete
+771eed73ee82: Pull complete
+Digest: sha256:a8fb2ba88181746111cbbe2969826d6546b71226785b196c93d2c3445a25000d
+Status: Downloaded newer image for ubuntu@sha256:a8fb2ba88181746111cbbe2969826d6546b71226785b196c93d2c3445a25000d
+docker.io/library/ubuntu:22.04@sha256:a8fb2ba88181746111cbbe2969826d6546b71226785b196c93d2c3445a25000d
+
+EXIT_STATUS: 0

@@ -1,0 +1,21 @@
+UTC: 2026-10-31T17:26:32.468460+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: bash -lc 'docker compose config --quiet && docker compose up -d --no-build --wait && docker compose ps && git diff --check'
+
+ Container swarmnet_px4  Recreate
+ Container swarmnet_ros2  Recreate
+ Container swarmnet_px4  Recreated
+ Container swarmnet_ros2  Recreated
+ Container swarmnet_ros2  Starting
+ Container swarmnet_px4  Starting
+ Container swarmnet_ros2  Started
+ Container swarmnet_px4  Started
+ Container swarmnet_px4  Waiting
+ Container swarmnet_ros2  Waiting
+ Container swarmnet_px4  Healthy
+ Container swarmnet_ros2  Healthy
+NAME            IMAGE                                                                                         COMMAND                  SERVICE      CREATED          STATUS                    PORTS
+swarmnet_px4    swarmnet/px4-sitl@sha256:904f450277bc59147303be7cc0ba0006adcc8c14ea20a4c7c5efe13caf0cfeff     "sleep infinity"         px4_sitl     12 seconds ago   Up 10 seconds (healthy)   
+swarmnet_ros2   swarmnet/ros2-nodes@sha256:a36ac86fb34c495581a053a361fae8014755f2bbf6d366552ea6e933cf52110e   "/ros_entrypoint.sh …"   ros2_nodes   12 seconds ago   Up 10 seconds (healthy)   
+
+EXIT_STATUS: 0

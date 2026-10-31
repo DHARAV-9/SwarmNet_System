@@ -1,0 +1,37 @@
+UTC: 2026-10-31T17:02:25.887161+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker pull --platform linux/arm64 ros:humble-ros-base-jammy@sha256:48435c01f2876ff519a0d07edf8dd3ab29a8106c907965c64385a14c76470d6b
+
+docker.io/library/ros@sha256:48435c01f2876ff519a0d07edf8dd3ab29a8106c907965c64385a14c76470d6b: Pulling from library/ros
+b0e603f1bf56: Pulling fs layer
+da37fb353ffb: Pulling fs layer
+f416cf83b767: Pulling fs layer
+f67f6955aef4: Pulling fs layer
+b0567f7869a8: Pulling fs layer
+b886f357f227: Pulling fs layer
+f9f39b1c0e8b: Pulling fs layer
+926940866d1e: Pulling fs layer
+b81ec55a55ff: Pulling fs layer
+b886f357f227: Download complete
+f67f6955aef4: Download complete
+926940866d1e: Download complete
+f9f39b1c0e8b: Download complete
+f416cf83b767: Download complete
+da37fb353ffb: Download complete
+f67f6955aef4: Pull complete
+f416cf83b767: Pull complete
+da37fb353ffb: Pull complete
+b0e603f1bf56: Download complete
+b0567f7869a8: Download complete
+b886f357f227: Pull complete
+b0567f7869a8: Pull complete
+b81ec55a55ff: Download complete
+926940866d1e: Pull complete
+f9f39b1c0e8b: Pull complete
+b81ec55a55ff: Pull complete
+b0e603f1bf56: Pull complete
+Digest: sha256:48435c01f2876ff519a0d07edf8dd3ab29a8106c907965c64385a14c76470d6b
+Status: Downloaded newer image for ros@sha256:48435c01f2876ff519a0d07edf8dd3ab29a8106c907965c64385a14c76470d6b
+docker.io/library/ros:humble-ros-base-jammy@sha256:48435c01f2876ff519a0d07edf8dd3ab29a8106c907965c64385a14c76470d6b
+
+EXIT_STATUS: 0
