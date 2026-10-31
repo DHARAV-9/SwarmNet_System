@@ -14,7 +14,7 @@ docker compose exec -T px4_sitl python3 /px4_config/scripts/drone_spawn.py --n "
 docker compose exec -T ros2_nodes bash -lc '
   source /opt/ros/humble/setup.bash
   source /ros2_ws/install/setup.bash
-  ros2 topic list | grep -E "^/swarm/(formation_targets|drone_state/1)$"
+  ros2 topic list | grep -E "^/swarm/(formation_targets|drone_1/state)$"
   ros2 topic echo /swarm/formation_targets --once
 '
 

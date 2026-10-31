@@ -9,6 +9,7 @@ from geometry_msgs.msg import PoseStamped
 from rclpy.node import Node
 from rclpy.qos import DurabilityPolicy, QoSProfile, ReliabilityPolicy
 from swarmnet_msgs.msg import DroneState, FormationTargets
+from swarmnet_follower.topics import state_topic
 
 
 class FollowerNode(Node):
@@ -39,7 +40,7 @@ class FollowerNode(Node):
         )
         self.state_publisher = self.create_publisher(
             DroneState,
-            f"/swarm/drone_state/{self.drone_id}",
+            state_topic(self.drone_id),
             10,
         )
         hold_rate = float(self.get_parameter("hold_rate_hz").value)

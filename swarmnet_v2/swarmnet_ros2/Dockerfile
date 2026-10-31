@@ -14,4 +14,7 @@ RUN test "$(dpkg --print-architecture)" = arm64 \
 
 RUN mkdir -p /ros2_ws/src /ros2_ws/logs
 
+RUN geographiclib-get-geoids egm96-5 \
+    && test -s /usr/share/GeographicLib/geoids/egm96-5.pgm
+
 WORKDIR /ros2_ws

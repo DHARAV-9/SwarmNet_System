@@ -1,0 +1,20 @@
+UTC: 2026-10-31T17:30:00.926805+00:00
+CWD: /Users/dharavbhatt/swaram_net
+COMMAND: ./venv/bin/python -m pytest swarmnet_v2/tests/test_ros_names.py -v
+
+============================= test session starts ==============================
+platform darwin -- Python 3.11.14, pytest-9.1.1, pluggy-1.6.0 -- /Users/dharavbhatt/swaram_net/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/dharavbhatt/swaram_net
+plugins: cov-7.1.0
+collecting ... collected 5 items
+
+swarmnet_v2/tests/test_ros_names.py::test_all_fleet_state_topics_are_distinct_valid_ros_names PASSED [ 20%]
+swarmnet_v2/tests/test_ros_names.py::test_invalid_drone_ids_are_rejected[0] PASSED [ 40%]
+swarmnet_v2/tests/test_ros_names.py::test_invalid_drone_ids_are_rejected[-1] PASSED [ 60%]
+swarmnet_v2/tests/test_ros_names.py::test_invalid_drone_ids_are_rejected[True] PASSED [ 80%]
+swarmnet_v2/tests/test_ros_names.py::test_invalid_drone_ids_are_rejected[1] PASSED [100%]
+
+============================== 5 passed in 0.01s ===============================
+
+EXIT_STATUS: 0

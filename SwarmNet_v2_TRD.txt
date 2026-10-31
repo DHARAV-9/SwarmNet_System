@@ -86,7 +86,7 @@ DRONE ROLE ARCHITECTURE
     - Hosts MAPPO centralized critic (training only)
     - Publishes /swarm/formation_targets DDS topic
     - Maintains Raft leader role
-    - Monitors follower health via /swarm/drone_state topics
+    - Monitors follower health via /swarm/drone_<id>/state topics
     - Triggers re-assignment on follower failure
 
   Vehicles 2–50 (FOLLOWERS)
@@ -96,7 +96,7 @@ DRONE ROLE ARCHITECTURE
     - Runs MPC: position estimate → thrust setpoint
     - Runs ORCA: thrust setpoint → collision-safe velocity
     - Runs MAPPO actor: local obs → policy action (overrides MPC)
-    - Publishes /swarm/drone_state/<id> at 10 Hz
+    - Publishes /swarm/drone_<id>/state at 10 Hz
     - Holds last formation position for 10s on comms loss
 
 
@@ -625,7 +625,7 @@ ROS2 TOPIC DESIGN
     Rate: on change (formation update)
     Content: array of 50 PoseStamped targets with drone_id assignment
 
-  /swarm/drone_state/<drone_id>    (each drone publishes)
+  /swarm/drone_<drone_id>/state    (each drone publishes; e.g. /swarm/drone_1/state)
     Type: swarmnet_msgs/DroneState
     Rate: 10 Hz
     Content: position, velocity, battery, raft_state, task, alive
@@ -1037,7 +1037,7 @@ UNIT TESTS (pytest)
 INTEGRATION TEST
   tests/test_integration.py
     - Spawn 10 drones (reduced N for CI)
-    - Verify all appear on DDS /swarm/drone_state topics
+    - Verify all appear on DDS /swarm/drone_<id>/state topics
     - Kill drone 5 → verify formation rebalances in < 5s
     - Enable 10 m/s wind → verify formation error < 15cm RMS
     - Trigger PBFT emergency land → verify all drones land
@@ -1155,7 +1155,7 @@ EXPECTED TERMINAL OUTPUT ON LAUNCH
   [SPAWN] Launching drone 50 on port 14599 at pos (6.0, 6.0, 5.0)
   [MASTER] Formation manager initialized. N=50
   [MASTER] Hungarian assignment complete in 0.8ms
-  [DDS] All 50 drones publishing /swarm/drone_state
+  [DDS] All 50 drones publishing /swarm/drone_<id>/state
   [EKF] Drone 1: EKF converged. pos_error=0.02m
   [ORCA] Spacing check: min_dist=1.98m (OK)
   [QGC] 50 vehicles connected via MAVLink

@@ -252,7 +252,8 @@ FR-03  FOLLOWER DRONES — AUTONOMOUS EXECUTION
   - Run MPC position controller: 500ms prediction horizon
   - Run ORCA: enforce 50cm minimum spacing every 20ms
   - Hold last known formation for 10s on comms loss
-  - Report state (position, battery, status) via DDS at 10 Hz
+  - Report state (position, battery, status) via DDS at 10 Hz on
+    /swarm/drone_<id>/state (e.g. /swarm/drone_1/state; no numeric tokens)
 
 FR-04  EKF SENSOR FUSION
   Extended Kalman Filter must fuse:
