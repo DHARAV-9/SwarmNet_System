@@ -1,0 +1,9 @@
+UTC: 2026-11-23T10:30:28.075253+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose up -d --no-build --wait
+
+ Container swarmnet_px4  Recreate
+ Container swarmnet_ros2  Recreate
+Error response from daemon: No such image: swarmnet/ros2-nodes@sha256:428618639cda845890386ef1b5e38604309ce3652c488022addae296942b8deb
+
+EXIT_STATUS: 1

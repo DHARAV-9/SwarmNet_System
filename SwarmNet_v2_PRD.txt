@@ -229,8 +229,10 @@ CHALLENGE 4 — DOCKER ON APPLE SILICON
 
 FR-01  50-DRONE SITL DEPLOYMENT
   System must spawn exactly 50 PX4 SITL instances in Gazebo Harmonic.
-  Each instance must have: unique MAV_SYS_ID (1–50), unique UDP port
-  (14550–14600), unique Gazebo model instance, independent PX4 log.
+  Each instance must have: unique MAV_SYS_ID (1–50), independent
+  PX4/MAVROS UDP endpoints, unique Gazebo model instance, and independent PX4
+  storage and log. QGC uses one UDP listener on 14550 and distinguishes
+  vehicles by system ID. The 50-vehicle layout is 5 rows by 10 columns.
   All 50 must be launchable with a single command.
   Vehicle 1 is designated master. Vehicles 2–50 are followers.
 

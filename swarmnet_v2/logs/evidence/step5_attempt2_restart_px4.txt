@@ -1,0 +1,8 @@
+UTC: 2026-11-23T10:34:07.036494+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose restart px4_sitl
+
+ Container swarmnet_px4  Restarting
+ Container swarmnet_px4  Started
+
+EXIT_STATUS: 0

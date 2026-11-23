@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Launch PX4 SITL instances at deterministic swarm grid positions."""
+"""Launch PX4 SITL fleet instances with the same routing and grid as ROS2."""
 
 from __future__ import annotations
 
@@ -8,178 +8,153 @@ import json
 import os
 import signal
 import subprocess
+import tempfile
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 
-DEFAULT_GRID_WIDTH = 7
-DEFAULT_SPACING_M = 2.0
-DEFAULT_ALTITUDE_M = 5.0
-DEFAULT_MAVLINK_PORT = 14550
+from swarmnet_master.formation import (
+    DEFAULT_ALTITUDE_M,
+    DEFAULT_GRID_WIDTH,
+    DEFAULT_SPACING_M,
+    FormationTarget,
+    grid_targets,
+)
+from swarmnet_master.routing import QGC_PORT, VehicleRoute
+
+SPAWN_HEIGHT_M = 0.15
+DEFAULT_RUNS_DIR = Path("/var/log/swarmnet/px4/fleet_runs")
 
 
 @dataclass(frozen=True)
 class DroneInstance:
-    """Runtime configuration for one PX4 SITL vehicle."""
+    route: VehicleRoute
+    target: FormationTarget
 
-    drone_id: int
-    px4_instance: int
-    mavlink_port: int
-    x: float
-    y: float
-    z: float
+    @property
+    def spawn_xyz(self) -> tuple[float, float, float]:
+        return self.target.x, self.target.y, SPAWN_HEIGHT_M
 
 
-def grid_position(
-    drone_id: int,
-    grid_width: int = DEFAULT_GRID_WIDTH,
-    spacing_m: float = DEFAULT_SPACING_M,
-    altitude_m: float = DEFAULT_ALTITUDE_M,
-) -> tuple[float, float, float]:
-    """Return the TRD-defined centered grid position for a one-based ID."""
-    if drone_id < 1:
-        raise ValueError("drone_id must be at least 1")
-    if grid_width < 1:
-        raise ValueError("grid_width must be positive")
-    row, col = divmod(drone_id - 1, grid_width)
-    midpoint = (grid_width - 1) / 2
-    return (
-        (col - midpoint) * spacing_m,
-        (row - midpoint) * spacing_m,
-        altitude_m,
-    )
+def build_instances(n_drones: int, grid_width: int = DEFAULT_GRID_WIDTH,
+                    spacing_m: float = DEFAULT_SPACING_M,
+                    altitude_m: float = DEFAULT_ALTITUDE_M) -> list[DroneInstance]:
+    return [DroneInstance(VehicleRoute(target.drone_id), target)
+            for target in grid_targets(n_drones, grid_width, spacing_m, altitude_m)]
 
 
-def build_instances(
-    n_drones: int,
-    base_mavlink_port: int = DEFAULT_MAVLINK_PORT,
-    grid_width: int = DEFAULT_GRID_WIDTH,
-    spacing_m: float = DEFAULT_SPACING_M,
-    altitude_m: float = DEFAULT_ALTITUDE_M,
-) -> list[DroneInstance]:
-    """Create unique IDs, MAVLink ports, and grid positions for a fleet."""
-    if not 1 <= n_drones <= 50:
-        raise ValueError("n_drones must be between 1 and 50")
+def px4_command(directory: Path, drone: DroneInstance) -> tuple[dict[str, str], list[str]]:
+    route = drone.route
+    east, north, up = drone.spawn_xyz
+    environment = {
+        **os.environ,
+        "PX4_INSTANCE": str(route.instance),
+        "PX4_GZ_MODEL_POSE": f"{east},{north},{up},0,0,0",
+        "SWARM_STATE_DIR": str(directory / route.state_dir),
+        "SWARM_OFFBOARD_PORT": str(route.offboard_port),
+        "SWARM_MAVROS_PORT": str(route.mavros_port),
+        "SWARM_GCS_SOURCE_PORT": str(route.gcs_source_port),
+        "QGC_PORT": str(QGC_PORT),
+    }
+    return environment, ["bash", str(Path(__file__).with_name("spawn_one_drone.sh"))]
+
+
+def manifest(fleet: list[DroneInstance]) -> list[dict]:
     return [
-        DroneInstance(
-            drone_id=drone_id,
-            px4_instance=drone_id - 1,
-            mavlink_port=base_mavlink_port + drone_id - 1,
-            x=grid_position(drone_id, grid_width, spacing_m, altitude_m)[0],
-            y=grid_position(drone_id, grid_width, spacing_m, altitude_m)[1],
-            z=altitude_m,
-        )
-        for drone_id in range(1, n_drones + 1)
+        {
+            "drone_id": drone.route.drone_id,
+            "px4_instance": drone.route.instance,
+            "px4_offboard_port": drone.route.offboard_port,
+            "mavros_port": drone.route.mavros_port,
+            "px4_gcs_source_port": drone.route.gcs_source_port,
+            "qgc_port": QGC_PORT,
+            "mavros_namespace": drone.route.namespace,
+            "state_dir": drone.route.state_dir,
+            "spawn_world_enu": drone.spawn_xyz,
+            "desired_world_enu": (drone.target.x, drone.target.y, drone.target.z),
+        }
+        for drone in fleet
     ]
 
 
-def px4_command(px4_dir: Path, instance: DroneInstance) -> tuple[dict[str, str], list[str]]:
-    """Build one PX4/Gazebo launch command with isolated instance settings."""
-    environment = os.environ.copy()
-    environment.update(
-        {
-            "PX4_SYS_AUTOSTART": "4001",
-            "PX4_SIM_MODEL": "gz_x500",
-            "PX4_GZ_MODEL": "x500",
-            "PX4_GZ_MODEL_NAME": f"swarmnet_x500_{instance.drone_id}",
-            "PX4_GZ_MODEL_POSE": f"{instance.x},{instance.y},{instance.z},0,0,0",
-            "PX4_INSTANCE": str(instance.px4_instance),
-            "MAV_SYS_ID": str(instance.drone_id),
-            "MAVLINK_REMOTE_PORT": str(instance.mavlink_port),
-        }
-    )
-    binary = px4_dir / "build" / "px4_sitl_default" / "bin" / "px4"
-    return environment, [str(binary), "-i", str(instance.px4_instance)]
+def check_running(processes: dict[int, subprocess.Popen]) -> None:
+    for drone_id, process in processes.items():
+        if (status := process.poll()) is not None:
+            raise RuntimeError(f"PX4 vehicle {drone_id} exited with code {status}")
 
 
-def ensure_px4_build(px4_dir: Path) -> None:
-    """Build the SITL binary only when it is missing from the PX4 checkout."""
-    binary = px4_dir / "build" / "px4_sitl_default" / "bin" / "px4"
-    if binary.exists():
-        return
-    subprocess.run(["make", "px4_sitl_default"], cwd=px4_dir, check=True)
-
-
-def write_manifest(instances: list[DroneInstance], log_dir: Path) -> Path:
-    """Persist the generated fleet mapping for QGC and troubleshooting."""
-    log_dir.mkdir(parents=True, exist_ok=True)
-    path = log_dir / "swarm_manifest.json"
-    path.write_text(
-        json.dumps([asdict(instance) for instance in instances], indent=2) + "\n",
-        encoding="utf-8",
-    )
-    return path
-
-
-def spawn(instances: list[DroneInstance], px4_dir: Path, log_dir: Path) -> None:
-    """Start PX4 processes and keep them alive until interrupted."""
-    processes: list[subprocess.Popen[bytes]] = []
+def spawn(fleet: list[DroneInstance], directory: Path) -> None:
+    processes: dict[int, subprocess.Popen] = {}
     try:
-        for instance in instances:
-            environment, command = px4_command(px4_dir, instance)
-            output = (log_dir / f"vehicle_{instance.drone_id}.log").open("wb")
-            process = subprocess.Popen(
-                command,
-                cwd=px4_dir,
-                env=environment,
-                stdout=output,
-                stderr=subprocess.STDOUT,
-                start_new_session=True,
-            )
-            processes.append(process)
-            print(
-                f"[SPAWN] Vehicle {instance.drone_id:02d} "
-                f"sys_id={instance.drone_id} qgc_udp={instance.mavlink_port} "
-                f"position=({instance.x:.1f}, {instance.y:.1f}, {instance.z:.1f})"
-            )
-            time.sleep(0.25)
-        print(f"[SPAWN] {len(processes)} PX4 SITL instances started.")
-        while all(process.poll() is None for process in processes):
-            time.sleep(1.0)
+        for drone in fleet:
+            route = drone.route
+            env, command = px4_command(directory, drone)
+            path = directory / f"vehicle_{route.drone_id}.log"
+            with path.open("xb") as output:
+                processes[route.drone_id] = subprocess.Popen(
+                    command, env=env, stdout=output, stderr=subprocess.STDOUT,
+                    start_new_session=True,
+                )
+            marker = f"SwarmNet PX4 instance {route.instance} ready"
+            deadline = time.monotonic() + 90
+            while marker not in path.read_text(errors="replace"):
+                check_running(processes)
+                if time.monotonic() >= deadline:
+                    raise RuntimeError(f"PX4 vehicle {route.drone_id} startup timed out; see {path}")
+                time.sleep(0.2)
+            print(f"Vehicle {route.drone_id} completed PX4 startup; log: {path}", flush=True)
+        print(f"{len(processes)} PX4 vehicles started; flight not yet verified", flush=True)
+        while True:
+            check_running(processes)
+            time.sleep(0.5)
     finally:
-        for process in processes:
-            if process.poll() is None:
+        for process in processes.values():
+            try:
                 os.killpg(process.pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+        for process in processes.values():
+            try:
+                process.wait(timeout=3)
+            except subprocess.TimeoutExpired:
+                os.killpg(process.pid, signal.SIGKILL)
+                process.wait()
 
 
-def parse_args() -> argparse.Namespace:
-    """Parse fleet size and PX4 path options."""
-    parser = argparse.ArgumentParser(description="Spawn a PX4 SITL fleet")
-    parser.add_argument("--n", type=int, default=50, help="Number of drones (1-50)")
-    parser.add_argument("--base-port", type=int, default=DEFAULT_MAVLINK_PORT)
-    parser.add_argument("--grid-width", type=int, default=DEFAULT_GRID_WIDTH)
-    parser.add_argument("--spacing", type=float, default=DEFAULT_SPACING_M)
-    parser.add_argument("--altitude", type=float, default=DEFAULT_ALTITUDE_M)
-    parser.add_argument(
-        "--px4-dir",
-        type=Path,
-        default=Path(os.environ.get("PX4_DIR", "/workspace/PX4-Autopilot")),
-    )
-    parser.add_argument("--log-dir", type=Path, default=Path("/workspace/PX4-Autopilot/logs"))
-    parser.add_argument("--dry-run", action="store_true", help="Print mapping without PX4")
-    return parser.parse_args()
+def stop_on_signal(signum, frame) -> None:
+    raise KeyboardInterrupt
 
 
 def main() -> None:
-    """Generate the fleet mapping and optionally launch PX4 SITL."""
-    args = parse_args()
-    instances = build_instances(
-        args.n,
-        args.base_port,
-        args.grid_width,
-        args.spacing,
-        args.altitude,
-    )
-    manifest = write_manifest(instances, args.log_dir)
-    print(f"[SPAWN] Fleet manifest written to {manifest}")
-    for instance in instances:
-        print(f"[SPAWN] {instance}")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--n", type=int, default=2)
+    parser.add_argument("--grid-width", type=int, default=DEFAULT_GRID_WIDTH)
+    parser.add_argument("--spacing", type=float, default=DEFAULT_SPACING_M)
+    parser.add_argument("--altitude", type=float, default=DEFAULT_ALTITUDE_M)
+    parser.add_argument("--log-dir", type=Path, help="New directory for this run")
+    parser.add_argument("--dry-run", action="store_true", help="Print the plan without starting PX4")
+    args = parser.parse_args()
+    try:
+        fleet = build_instances(args.n, args.grid_width, args.spacing, args.altitude)
+    except ValueError as error:
+        parser.error(str(error))
+    plan = json.dumps(manifest(fleet), indent=2)
     if args.dry_run:
+        print(plan)
         return
-    if not (args.px4_dir / "Tools" / "setup" / "ubuntu.sh").exists():
-        raise SystemExit(f"PX4 checkout not found at {args.px4_dir}")
-    ensure_px4_build(args.px4_dir)
-    spawn(instances, args.px4_dir, args.log_dir)
+    if args.log_dir is None:
+        DEFAULT_RUNS_DIR.mkdir(parents=True, exist_ok=True)
+        directory = Path(tempfile.mkdtemp(prefix="run_", dir=DEFAULT_RUNS_DIR))
+    else:
+        directory = args.log_dir.resolve()
+        directory.mkdir(parents=True)
+    (directory / "swarm_manifest.json").write_text(plan + "\n", encoding="utf-8")
+    print(f"Planned fleet: {directory / 'swarm_manifest.json'}", flush=True)
+    signal.signal(signal.SIGTERM, stop_on_signal)
+    try:
+        spawn(fleet, directory)
+    except KeyboardInterrupt:
+        pass
 
 
 if __name__ == "__main__":

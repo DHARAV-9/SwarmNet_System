@@ -1,0 +1,8 @@
+UTC: 2026-11-23T10:25:46.388341+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: ../venv/bin/python -m pytest tests -q
+
+.................                                                        [100%]
+17 passed in 0.01s
+
+EXIT_STATUS: 0

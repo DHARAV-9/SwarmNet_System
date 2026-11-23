@@ -1,0 +1,459 @@
+UTC: 2026-11-23T10:32:05.965674+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose exec -T ros2_nodes timeout --signal=INT --kill-after=10 390 bash -lc 'source /opt/ros/humble/setup.bash; source install/setup.bash; exec ros2 launch swarmnet_master mavros_fleet.launch.py n_drones:=2'
+
+[INFO] [launch]: All log files can be found below /root/.ros/log/2026-11-23-10-32-06-268212-50e086fef34d-610
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [mavros_node-1]: process started with pid [628]
+[INFO] [mavros_node-2]: process started with pid [630]
+[mavros_node-1] [INFO] [1795429926.309501177] [drone_1.mavros.bridge]: Starting mavros_node container
+[mavros_node-1] [INFO] [1795429926.309537260] [drone_1.mavros.bridge]: FCU URL: udp://:16000@px4_sitl:15000
+[mavros_node-1] [INFO] [1795429926.309541843] [drone_1.mavros.bridge]: GCS URL: 
+[mavros_node-1] [INFO] [1795429926.309544802] [drone_1.mavros.bridge]: UAS Prefix: /uas1
+[mavros_node-1] [INFO] [1795429926.309547427] [drone_1.mavros.bridge]: Starting mavros router node
+[mavros_node-1] [WARN] [1795429926.309566718] [rcl.logging_rosout]: Publisher already registered for provided node name. If this is due to multiple nodes with the same name then all logs for that logger name will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[mavros_node-2] [INFO] [1795429926.309501427] [drone_2.mavros.bridge]: Starting mavros_node container
+[mavros_node-2] [INFO] [1795429926.309537427] [drone_2.mavros.bridge]: FCU URL: udp://:16001@px4_sitl:15001
+[mavros_node-2] [INFO] [1795429926.309541718] [drone_2.mavros.bridge]: GCS URL: 
+[mavros_node-2] [INFO] [1795429926.309544552] [drone_2.mavros.bridge]: UAS Prefix: /uas2
+[mavros_node-2] [INFO] [1795429926.309547052] [drone_2.mavros.bridge]: Starting mavros router node
+[mavros_node-2] [WARN] [1795429926.309573427] [rcl.logging_rosout]: Publisher already registered for provided node name. If this is due to multiple nodes with the same name then all logs for that logger name will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[mavros_node-2] [INFO] [1795429926.311769510] [drone_2.mavros.bridge]: Built-in SIMD instructions: ARM NEON
+[mavros_node-2] [INFO] [1795429926.311782552] [drone_2.mavros.bridge]: Built-in MAVLink package version: 2026.9.9
+[mavros_node-2] [INFO] [1795429926.311786135] [drone_2.mavros.bridge]: Known MAVLink dialects: common ardupilotmega ASLUAV AVSSUAS all csAirLink cubepilot development icarous loweheiser marsh paparazzi standard stemstudios storm32 uAvionix
+[mavros_node-2] [INFO] [1795429926.311788927] [drone_2.mavros.bridge]: MAVROS Router started
+[mavros_node-1] [INFO] [1795429926.311785802] [drone_1.mavros.bridge]: Built-in SIMD instructions: ARM NEON
+[mavros_node-1] [INFO] [1795429926.311794052] [drone_1.mavros.bridge]: Built-in MAVLink package version: 2026.9.9
+[mavros_node-1] [INFO] [1795429926.311797302] [drone_1.mavros.bridge]: Known MAVLink dialects: common ardupilotmega ASLUAV AVSSUAS all csAirLink cubepilot development icarous loweheiser marsh paparazzi standard stemstudios storm32 uAvionix
+[mavros_node-1] [INFO] [1795429926.311800677] [drone_1.mavros.bridge]: MAVROS Router started
+[mavros_node-1] [INFO] [1795429926.311850135] [drone_1.mavros.bridge]: Starting mavros uas node
+[mavros_node-1] [WARN] [1795429926.311866885] [rcl.logging_rosout]: Publisher already registered for provided node name. If this is due to multiple nodes with the same name then all logs for that logger name will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[mavros_node-2] [INFO] [1795429926.312197760] [drone_2.mavros.bridge]: Starting mavros uas node
+[mavros_node-2] [WARN] [1795429926.312226510] [rcl.logging_rosout]: Publisher already registered for provided node name. If this is due to multiple nodes with the same name then all logs for that logger name will go out over the existing publisher. As soon as any node with that name is destructed it will unregister the publisher, preventing any further logs for that name from being published on the rosout topic.
+[mavros_node-2] [INFO] [1795429926.325895302] [drone_2.mavros.bridge]: Requested to add endpoint: type: 0, url: udp://:16001@px4_sitl:15001
+[mavros_node-2] [INFO] [1795429926.325934552] [drone_2.mavros.bridge]: Endpoint link[1000] created
+[mavros_node-1] [INFO] [1795429926.325895593] [drone_1.mavros.bridge]: Requested to add endpoint: type: 0, url: udp://:16000@px4_sitl:15000
+[mavros_node-1] [INFO] [1795429926.325934593] [drone_1.mavros.bridge]: Endpoint link[1000] created
+[mavros_node-1] [INFO] [1795429926.326393510] [drone_1.mavros.bridge]: link[1000] opened successfully
+[mavros_node-1] [INFO] [1795429926.326404302] [drone_1.mavros.bridge]: Requested to add endpoint: type: 2, url: /uas1
+[mavros_node-1] [INFO] [1795429926.326412427] [drone_1.mavros.bridge]: Endpoint link[1001] created
+[mavros_node-2] [INFO] [1795429926.326407427] [drone_2.mavros.bridge]: link[1000] opened successfully
+[mavros_node-2] [INFO] [1795429926.326417718] [drone_2.mavros.bridge]: Requested to add endpoint: type: 2, url: /uas2
+[mavros_node-2] [INFO] [1795429926.326427593] [drone_2.mavros.bridge]: Endpoint link[1001] created
+[mavros_node-1] [INFO] [1795429926.326555968] [drone_1.mavros.bridge]: link[1001] opened successfully
+[mavros_node-1] [INFO] [1795429926.339500843] [drone_1.mavros.bridge]: link[1000] detected remote address 1.1
+[mavros_node-1] [INFO] [1795429926.339602302] [drone_1.mavros.bridge]: UAS Executor started, threads: 4
+[mavros_node-2] [INFO] [1795429926.326556468] [drone_2.mavros.bridge]: link[1001] opened successfully
+[mavros_node-2] [INFO] [1795429926.326661385] [drone_2.mavros.bridge]: link[1000] detected remote address 2.1
+[mavros_node-2] [INFO] [1795429926.343282885] [drone_2.mavros.bridge]: UAS Executor started, threads: 4
+[mavros_node-1] [INFO] [1795429926.347559177] [drone_1.mavros.bridge]: Plugin actuator_control created
+[mavros_node-1] [INFO] [1795429926.347584385] [drone_1.mavros.bridge]: Plugin actuator_control initialized
+[mavros_node-2] [INFO] [1795429926.348522802] [drone_2.mavros.bridge]: Plugin actuator_control created
+[mavros_node-2] [INFO] [1795429926.348553927] [drone_2.mavros.bridge]: Plugin actuator_control initialized
+[mavros_node-2] [INFO] [1795429926.357006552] [drone_2.mavros.bridge]: Plugin adsb created
+[mavros_node-2] [INFO] [1795429926.357088427] [drone_2.mavros.bridge]: Plugin adsb initialized
+[mavros_node-1] [INFO] [1795429926.357169635] [drone_1.mavros.bridge]: Plugin adsb created
+[mavros_node-1] [INFO] [1795429926.357210718] [drone_1.mavros.bridge]: Plugin adsb initialized
+[mavros_node-1] [INFO] [1795429926.358567510] [drone_1.mavros.bridge]: Plugin altitude created
+[mavros_node-1] [INFO] [1795429926.358590802] [drone_1.mavros.bridge]: Plugin altitude initialized
+[mavros_node-2] [INFO] [1795429926.358642468] [drone_2.mavros.bridge]: Plugin altitude created
+[mavros_node-2] [INFO] [1795429926.358697885] [drone_2.mavros.bridge]: Plugin altitude initialized
+[mavros_node-1] [INFO] [1795429926.360100052] [drone_1.mavros.bridge]: Plugin cam_imu_sync created
+[mavros_node-1] [INFO] [1795429926.360116218] [drone_1.mavros.bridge]: Plugin cam_imu_sync initialized
+[mavros_node-2] [INFO] [1795429926.360710510] [drone_2.mavros.bridge]: Plugin cam_imu_sync created
+[mavros_node-2] [INFO] [1795429926.360810427] [drone_2.mavros.bridge]: Plugin cam_imu_sync initialized
+[mavros_node-1] [INFO] [1795429926.361472343] [drone_1.mavros.bridge]: Plugin camera created
+[mavros_node-1] [INFO] [1795429926.361516468] [drone_1.mavros.bridge]: Plugin camera initialized
+[mavros_node-2] [INFO] [1795429926.362049177] [drone_2.mavros.bridge]: Plugin camera created
+[mavros_node-2] [INFO] [1795429926.362061968] [drone_2.mavros.bridge]: Plugin camera initialized
+[mavros_node-1] [INFO] [1795429926.363190677] [drone_1.mavros.bridge]: Plugin cellular_status created
+[mavros_node-1] [INFO] [1795429926.363287760] [drone_1.mavros.bridge]: Plugin cellular_status initialized
+[mavros_node-2] [INFO] [1795429926.363444927] [drone_2.mavros.bridge]: Plugin cellular_status created
+[mavros_node-2] [INFO] [1795429926.363457302] [drone_2.mavros.bridge]: Plugin cellular_status initialized
+[mavros_node-2] [INFO] [1795429926.365728635] [drone_2.mavros.bridge]: Plugin command created
+[mavros_node-2] [INFO] [1795429926.365753552] [drone_2.mavros.bridge]: Plugin command initialized
+[mavros_node-1] [INFO] [1795429926.366333802] [drone_1.mavros.bridge]: Plugin command created
+[mavros_node-1] [INFO] [1795429926.366352843] [drone_1.mavros.bridge]: Plugin command initialized
+[mavros_node-2] [INFO] [1795429926.366999593] [drone_2.mavros.bridge]: Plugin companion_process_status created
+[mavros_node-2] [INFO] [1795429926.367010968] [drone_2.mavros.bridge]: Plugin companion_process_status initialized
+[mavros_node-1] [INFO] [1795429926.368094093] [drone_1.mavros.bridge]: Plugin companion_process_status created
+[mavros_node-1] [INFO] [1795429926.368108843] [drone_1.mavros.bridge]: Plugin companion_process_status initialized
+[mavros_node-2] [INFO] [1795429926.368981218] [drone_2.mavros.bridge]: Plugin debug_value created
+[mavros_node-2] [INFO] [1795429926.369003968] [drone_2.mavros.bridge]: Plugin debug_value initialized
+[mavros_node-1] [INFO] [1795429926.369584927] [drone_1.mavros.bridge]: Plugin debug_value created
+[mavros_node-1] [INFO] [1795429926.369610135] [drone_1.mavros.bridge]: Plugin debug_value initialized
+[mavros_node-2] [INFO] [1795429926.370255052] [drone_2.mavros.bridge.distance_sensor]: DS: Plugin not configured!
+[mavros_node-2] [INFO] [1795429926.370309302] [drone_2.mavros.bridge]: Plugin distance_sensor created
+[mavros_node-2] [INFO] [1795429926.370319927] [drone_2.mavros.bridge]: Plugin distance_sensor initialized
+[mavros_node-1] [INFO] [1795429926.370656177] [drone_1.mavros.bridge.distance_sensor]: DS: Plugin not configured!
+[mavros_node-1] [INFO] [1795429926.370715343] [drone_1.mavros.bridge]: Plugin distance_sensor created
+[mavros_node-1] [INFO] [1795429926.370726302] [drone_1.mavros.bridge]: Plugin distance_sensor initialized
+[mavros_node-2] [INFO] [1795429926.371627593] [drone_2.mavros.bridge]: Plugin esc_status created
+[mavros_node-2] [INFO] [1795429926.371647010] [drone_2.mavros.bridge]: Plugin esc_status initialized
+[mavros_node-2] [INFO] [1795429926.439596552] [drone_2.mavros.bridge]: Plugin esc_telemetry created
+[mavros_node-1] [INFO] [1795429926.371903468] [drone_1.mavros.bridge]: Plugin esc_status created
+[mavros_node-1] [INFO] [1795429926.371916968] [drone_1.mavros.bridge]: Plugin esc_status initialized
+[mavros_node-2] [INFO] [1795429926.439785093] [drone_2.mavros.bridge]: Plugin esc_telemetry initialized
+[mavros_node-1] [INFO] [1795429926.441564510] [drone_1.mavros.bridge]: Plugin esc_telemetry created
+[mavros_node-1] [INFO] [1795429926.441586968] [drone_1.mavros.bridge]: Plugin esc_telemetry initialized
+[mavros_node-2] [INFO] [1795429926.443886885] [drone_2.mavros.bridge]: Plugin fake_gps created
+[mavros_node-2] [INFO] [1795429926.443950593] [drone_2.mavros.bridge]: Plugin fake_gps initialized
+[mavros_node-1] [INFO] [1795429926.444119677] [drone_1.mavros.bridge]: Plugin fake_gps created
+[mavros_node-1] [INFO] [1795429926.444134385] [drone_1.mavros.bridge]: Plugin fake_gps initialized
+[mavros_node-2] [INFO] [1795429926.447384135] [drone_2.mavros.bridge]: Plugin ftp created
+[mavros_node-2] [INFO] [1795429926.447404343] [drone_2.mavros.bridge]: Plugin ftp initialized
+[mavros_node-1] [INFO] [1795429926.448354802] [drone_1.mavros.bridge]: Plugin ftp created
+[mavros_node-1] [INFO] [1795429926.448610260] [drone_1.mavros.bridge]: Plugin ftp initialized
+[mavros_node-2] [INFO] [1795429926.449860260] [drone_2.mavros.bridge]: Plugin geofence created
+[mavros_node-2] [INFO] [1795429926.449976677] [drone_2.mavros.bridge]: Plugin geofence initialized
+[mavros_node-1] [INFO] [1795429926.451344635] [drone_1.mavros.bridge]: Plugin geofence created
+[mavros_node-1] [INFO] [1795429926.451396885] [drone_1.mavros.bridge]: Plugin geofence initialized
+[mavros_node-2] [INFO] [1795429926.453504635] [drone_2.mavros.bridge]: Plugin gimbal_control created
+[mavros_node-2] [INFO] [1795429926.453533677] [drone_2.mavros.bridge]: Plugin gimbal_control initialized
+[mavros_node-1] [INFO] [1795429926.454483468] [drone_1.mavros.bridge]: Plugin gimbal_control created
+[mavros_node-1] [INFO] [1795429926.454556802] [drone_1.mavros.bridge]: Plugin gimbal_control initialized
+[mavros_node-2] [INFO] [1795429926.456628343] [drone_2.mavros.bridge]: Plugin global_position created
+[mavros_node-2] [INFO] [1795429926.456654802] [drone_2.mavros.bridge]: Plugin global_position initialized
+[mavros_node-2] [INFO] [1795429926.542076843] [drone_2.mavros.bridge]: Plugin gps_input created
+[mavros_node-2] [INFO] [1795429926.542157177] [drone_2.mavros.bridge]: Plugin gps_input initialized
+[mavros_node-1] [INFO] [1795429926.544054343] [drone_1.mavros.bridge]: Plugin global_position created
+[mavros_node-1] [INFO] [1795429926.544092927] [drone_1.mavros.bridge]: Plugin global_position initialized
+[mavros_node-2] [INFO] [1795429926.544757760] [drone_2.mavros.bridge]: Plugin gps_rtk created
+[mavros_node-2] [INFO] [1795429926.544845843] [drone_2.mavros.bridge]: Plugin gps_rtk initialized
+[mavros_node-1] [INFO] [1795429926.546239510] [drone_1.mavros.bridge]: Plugin gps_input created
+[mavros_node-1] [INFO] [1795429926.546371593] [drone_1.mavros.bridge]: Plugin gps_input initialized
+[mavros_node-2] [INFO] [1795429926.548448177] [drone_2.mavros.bridge]: Plugin gps_status created
+[mavros_node-2] [INFO] [1795429926.548485343] [drone_2.mavros.bridge]: Plugin gps_status initialized
+[mavros_node-1] [INFO] [1795429926.549727218] [drone_1.mavros.bridge]: Plugin gps_rtk created
+[mavros_node-1] [INFO] [1795429926.549795302] [drone_1.mavros.bridge]: Plugin gps_rtk initialized
+[mavros_node-2] [INFO] [1795429926.550596260] [drone_2.mavros.bridge]: Plugin guided_target created
+[mavros_node-2] [INFO] [1795429926.550618927] [drone_2.mavros.bridge]: Plugin guided_target initialized
+[mavros_node-1] [INFO] [1795429926.552836468] [drone_1.mavros.bridge]: Plugin gps_status created
+[mavros_node-1] [INFO] [1795429926.552870677] [drone_1.mavros.bridge]: Plugin gps_status initialized
+[mavros_node-2] [INFO] [1795429926.554046968] [drone_2.mavros.bridge]: Plugin hil created
+[mavros_node-2] [INFO] [1795429926.554073552] [drone_2.mavros.bridge]: Plugin hil initialized
+[mavros_node-1] [INFO] [1795429926.556064052] [drone_1.mavros.bridge]: Plugin guided_target created
+[mavros_node-1] [INFO] [1795429926.556147968] [drone_1.mavros.bridge]: Plugin guided_target initialized
+[mavros_node-2] [INFO] [1795429926.556852010] [drone_2.mavros.bridge]: Plugin home_position created
+[mavros_node-2] [INFO] [1795429926.556872343] [drone_2.mavros.bridge]: Plugin home_position initialized
+[mavros_node-2] [INFO] [1795429926.643527885] [drone_2.mavros.bridge]: Plugin imu created
+[mavros_node-2] [INFO] [1795429926.643597260] [drone_2.mavros.bridge]: Plugin imu initialized
+[mavros_node-1] [INFO] [1795429926.645410885] [drone_1.mavros.bridge]: Plugin hil created
+[mavros_node-1] [INFO] [1795429926.645566093] [drone_1.mavros.bridge]: Plugin hil initialized
+[mavros_node-2] [INFO] [1795429926.647725135] [drone_2.mavros.bridge]: Plugin landing_target created
+[mavros_node-2] [INFO] [1795429926.647756885] [drone_2.mavros.bridge]: Plugin landing_target initialized
+[mavros_node-1] [INFO] [1795429926.649507802] [drone_1.mavros.bridge]: Plugin home_position created
+[mavros_node-1] [INFO] [1795429926.649538135] [drone_1.mavros.bridge]: Plugin home_position initialized
+[mavros_node-2] [INFO] [1795429926.652347677] [drone_2.mavros.bridge]: Plugin local_position created
+[mavros_node-2] [INFO] [1795429926.652383885] [drone_2.mavros.bridge]: Plugin local_position initialized
+[mavros_node-1] [INFO] [1795429926.652927468] [drone_1.mavros.bridge]: Plugin imu created
+[mavros_node-1] [INFO] [1795429926.653147760] [drone_1.mavros.bridge]: Plugin imu initialized
+[mavros_node-2] [INFO] [1795429926.655338968] [drone_2.mavros.bridge]: Plugin log_transfer created
+[mavros_node-2] [INFO] [1795429926.655369843] [drone_2.mavros.bridge]: Plugin log_transfer initialized
+[mavros_node-1] [INFO] [1795429926.656116510] [drone_1.mavros.bridge]: Plugin landing_target created
+[mavros_node-1] [INFO] [1795429926.656138260] [drone_1.mavros.bridge]: Plugin landing_target initialized
+[mavros_node-2] [INFO] [1795429926.657201677] [drone_2.mavros.bridge]: Plugin mag_calibration_status created
+[mavros_node-2] [INFO] [1795429926.657223177] [drone_2.mavros.bridge]: Plugin mag_calibration_status initialized
+[mavros_node-2] [INFO] [1795429926.658958010] [drone_2.mavros.bridge]: Plugin manual_control created
+[mavros_node-2] [INFO] [1795429926.658978135] [drone_2.mavros.bridge]: Plugin manual_control initialized
+[mavros_node-1] [INFO] [1795429926.739819093] [drone_1.mavros.bridge]: Plugin local_position created
+[mavros_node-1] [INFO] [1795429926.740219718] [drone_1.mavros.bridge]: Plugin local_position initialized
+[mavros_node-2] [INFO] [1795429926.743973552] [drone_2.mavros.bridge]: Plugin mocap_pose_estimate created
+[mavros_node-2] [INFO] [1795429926.744034218] [drone_2.mavros.bridge]: Plugin mocap_pose_estimate initialized
+[mavros_node-1] [INFO] [1795429926.746874302] [drone_1.mavros.bridge]: Plugin log_transfer created
+[mavros_node-1] [INFO] [1795429926.747121177] [drone_1.mavros.bridge]: Plugin log_transfer initialized
+[mavros_node-2] [INFO] [1795429926.748688302] [drone_2.mavros.bridge]: Plugin mount_control created
+[mavros_node-2] [INFO] [1795429926.748831635] [drone_2.mavros.bridge]: Plugin mount_control initialized
+[mavros_node-1] [INFO] [1795429926.750737802] [drone_1.mavros.bridge]: Plugin mag_calibration_status created
+[mavros_node-1] [INFO] [1795429926.751003635] [drone_1.mavros.bridge]: Plugin mag_calibration_status initialized
+[mavros_node-2] [INFO] [1795429926.752832260] [drone_2.mavros.bridge]: Plugin nav_controller_output created
+[mavros_node-2] [INFO] [1795429926.752992385] [drone_2.mavros.bridge]: Plugin nav_controller_output initialized
+[mavros_node-1] [INFO] [1795429926.754680385] [drone_1.mavros.bridge]: Plugin manual_control created
+[mavros_node-1] [INFO] [1795429926.754715802] [drone_1.mavros.bridge]: Plugin manual_control initialized
+[mavros_node-1] [INFO] [1795429926.757296052] [drone_1.mavros.bridge]: Plugin mocap_pose_estimate created
+[mavros_node-1] [INFO] [1795429926.757313927] [drone_1.mavros.bridge]: Plugin mocap_pose_estimate initialized
+[mavros_node-2] [INFO] [1795429926.843584927] [drone_2.mavros.bridge]: Plugin obstacle_distance created
+[mavros_node-2] [INFO] [1795429926.843696594] [drone_2.mavros.bridge]: Plugin obstacle_distance initialized
+[mavros_node-1] [INFO] [1795429926.845675052] [drone_1.mavros.bridge]: Plugin mount_control created
+[mavros_node-1] [INFO] [1795429926.845724719] [drone_1.mavros.bridge]: Plugin mount_control initialized
+[mavros_node-2] [INFO] [1795429926.848361844] [drone_2.mavros.bridge]: Plugin obstacle_distance_3d created
+[mavros_node-2] [INFO] [1795429926.848505635] [drone_2.mavros.bridge]: Plugin obstacle_distance_3d initialized
+[mavros_node-1] [INFO] [1795429926.849662594] [drone_1.mavros.bridge]: Plugin nav_controller_output created
+[mavros_node-1] [INFO] [1795429926.849727010] [drone_1.mavros.bridge]: Plugin nav_controller_output initialized
+[mavros_node-2] [INFO] [1795429926.853222510] [drone_2.mavros.bridge]: Plugin odometry created
+[mavros_node-2] [INFO] [1795429926.853274552] [drone_2.mavros.bridge]: Plugin odometry initialized
+[mavros_node-2] [INFO] [1795429926.939627719] [drone_2.mavros.bridge]: Plugin onboard_computer_status created
+[mavros_node-2] [INFO] [1795429926.939689135] [drone_2.mavros.bridge]: Plugin onboard_computer_status initialized
+[mavros_node-1] [INFO] [1795429926.940959094] [drone_1.mavros.bridge]: Plugin obstacle_distance created
+[mavros_node-1] [INFO] [1795429926.941003927] [drone_1.mavros.bridge]: Plugin obstacle_distance initialized
+[mavros_node-1] [INFO] [1795429926.947938302] [drone_1.mavros.bridge]: Plugin obstacle_distance_3d created
+[mavros_node-1] [INFO] [1795429926.948203552] [drone_1.mavros.bridge]: Plugin obstacle_distance_3d initialized
+[mavros_node-2] [INFO] [1795429926.948946552] [drone_2.mavros.bridge]: Plugin open_drone_id created
+[mavros_node-2] [INFO] [1795429926.949063094] [drone_2.mavros.bridge]: Plugin open_drone_id initialized
+[mavros_node-2] [INFO] [1795429926.954490760] [drone_2.mavros.bridge]: Plugin optical_flow created
+[mavros_node-2] [INFO] [1795429926.954827302] [drone_2.mavros.bridge]: Plugin optical_flow initialized
+[mavros_node-1] [INFO] [1795429927.042049385] [drone_1.mavros.bridge]: Plugin odometry created
+[mavros_node-1] [INFO] [1795429927.042168969] [drone_1.mavros.bridge]: Plugin odometry initialized
+[mavros_node-2] [INFO] [1795429927.045183344] [drone_2.mavros.bridge]: Plugin param created
+[mavros_node-2] [INFO] [1795429927.045441010] [drone_2.mavros.bridge]: Plugin param initialized
+[mavros_node-1] [INFO] [1795429927.049181219] [drone_1.mavros.bridge]: Plugin onboard_computer_status created
+[mavros_node-1] [INFO] [1795429927.049229260] [drone_1.mavros.bridge]: Plugin onboard_computer_status initialized
+[mavros_node-2] [INFO] [1795429927.050318719] [drone_2.mavros.bridge]: Plugin play_tune created
+[mavros_node-2] [INFO] [1795429927.050454885] [drone_2.mavros.bridge]: Plugin play_tune initialized
+[mavros_node-1] [INFO] [1795429927.054865094] [drone_1.mavros.bridge]: Plugin open_drone_id created
+[mavros_node-1] [INFO] [1795429927.054971135] [drone_1.mavros.bridge]: Plugin open_drone_id initialized
+[mavros_node-2] [INFO] [1795429927.055600260] [drone_2.mavros.bridge]: Plugin px4flow created
+[mavros_node-2] [INFO] [1795429927.055652760] [drone_2.mavros.bridge]: Plugin px4flow initialized
+[mavros_node-1] [INFO] [1795429927.144249219] [drone_1.mavros.bridge]: Plugin optical_flow created
+[mavros_node-1] [INFO] [1795429927.144497052] [drone_1.mavros.bridge]: Plugin optical_flow initialized
+[mavros_node-2] [INFO] [1795429927.144641844] [drone_2.mavros.bridge]: Plugin rallypoint created
+[mavros_node-2] [INFO] [1795429927.144889135] [drone_2.mavros.bridge]: Plugin rallypoint initialized
+[mavros_node-1] [INFO] [1795429927.150317969] [drone_1.mavros.bridge]: Plugin param created
+[mavros_node-1] [INFO] [1795429927.150363510] [drone_1.mavros.bridge]: Plugin param initialized
+[mavros_node-2] [INFO] [1795429927.151497760] [drone_2.mavros.bridge]: Plugin rangefinder created
+[mavros_node-2] [INFO] [1795429927.151551927] [drone_2.mavros.bridge]: Plugin rangefinder initialized
+[mavros_node-1] [INFO] [1795429927.154081469] [drone_1.mavros.bridge]: Plugin play_tune created
+[mavros_node-1] [INFO] [1795429927.154123927] [drone_1.mavros.bridge]: Plugin play_tune initialized
+[mavros_node-2] [INFO] [1795429927.156537469] [drone_2.mavros.bridge]: Plugin rc_io created
+[mavros_node-2] [INFO] [1795429927.239532552] [drone_2.mavros.bridge]: Plugin rc_io initialized
+[mavros_node-1] [INFO] [1795429927.243113552] [drone_1.mavros.bridge]: Plugin px4flow created
+[mavros_node-1] [INFO] [1795429927.243188885] [drone_1.mavros.bridge]: Plugin px4flow initialized
+[mavros_node-2] [INFO] [1795429927.244559552] [drone_2.mavros.bridge]: Plugin setpoint_accel created
+[mavros_node-2] [INFO] [1795429927.244638510] [drone_2.mavros.bridge]: Plugin setpoint_accel initialized
+[mavros_node-1] [INFO] [1795429927.250887594] [drone_1.mavros.bridge]: Plugin rallypoint created
+[mavros_node-2] [INFO] [1795429927.251086219] [drone_2.mavros.bridge]: Plugin setpoint_attitude created
+[mavros_node-2] [INFO] [1795429927.251120219] [drone_2.mavros.bridge]: Plugin setpoint_attitude initialized
+[mavros_node-1] [INFO] [1795429927.251241719] [drone_1.mavros.bridge]: Plugin rallypoint initialized
+[mavros_node-1] [INFO] [1795429927.256065802] [drone_1.mavros.bridge]: Plugin rangefinder created
+[mavros_node-1] [INFO] [1795429927.256110260] [drone_1.mavros.bridge]: Plugin rangefinder initialized
+[mavros_node-2] [INFO] [1795429927.257001427] [drone_2.mavros.bridge]: Plugin setpoint_position created
+[mavros_node-2] [INFO] [1795429927.257031552] [drone_2.mavros.bridge]: Plugin setpoint_position initialized
+[mavros_node-1] [INFO] [1795429927.343292052] [drone_1.mavros.bridge]: Plugin rc_io created
+[mavros_node-1] [INFO] [1795429927.343361802] [drone_1.mavros.bridge]: Plugin rc_io initialized
+[mavros_node-2] [INFO] [1795429927.346276385] [drone_2.mavros.bridge]: Plugin setpoint_raw created
+[mavros_node-2] [INFO] [1795429927.346452635] [drone_2.mavros.bridge]: Plugin setpoint_raw initialized
+[mavros_node-1] [INFO] [1795429927.348970885] [drone_1.mavros.bridge]: Plugin setpoint_accel created
+[mavros_node-1] [INFO] [1795429927.349104260] [drone_1.mavros.bridge]: Plugin setpoint_accel initialized
+[mavros_node-2] [INFO] [1795429927.353191427] [drone_2.mavros.bridge]: Plugin setpoint_trajectory created
+[mavros_node-2] [INFO] [1795429927.353252094] [drone_2.mavros.bridge]: Plugin setpoint_trajectory initialized
+[mavros_node-1] [INFO] [1795429927.446418552] [drone_1.mavros.bridge]: Plugin setpoint_attitude created
+[mavros_node-1] [INFO] [1795429927.446522719] [drone_1.mavros.bridge]: Plugin setpoint_attitude initialized
+[mavros_node-2] [INFO] [1795429927.447049427] [drone_2.mavros.bridge]: Plugin setpoint_velocity created
+[mavros_node-2] [INFO] [1795429927.447120469] [drone_2.mavros.bridge]: Plugin setpoint_velocity initialized
+[mavros_node-1] [INFO] [1795429927.453887344] [drone_1.mavros.bridge]: Plugin setpoint_position created
+[mavros_node-1] [INFO] [1795429927.453937802] [drone_1.mavros.bridge]: Plugin setpoint_position initialized
+[mavros_node-2] [INFO] [1795429927.456735219] [drone_2.mavros.bridge]: Plugin sim_state created
+[mavros_node-2] [INFO] [1795429927.457006844] [drone_2.mavros.bridge]: Plugin sim_state initialized
+[mavros_node-1] [INFO] [1795429927.541538386] [drone_1.mavros.bridge]: Plugin setpoint_raw created
+[mavros_node-1] [INFO] [1795429927.542429011] [drone_1.mavros.bridge]: Plugin setpoint_raw initialized
+[mavros_node-1] [INFO] [1795429927.548973094] [drone_1.mavros.bridge]: Plugin setpoint_trajectory created
+[mavros_node-1] [INFO] [1795429927.549022177] [drone_1.mavros.bridge]: Plugin setpoint_trajectory initialized
+[mavros_node-2] [INFO] [1795429927.553645969] [drone_2.mavros.bridge]: Plugin sys_status created
+[mavros_node-2] [INFO] [1795429927.553718719] [drone_2.mavros.bridge]: Plugin sys_status initialized
+[mavros_node-1] [INFO] [1795429927.640699302] [drone_1.mavros.bridge]: Plugin setpoint_velocity created
+[mavros_node-1] [INFO] [1795429927.640769219] [drone_1.mavros.bridge]: Plugin setpoint_velocity initialized
+[mavros_node-2] [INFO] [1795429927.645857761] [drone_2.mavros.bridge.time]: TM: Timesync mode: MAVLINK
+[mavros_node-2] [INFO] [1795429927.648862594] [drone_2.mavros.bridge]: Plugin sys_time created
+[mavros_node-2] [INFO] [1795429927.648988302] [drone_2.mavros.bridge]: Plugin sys_time initialized
+[mavros_node-1] [INFO] [1795429927.652407136] [drone_1.mavros.bridge]: Plugin sim_state created
+[mavros_node-1] [INFO] [1795429927.652462719] [drone_1.mavros.bridge]: Plugin sim_state initialized
+[mavros_node-2] [INFO] [1795429927.654344802] [drone_2.mavros.bridge]: Plugin tdr_radio created
+[mavros_node-2] [INFO] [1795429927.654401011] [drone_2.mavros.bridge]: Plugin tdr_radio initialized
+[mavros_node-2] [INFO] [1795429927.744809802] [drone_2.mavros.bridge]: Plugin terrain created
+[mavros_node-2] [INFO] [1795429927.744901802] [drone_2.mavros.bridge]: Plugin terrain initialized
+[mavros_node-1] [INFO] [1795429927.748120844] [drone_1.mavros.bridge]: Plugin sys_status created
+[mavros_node-1] [INFO] [1795429927.748202052] [drone_1.mavros.bridge]: Plugin sys_status initialized
+[mavros_node-2] [INFO] [1795429927.752337177] [drone_2.mavros.bridge]: Plugin trajectory created
+[mavros_node-2] [INFO] [1795429927.752388677] [drone_2.mavros.bridge]: Plugin trajectory initialized
+[mavros_node-1] [INFO] [1795429927.840839719] [drone_1.mavros.bridge.time]: TM: Timesync mode: MAVLINK
+[mavros_node-1] [INFO] [1795429927.844333344] [drone_1.mavros.bridge]: Plugin sys_time created
+[mavros_node-1] [INFO] [1795429927.844413969] [drone_1.mavros.bridge]: Plugin sys_time initialized
+[mavros_node-2] [INFO] [1795429927.846438927] [drone_2.mavros.bridge]: Plugin tunnel created
+[mavros_node-2] [INFO] [1795429927.847237344] [drone_2.mavros.bridge]: Plugin tunnel initialized
+[mavros_node-1] [INFO] [1795429927.852085177] [drone_1.mavros.bridge]: Plugin tdr_radio created
+[mavros_node-1] [INFO] [1795429927.852251261] [drone_1.mavros.bridge]: Plugin tdr_radio initialized
+[mavros_node-2] [INFO] [1795429927.856093677] [drone_2.mavros.bridge]: Plugin vfr_hud created
+[mavros_node-2] [INFO] [1795429927.856154802] [drone_2.mavros.bridge]: Plugin vfr_hud initialized
+[mavros_node-1] [INFO] [1795429927.943489969] [drone_1.mavros.bridge]: Plugin terrain created
+[mavros_node-1] [INFO] [1795429927.943637761] [drone_1.mavros.bridge]: Plugin terrain initialized
+[mavros_node-2] [INFO] [1795429927.947651677] [drone_2.mavros.bridge]: Plugin vibration created
+[mavros_node-2] [INFO] [1795429927.947725052] [drone_2.mavros.bridge]: Plugin vibration initialized
+[mavros_node-1] [INFO] [1795429927.952577052] [drone_1.mavros.bridge]: Plugin trajectory created
+[mavros_node-1] [INFO] [1795429927.952638886] [drone_1.mavros.bridge]: Plugin trajectory initialized
+[mavros_node-2] [INFO] [1795429928.042700427] [drone_2.mavros.bridge]: Plugin vision_pose created
+[mavros_node-2] [INFO] [1795429928.042789302] [drone_2.mavros.bridge]: Plugin vision_pose initialized
+[mavros_node-1] [INFO] [1795429928.044488052] [drone_1.mavros.bridge]: Plugin tunnel created
+[mavros_node-1] [INFO] [1795429928.044682094] [drone_1.mavros.bridge]: Plugin tunnel initialized
+[mavros_node-2] [INFO] [1795429928.051856719] [drone_2.mavros.bridge]: Plugin vision_speed created
+[mavros_node-2] [INFO] [1795429928.052446802] [drone_2.mavros.bridge]: Plugin vision_speed initialized
+[mavros_node-1] [INFO] [1795429928.053142969] [drone_1.mavros.bridge]: Plugin vfr_hud created
+[mavros_node-1] [INFO] [1795429928.053181677] [drone_1.mavros.bridge]: Plugin vfr_hud initialized
+[mavros_node-1] [INFO] [1795429928.145600552] [drone_1.mavros.bridge]: Plugin vibration created
+[mavros_node-1] [INFO] [1795429928.145660761] [drone_1.mavros.bridge]: Plugin vibration initialized
+[mavros_node-2] [INFO] [1795429928.146273219] [drone_2.mavros.bridge]: Plugin waypoint created
+[mavros_node-2] [INFO] [1795429928.146397886] [drone_2.mavros.bridge]: Plugin waypoint initialized
+[mavros_node-1] [INFO] [1795429928.152850844] [drone_1.mavros.bridge]: Plugin vision_pose created
+[mavros_node-1] [INFO] [1795429928.152917552] [drone_1.mavros.bridge]: Plugin vision_pose initialized
+[mavros_node-2] [INFO] [1795429928.250604678] [drone_2.mavros.bridge]: Plugin wheel_odometry created
+[mavros_node-2] [INFO] [1795429928.251200678] [drone_2.mavros.bridge]: Plugin wheel_odometry initialized
+[mavros_node-1] [INFO] [1795429928.254008178] [drone_1.mavros.bridge]: Plugin vision_speed created
+[mavros_node-1] [INFO] [1795429928.255097719] [drone_1.mavros.bridge]: Plugin vision_speed initialized
+[mavros_node-2] [INFO] [1795429928.339767636] [drone_2.mavros.bridge]: Plugin wind_estimation created
+[mavros_node-2] [INFO] [1795429928.339854094] [drone_2.mavros.bridge]: Plugin wind_estimation initialized
+[mavros_node-2] [INFO] [1795429928.341330928] [drone_2.mavros.bridge]: Built-in SIMD instructions: ARM NEON
+[mavros_node-2] [INFO] [1795429928.341372136] [drone_2.mavros.bridge]: Built-in MAVLink package version: 2026.9.9
+[mavros_node-2] [INFO] [1795429928.341401261] [drone_2.mavros.bridge]: Known MAVLink dialects: common ardupilotmega ASLUAV AVSSUAS all csAirLink cubepilot development icarous loweheiser marsh paparazzi standard stemstudios storm32 uAvionix
+[mavros_node-2] [INFO] [1795429928.341414219] [drone_2.mavros.bridge]: MAVROS UAS via /uas2 started. MY ID 2.191, TARGET ID 2.1
+[mavros_node-2] [INFO] [1795429928.343591886] [drone_2.mavros.bridge]: link[1001] detected remote address 2.191
+[mavros_node-2] [INFO] [1795429928.344182303] [drone_2.mavros.bridge.imu]: IMU: High resolution IMU detected!
+[mavros_node-1] [INFO] [1795429928.344331261] [drone_1.mavros.bridge]: Plugin waypoint created
+[mavros_node-1] [INFO] [1795429928.344428844] [drone_1.mavros.bridge]: Plugin waypoint initialized
+[mavros_node-2] [INFO] [1795429928.345835469] [drone_2.mavros.bridge.imu]: IMU: Attitude quaternion IMU detected!
+[mavros_node-1] [INFO] [1795429928.352170011] [drone_1.mavros.bridge]: Plugin wheel_odometry created
+[mavros_node-1] [INFO] [1795429928.352242844] [drone_1.mavros.bridge]: Plugin wheel_odometry initialized
+[mavros_node-1] [INFO] [1795429928.442230094] [drone_1.mavros.bridge]: Plugin wind_estimation created
+[mavros_node-1] [INFO] [1795429928.442317428] [drone_1.mavros.bridge]: Plugin wind_estimation initialized
+[mavros_node-1] [INFO] [1795429928.442751011] [drone_1.mavros.bridge]: Built-in SIMD instructions: ARM NEON
+[mavros_node-1] [INFO] [1795429928.442759844] [drone_1.mavros.bridge]: Built-in MAVLink package version: 2026.9.9
+[mavros_node-1] [INFO] [1795429928.442764803] [drone_1.mavros.bridge]: Known MAVLink dialects: common ardupilotmega ASLUAV AVSSUAS all csAirLink cubepilot development icarous loweheiser marsh paparazzi standard stemstudios storm32 uAvionix
+[mavros_node-1] [INFO] [1795429928.442790969] [drone_1.mavros.bridge]: MAVROS UAS via /uas1 started. MY ID 1.191, TARGET ID 1.1
+[mavros_node-1] [INFO] [1795429928.443322844] [drone_1.mavros.bridge.imu]: IMU: High resolution IMU detected!
+[mavros_node-1] [INFO] [1795429928.443502886] [drone_1.mavros.bridge.imu]: IMU: Attitude quaternion IMU detected!
+[mavros_node-1] [INFO] [1795429928.540794761] [drone_1.mavros.bridge]: link[1001] detected remote address 1.191
+[mavros_node-2] [INFO] [1795429928.543510886] [drone_2.mavros.bridge]: CON: Got HEARTBEAT, connected. FCU: PX4 Autopilot
+[mavros_node-2] [INFO] [1795429928.543763053] [drone_2.mavros.bridge.mission]: WP: detected enable_partial_push: 0
+[mavros_node-2] [INFO] [1795429928.544132844] [drone_2.mavros.bridge.imu]: IMU: High resolution IMU detected!
+[mavros_node-2] [INFO] [1795429928.544563928] [drone_2.mavros.bridge.imu]: IMU: Attitude quaternion IMU detected!
+[mavros_node-1] [INFO] [1795429928.644639053] [drone_1.mavros.bridge]: CON: Got HEARTBEAT, connected. FCU: PX4 Autopilot
+[mavros_node-1] [INFO] [1795429928.645032386] [drone_1.mavros.bridge.mission]: WP: detected enable_partial_push: 0
+[mavros_node-1] [INFO] [1795429928.647669469] [drone_1.mavros.bridge.imu]: IMU: High resolution IMU detected!
+[mavros_node-1] [INFO] [1795429928.668033678] [drone_1.mavros.bridge.imu]: IMU: Attitude quaternion IMU detected!
+[mavros_node-2] [WARN] [1795429930.547935387] [drone_2.mavros.bridge.sys]: VER: broadcast request timeout, retries left 4
+[mavros_node-1] [WARN] [1795429930.648490012] [drone_1.mavros.bridge.sys]: VER: broadcast request timeout, retries left 4
+[mavros_node-2] [WARN] [1795429931.548233679] [drone_2.mavros.bridge.sys]: VER: broadcast request timeout, retries left 3
+[mavros_node-1] [WARN] [1795429931.650823679] [drone_1.mavros.bridge.sys]: VER: broadcast request timeout, retries left 3
+[mavros_node-2] [INFO] [1795429932.550934055] [drone_2.mavros.bridge.geofence]: GF: Using MISSION_ITEM_INT
+[mavros_node-2] [INFO] [1795429932.551030263] [drone_2.mavros.bridge.rallypoint]: RP: Using MISSION_ITEM_INT
+[mavros_node-2] [INFO] [1795429932.551098763] [drone_2.mavros.bridge.mission]: WP: Using MISSION_ITEM_INT
+[mavros_node-2] [INFO] [1795429932.551116805] [drone_2.mavros.bridge.sys]: VER: 2.1: Capabilities         0x000000000000e8ff
+[mavros_node-2] [INFO] [1795429932.551141180] [drone_2.mavros.bridge.sys]: VER: 2.1: Flight software:     011000ff (6ea3539157000000)
+[mavros_node-2] [INFO] [1795429932.551150055] [drone_2.mavros.bridge.sys]: VER: 2.1: Middleware software: 011000ff (6ea3539157000000)
+[mavros_node-2] [INFO] [1795429932.551157096] [drone_2.mavros.bridge.sys]: VER: 2.1: OS software:         060a0eff (0000000000000000)
+[mavros_node-2] [INFO] [1795429932.551163846] [drone_2.mavros.bridge.sys]: VER: 2.1: Board hardware:      00000001
+[mavros_node-2] [INFO] [1795429932.551171763] [drone_2.mavros.bridge.sys]: VER: 2.1: VID/PID:             0000:0000
+[mavros_node-2] [INFO] [1795429932.551178471] [drone_2.mavros.bridge.sys]: VER: 2.1: UID:                 4954414c44494e50
+[mavros_node-2] [WARN] [1795429932.556407346] [drone_2.mavros.bridge.sys]: VER: unicast request timeout, retries left 2
+[mavros_node-1] [INFO] [1795429932.654152721] [drone_1.mavros.bridge.geofence]: GF: Using MISSION_ITEM_INT
+[mavros_node-1] [INFO] [1795429932.654321596] [drone_1.mavros.bridge.rallypoint]: RP: Using MISSION_ITEM_INT
+[mavros_node-1] [INFO] [1795429932.654347513] [drone_1.mavros.bridge.mission]: WP: Using MISSION_ITEM_INT
+[mavros_node-1] [INFO] [1795429932.654568763] [drone_1.mavros.bridge.sys]: VER: 1.1: Capabilities         0x000000000000e8ff
+[mavros_node-1] [INFO] [1795429932.654660305] [drone_1.mavros.bridge.sys]: VER: 1.1: Flight software:     011000ff (6ea3539157000000)
+[mavros_node-1] [INFO] [1795429932.654677555] [drone_1.mavros.bridge.sys]: VER: 1.1: Middleware software: 011000ff (6ea3539157000000)
+[mavros_node-1] [INFO] [1795429932.654684263] [drone_1.mavros.bridge.sys]: VER: 1.1: OS software:         060a0eff (0000000000000000)
+[mavros_node-1] [INFO] [1795429932.654711846] [drone_1.mavros.bridge.sys]: VER: 1.1: Board hardware:      00000001
+[mavros_node-1] [INFO] [1795429932.654732055] [drone_1.mavros.bridge.sys]: VER: 1.1: VID/PID:             0000:0000
+[mavros_node-1] [INFO] [1795429932.654740305] [drone_1.mavros.bridge.sys]: VER: 1.1: UID:                 4954414c44494e4f
+[mavros_node-1] [WARN] [1795429932.661357596] [drone_1.mavros.bridge.sys]: VER: unicast request timeout, retries left 2
+[mavros_node-2] [INFO] [1795429943.544965671] [drone_2.mavros.bridge.mission]: WP: mission received
+[mavros_node-1] [INFO] [1795429943.645778921] [drone_1.mavros.bridge.mission]: WP: mission received
+[mavros_node-2] [INFO] [1795429948.544539840] [drone_2.mavros.bridge.rallypoint]: RP: mission received
+[mavros_node-1] [INFO] [1795429948.646121340] [drone_1.mavros.bridge.rallypoint]: RP: mission received
+[mavros_node-2] [INFO] [1795429953.545628175] [drone_2.mavros.bridge.geofence]: GF: mission received
+[mavros_node-1] [INFO] [1795429953.645897467] [drone_1.mavros.bridge.geofence]: GF: mission received
+[mavros_node-2] [WARN] [1795430056.676845626] [drone_2.mavros.bridge]: CON: Lost connection, HEARTBEAT timed out.
+[mavros_node-1] [WARN] [1795430056.755905084] [drone_1.mavros.bridge]: CON: Lost connection, HEARTBEAT timed out.
+[mavros_node-1] [INFO] [1795430056.768152626] [drone_1.mavros.bridge.imu]: IMU: High resolution IMU detected!
+[mavros_node-1] [INFO] [1795430056.772713167] [drone_1.mavros.bridge.imu]: IMU: Attitude quaternion IMU detected!
+[mavros_node-1] [INFO] [1795430057.008487709] [drone_1.mavros.bridge]: CON: Got HEARTBEAT, connected. FCU: PX4 Autopilot
+[mavros_node-1] [INFO] [1795430057.009051209] [drone_1.mavros.bridge.mission]: WP: detected enable_partial_push: 0
+[mavros_node-1] [INFO] [1795430057.010448667] [drone_1.mavros.bridge.imu]: IMU: High resolution IMU detected!
+[mavros_node-1] [INFO] [1795430057.012826959] [drone_1.mavros.bridge.imu]: IMU: Attitude quaternion IMU detected!
+[mavros_node-1] [WARN] [1795430057.726146626] [drone_1.mavros.bridge.sys]: FCU: UNK(8): EVENT 1914663 with args -0-10-13-2-56-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [WARN] [1795430059.014948835] [drone_1.mavros.bridge.sys]: VER: broadcast request timeout, retries left 4
+[mavros_node-1] [WARN] [1795430059.804579419] [drone_1.mavros.bridge.sys]: FCU: UNK(8): EVENT 11047904 with args -0-128-16-16-0-0-0-0-0-0-0-0-0-176-59-127-128-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [INFO] [1795430059.804744960] [drone_1.mavros.bridge.sys]: FCU: EVENT 377561 with args -8-0-0-0-20-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [ERROR] [1795430059.805504544] [drone_1.mavros.bridge.sys]: FCU: EVENT 3087815 with args -0-64-0-0-20-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [ERROR] [1795430059.805832710] [drone_1.mavros.bridge.sys]: FCU: EVENT 453929 with args -71-132-0-0-7-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [ERROR] [1795430059.805950752] [drone_1.mavros.bridge.sys]: FCU: EVENT 6801787 with args -255-255-255-255-12-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [WARN] [1795430059.805998210] [drone_1.mavros.bridge.sys]: FCU: UNK(8): EVENT 1914663 with args -0-10-13-2-56-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [WARN] [1795430060.013883835] [drone_1.mavros.bridge.sys]: VER: broadcast request timeout, retries left 3
+[mavros_node-1] [INFO] [1795430061.019320544] [drone_1.mavros.bridge.sys]: VER: 1.1: Capabilities         0x000000000000e8ff
+[mavros_node-1] [INFO] [1795430061.019424211] [drone_1.mavros.bridge.sys]: VER: 1.1: Flight software:     011000ff (6ea3539157000000)
+[mavros_node-1] [INFO] [1795430061.019444961] [drone_1.mavros.bridge.sys]: VER: 1.1: Middleware software: 011000ff (6ea3539157000000)
+[mavros_node-1] [INFO] [1795430061.019465044] [drone_1.mavros.bridge.sys]: VER: 1.1: OS software:         060a0eff (0000000000000000)
+[mavros_node-1] [INFO] [1795430061.019478253] [drone_1.mavros.bridge.sys]: VER: 1.1: Board hardware:      00000001
+[mavros_node-1] [INFO] [1795430061.019488378] [drone_1.mavros.bridge.sys]: VER: 1.1: VID/PID:             0000:0000
+[mavros_node-1] [INFO] [1795430061.019505044] [drone_1.mavros.bridge.sys]: VER: 1.1: UID:                 4954414c44494e4f
+[mavros_node-1] [WARN] [1795430061.025567086] [drone_1.mavros.bridge.sys]: VER: unicast request timeout, retries left 2
+[mavros_node-2] [INFO] [1795430064.133072046] [drone_2.mavros.bridge.imu]: IMU: High resolution IMU detected!
+[mavros_node-2] [INFO] [1795430064.336230963] [drone_2.mavros.bridge.imu]: IMU: Attitude quaternion IMU detected!
+[mavros_node-2] [INFO] [1795430065.118257880] [drone_2.mavros.bridge]: CON: Got HEARTBEAT, connected. FCU: PX4 Autopilot
+[mavros_node-2] [INFO] [1795430065.118625421] [drone_2.mavros.bridge.mission]: WP: detected enable_partial_push: 0
+[mavros_node-2] [INFO] [1795430065.119044338] [drone_2.mavros.bridge.imu]: IMU: High resolution IMU detected!
+[mavros_node-2] [INFO] [1795430065.130055296] [drone_2.mavros.bridge.imu]: IMU: Attitude quaternion IMU detected!
+[mavros_node-2] [WARN] [1795430065.819568797] [drone_2.mavros.bridge.sys]: FCU: UNK(8): EVENT 1914663 with args -0-10-13-2-56-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [WARN] [1795430067.145864756] [drone_2.mavros.bridge.sys]: VER: broadcast request timeout, retries left 4
+[mavros_node-2] [WARN] [1795430067.939470548] [drone_2.mavros.bridge.sys]: FCU: UNK(8): EVENT 11047904 with args -0-128-16-16-0-0-0-0-0-0-0-0-0-176-59-127-128-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [INFO] [1795430067.939652423] [drone_2.mavros.bridge.sys]: FCU: EVENT 377561 with args -8-0-0-0-20-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [ERROR] [1795430067.939772339] [drone_2.mavros.bridge.sys]: FCU: EVENT 3087815 with args -0-64-0-0-20-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [ERROR] [1795430067.940094589] [drone_2.mavros.bridge.sys]: FCU: EVENT 453929 with args -71-132-0-0-7-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [ERROR] [1795430067.940180298] [drone_2.mavros.bridge.sys]: FCU: EVENT 6801787 with args -255-255-255-255-12-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [WARN] [1795430067.940212506] [drone_2.mavros.bridge.sys]: FCU: UNK(8): EVENT 1914663 with args -0-10-13-2-56-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [WARN] [1795430068.146044089] [drone_2.mavros.bridge.sys]: VER: broadcast request timeout, retries left 3
+[mavros_node-2] [INFO] [1795430069.150949590] [drone_2.mavros.bridge.sys]: VER: 2.1: Capabilities         0x000000000000e8ff
+[mavros_node-2] [INFO] [1795430069.151055340] [drone_2.mavros.bridge.sys]: VER: 2.1: Flight software:     011000ff (6ea3539157000000)
+[mavros_node-2] [INFO] [1795430069.151065132] [drone_2.mavros.bridge.sys]: VER: 2.1: Middleware software: 011000ff (6ea3539157000000)
+[mavros_node-2] [INFO] [1795430069.151077298] [drone_2.mavros.bridge.sys]: VER: 2.1: OS software:         060a0eff (0000000000000000)
+[mavros_node-2] [INFO] [1795430069.151080882] [drone_2.mavros.bridge.sys]: VER: 2.1: Board hardware:      00000001
+[mavros_node-2] [INFO] [1795430069.151084298] [drone_2.mavros.bridge.sys]: VER: 2.1: VID/PID:             0000:0000
+[mavros_node-2] [INFO] [1795430069.151087673] [drone_2.mavros.bridge.sys]: VER: 2.1: UID:                 4954414c44494e50
+[mavros_node-2] [WARN] [1795430069.158728632] [drone_2.mavros.bridge.sys]: VER: unicast request timeout, retries left 2
+[mavros_node-1] [INFO] [1795430072.009746341] [drone_1.mavros.bridge.mission]: WP: mission received
+[mavros_node-1] [WARN] [1795430072.327478258] [drone_1.mavros.bridge.sys]: FCU: UNK(8): EVENT 11047904 with args -0-128-16-0-0-0-0-0-0-0-0-0-0-176-123-127-128-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [INFO] [1795430072.328087425] [drone_1.mavros.bridge.sys]: FCU: EVENT 377561 with args -8-0-0-0-20-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [ERROR] [1795430072.328545591] [drone_1.mavros.bridge.sys]: FCU: EVENT 453929 with args -71-132-0-0-7-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [ERROR] [1795430072.328783591] [drone_1.mavros.bridge.sys]: FCU: EVENT 6801787 with args -255-255-255-255-12-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [WARN] [1795430072.328940425] [drone_1.mavros.bridge.sys]: FCU: UNK(8): EVENT 1914663 with args -0-10-13-2-56-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [WARN] [1795430072.331570508] [drone_2.mavros.bridge.sys]: FCU: UNK(8): EVENT 11047904 with args -0-128-16-0-0-0-0-0-0-0-0-0-0-176-123-127-128-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [INFO] [1795430072.331755633] [drone_2.mavros.bridge.sys]: FCU: EVENT 377561 with args -8-0-0-0-20-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [ERROR] [1795430072.331946675] [drone_2.mavros.bridge.sys]: FCU: EVENT 453929 with args -71-132-0-0-7-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [ERROR] [1795430072.332156466] [drone_2.mavros.bridge.sys]: FCU: EVENT 6801787 with args -255-255-255-255-12-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [WARN] [1795430072.332209716] [drone_2.mavros.bridge.sys]: FCU: UNK(8): EVENT 1914663 with args -0-10-13-2-56-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [WARN] [1795430074.799444426] [drone_1.mavros.bridge.cmd]: CMD: Unexpected command 176, result 0
+[mavros_node-2] [WARN] [1795430074.799514843] [drone_2.mavros.bridge.cmd]: CMD: Unexpected command 176, result 0
+[mavros_node-1] [ERROR] [1795430075.351187051] [drone_1.mavros.bridge.sys]: FCU: EVENT 133277 with args -0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [ERROR] [1795430075.970112676] [drone_2.mavros.bridge.sys]: FCU: EVENT 133277 with args -0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [WARN] [1795430075.978092010] [drone_1.mavros.bridge.sys]: FCU: UNK(8): EVENT 11047904 with args -0-128-16-0-0-0-0-0-0-0-0-0-0-176-123-127-128-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [INFO] [1795430075.978181426] [drone_1.mavros.bridge.sys]: FCU: EVENT 1871713 with args -32-48-60-0-20-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [INFO] [1795430075.978223218] [drone_1.mavros.bridge.sys]: FCU: EVENT 377561 with args -8-0-0-0-20-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [ERROR] [1795430075.978245718] [drone_1.mavros.bridge.sys]: FCU: EVENT 453929 with args -71-132-0-0-7-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [ERROR] [1795430075.978309176] [drone_1.mavros.bridge.sys]: FCU: EVENT 6801787 with args -255-255-255-255-12-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [WARN] [1795430075.978337676] [drone_1.mavros.bridge.sys]: FCU: UNK(8): EVENT 1914663 with args -0-10-13-2-56-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [INFO] [1795430077.042467677] [drone_1.mavros.bridge.rallypoint]: RP: mission received
+[mavros_node-2] [WARN] [1795430077.460129052] [drone_2.mavros.bridge.sys]: FCU: UNK(8): EVENT 11047904 with args -0-128-16-0-0-0-0-0-0-0-0-0-0-176-123-127-128-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [INFO] [1795430077.460261469] [drone_2.mavros.bridge.sys]: FCU: EVENT 1871713 with args -32-48-60-0-20-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [INFO] [1795430077.460370635] [drone_2.mavros.bridge.sys]: FCU: EVENT 377561 with args -8-0-0-0-20-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [ERROR] [1795430077.460389635] [drone_2.mavros.bridge.sys]: FCU: EVENT 453929 with args -71-132-0-0-7-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [ERROR] [1795430077.460567635] [drone_2.mavros.bridge.sys]: FCU: EVENT 6801787 with args -255-255-255-255-12-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [WARN] [1795430077.460685927] [drone_2.mavros.bridge.sys]: FCU: UNK(8): EVENT 1914663 with args -0-10-13-2-56-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [WARN] [1795430078.239933344] [drone_2.mavros.bridge.sys]: FCU: UNK(8): EVENT 11047904 with args -0-128-16-16-0-0-0-0-0-0-0-0-0-176-59-127-128-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [INFO] [1795430078.240128678] [drone_2.mavros.bridge.sys]: FCU: EVENT 1871713 with args -32-48-60-0-20-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [INFO] [1795430078.240357553] [drone_2.mavros.bridge.sys]: FCU: EVENT 377561 with args -8-0-0-0-20-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [ERROR] [1795430078.240857469] [drone_2.mavros.bridge.sys]: FCU: EVENT 3087815 with args -0-64-0-0-20-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [ERROR] [1795430078.241003928] [drone_2.mavros.bridge.sys]: FCU: EVENT 453929 with args -71-132-0-0-7-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [ERROR] [1795430078.241086469] [drone_2.mavros.bridge.sys]: FCU: EVENT 6801787 with args -255-255-255-255-12-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [WARN] [1795430078.241126428] [drone_2.mavros.bridge.sys]: FCU: UNK(8): EVENT 1914663 with args -0-10-13-2-56-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [WARN] [1795430078.242311844] [drone_1.mavros.bridge.sys]: FCU: UNK(8): EVENT 11047904 with args -0-128-16-16-0-0-0-0-0-0-0-0-0-176-59-127-128-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [INFO] [1795430078.242353469] [drone_1.mavros.bridge.sys]: FCU: EVENT 1871713 with args -32-48-60-0-20-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [INFO] [1795430078.242365344] [drone_1.mavros.bridge.sys]: FCU: EVENT 377561 with args -8-0-0-0-20-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [ERROR] [1795430078.242375261] [drone_1.mavros.bridge.sys]: FCU: EVENT 3087815 with args -0-64-0-0-20-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [ERROR] [1795430078.242419386] [drone_1.mavros.bridge.sys]: FCU: EVENT 453929 with args -71-132-0-0-7-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [ERROR] [1795430078.242432886] [drone_1.mavros.bridge.sys]: FCU: EVENT 6801787 with args -255-255-255-255-12-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-1] [WARN] [1795430078.242443594] [drone_1.mavros.bridge.sys]: FCU: UNK(8): EVENT 1914663 with args -0-10-13-2-56-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-0-
+[mavros_node-2] [INFO] [1795430080.119791845] [drone_2.mavros.bridge.mission]: WP: mission received
+[mavros_node-1] [INFO] [1795430082.009589679] [drone_1.mavros.bridge.geofence]: GF: mission received
+[mavros_node-2] [INFO] [1795430085.119706083] [drone_2.mavros.bridge.rallypoint]: RP: mission received
+[mavros_node-2] [INFO] [1795430090.119741419] [drone_2.mavros.bridge.geofence]: GF: mission received
+
+
+EXIT_STATUS: 137

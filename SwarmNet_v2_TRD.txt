@@ -84,14 +84,14 @@ DRONE ROLE ARCHITECTURE
     - Receives mission from QGroundControl via MAVLink
     - Runs Hungarian algorithm to assign formation positions
     - Hosts MAPPO centralized critic (training only)
-    - Publishes /swarm/formation_targets DDS topic
+    - Publishes /swarm/desired_formation DDS topic
     - Maintains Raft leader role
     - Monitors follower health via /swarm/drone_<id>/state topics
     - Triggers re-assignment on follower failure
 
   Vehicles 2–50 (FOLLOWERS)
     Each runs independently:
-    - Subscribes to /swarm/formation_targets
+    - Subscribes to /swarm/desired_formation
     - Runs EKF: fuses IMU + baro + optical flow → position estimate
     - Runs MPC: position estimate → thrust setpoint
     - Runs ORCA: thrust setpoint → collision-safe velocity
@@ -593,7 +593,7 @@ ALGORITHM
   2. Run Hungarian algorithm (Kuhn-Munkres): O(N³)
      With N=50: O(125,000) operations — completes in < 1ms
   3. Output assignment array: assignment[i] = j
-  4. Publish /swarm/formation_targets with per-drone targets
+  4. Publish /swarm/desired_formation with per-drone targets
 
 LIBRARY
   scipy.optimize.linear_sum_assignment (Python, in master_node.py)
@@ -601,7 +601,7 @@ LIBRARY
 
 FORMATION PRESETS
   V_FORMATION:     positions on two diagonal lines from master
-  GRID_FORMATION:  7×7 grid with 2m spacing (50 positions)
+  GRID_FORMATION:  5 rows × 10 columns with 2 m spacing at N=50
   CIRCLE:          concentric rings (master center, 49 on rings)
   LINE:            single file, 2m spacing
   CUSTOM:          loaded from YAML file
@@ -620,15 +620,16 @@ PROTOCOL STACK
 
 ROS2 TOPIC DESIGN
 
-  /swarm/formation_targets         (master publishes, all drones subscribe)
-    Type: swarmnet_msgs/FormationTargets
-    Rate: on change (formation update)
-    Content: array of 50 PoseStamped targets with drone_id assignment
+  /swarm/desired_formation         (master publishes, all drones subscribe)
+    Type: swarmnet_msgs/DesiredFormation
+    Rate: 1 Hz, transient-local
+    Content: desired world ENU positions and yaw with drone_id assignment
 
   /swarm/drone_<drone_id>/state    (each drone publishes; e.g. /swarm/drone_1/state)
     Type: swarmnet_msgs/DroneState
     Rate: 10 Hz
-    Content: position, velocity, battery, raft_state, task, alive
+    Content (Step 4): measured world ENU position/velocity, battery percentage,
+      alive, comms_healthy, and publication timestamp
 
   /drone_<id>/ekf/state            (EKF node publishes)
     Type: geometry_msgs/PoseWithCovarianceStamped
@@ -674,26 +675,21 @@ CYCLONE DDS CONFIGURATION
 
 swarmnet_msgs/DroneState.msg
   uint8   drone_id
-  float64 x, y, z                   # EKF position estimate (m)
-  float64 vx, vy, vz                # EKF velocity (m/s)
-  float64 roll, pitch, yaw          # attitude (rad)
-  float32 battery                   # 0.0 – 100.0 %
-  uint8   raft_state                # 0=follower, 1=candidate, 2=leader
-  uint8   flight_mode               # 0=hold, 1=offboard, 2=RTL, 3=land
-  string  task                      # current assigned task
+  float64 x, y, z                   # MAVROS estimate in world ENU (m)
+  float64 vx, vy, vz                # MAVROS velocity in world ENU (m/s)
+  float32 battery                   # 0.0 – 100.0 %, NaN if unavailable
   bool    alive
-  bool    gps_healthy
   bool    comms_healthy
-  float64 timestamp                 # Unix epoch
+  float64 timestamp                 # publication time, Unix epoch seconds
 
-swarmnet_msgs/FormationTargets.msg
+swarmnet_msgs/DesiredFormation.msg
   uint8                formation_type    # 0=grid, 1=V, 2=circle, 3=line
-  swarmnet_msgs/DroneTarget[] targets   # one per drone
+  swarmnet_msgs/DesiredDronePose[] targets
 
-swarmnet_msgs/DroneTarget.msg
+swarmnet_msgs/DesiredDronePose.msg
   uint8   drone_id
-  float64 target_x, target_y, target_z  # absolute position (m)
-  float64 target_yaw                     # heading (rad)
+  float64 x, y, z  # desired position, world ENU (m)
+  float64 yaw      # desired yaw, counterclockwise from east (rad)
 
 swarmnet_msgs/PBFTMessage.msg
   uint8  phase          # 0=PRE_PREPARE, 1=PREPARE, 2=COMMIT, 3=VIEW_CHANGE
@@ -717,19 +713,23 @@ swarmnet_msgs/JammerState.msg
 
 SPAWN SCRIPT: drone_spawn.py
 
-  Spawns 50 PX4 SITL instances with unique parameters:
-    MAV_SYS_ID:    1–50 (unique vehicle ID)
-    UDP port:      14550–14599 (MAVLink to QGC)
-    DDS port:      incremented from base 8888
-    Gazebo model:  x500_swarmnet (spawned at grid positions)
-    Initial pos:   7×7 grid with 2m spacing, centered at origin
+  Configures N PX4 SITL instances (defaults to 2; N=50 is a scale target):
+    MAV_SYS_ID:    i + 1 for zero-based instance i
+    GCS link:      PX4 18570+i to one QGC listener at UDP 14550
+    MAVROS link:   PX4 15000+i to MAVROS 16000+i, reverse on the same endpoints
+    MAVROS node:   /drone_<i+1>/mavros/bridge
+    DDS:           Shared agent UDP 8888, unique client key and namespace
+    Gazebo model:  x500_<i>; instance 0 launches the world; others attach
+    Storage:       instance_<i> and vehicle_<i+1>.log under each new run
+    ID limit:      N <= 254; MAVLink ID 0 is invalid and 255 is reserved for GCS
 
   Grid position formula:
-    row = (drone_id - 1) // 7
-    col = (drone_id - 1) % 7
-    x_init = (col - 3) * 2.0    # meters
-    y_init = (row - 3) * 2.0    # meters
-    z_init = 5.0                  # meters altitude
+    row, col = divmod(i, 10)
+    rows = ceil(N / 10)
+    row_width = min(10, N - 10 * row)
+    x = (col - (row_width - 1) / 2) * 2.0  # east, meters
+    y = (row - (rows - 1) / 2) * 2.0       # north, meters
+    Spawn z = 0.15 m; desired hover z = 5.0 m. These are separate values.
 
 PX4 PARAMETERS (per drone, set via MAVLink)
   SYS_VEHICLE_TYPE  = 1 (multicopter)
@@ -803,8 +803,8 @@ swarmnet_v2/
 │   ├── swarmnet_msgs/                 # Custom message definitions
 │   │   ├── msg/
 │   │   │   ├── DroneState.msg
-│   │   │   ├── FormationTargets.msg
-│   │   │   ├── DroneTarget.msg
+│   │   │   ├── DesiredFormation.msg
+│   │   │   ├── DesiredDronePose.msg
 │   │   │   ├── PBFTMessage.msg
 │   │   │   └── JammerState.msg
 │   │   └── CMakeLists.txt
@@ -891,7 +891,7 @@ QGC INTERFACE (MAVLink v2)
 MASTER NODE ROS2 SERVICES
   /swarm/change_formation   (swarmnet_msgs/srv/ChangeFormation)
     Request:  formation_type (uint8), waypoint (PoseStamped)
-    Response: success (bool), assignment (DroneTarget[])
+    Response: success (bool), assignment (DesiredDronePose[])
 
   /swarm/emergency_land     (std_srvs/srv/Trigger)
     Triggers PBFT EMERGENCY_LAND command

@@ -1,0 +1,18 @@
+UTC: 2026-11-23T10:31:17.445453+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: env ROS_IMAGE=swarmnet/ros2-nodes@sha256:55ae9de19acc5eb467120926c4d80c7cca5862208367fdf5b7ee4ac61616dda3 docker compose up -d --no-build --wait
+
+ Container swarmnet_ros2  Recreate
+ Container swarmnet_px4  Recreate
+ Container swarmnet_ros2  Recreated
+ Container swarmnet_px4  Recreated
+ Container swarmnet_ros2  Starting
+ Container swarmnet_px4  Starting
+ Container swarmnet_ros2  Started
+ Container swarmnet_px4  Started
+ Container swarmnet_px4  Waiting
+ Container swarmnet_ros2  Waiting
+ Container swarmnet_px4  Healthy
+ Container swarmnet_ros2  Healthy
+
+EXIT_STATUS: 0

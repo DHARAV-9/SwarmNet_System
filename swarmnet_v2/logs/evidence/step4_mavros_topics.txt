@@ -1,0 +1,12 @@
+UTC: 2026-11-23T10:25:06.268352+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: env ROS_IMAGE=swarmnet/ros2-nodes@sha256:55ae9de19acc5eb467120926c4d80c7cca5862208367fdf5b7ee4ac61616dda3 ROS_DOMAIN_ID=91 docker compose run --rm --no-deps -T ros2_nodes bash -lc 'set -e; source /opt/ros/humble/setup.bash; dpkg-query -W ros-humble-mavros; ros2 run mavros mavros_node --ros-args -r __ns:=/drone_1/mavros -r __node:=bridge -p fcu_url:=udp://:16000@127.0.0.1:15000 >/tmp/mavros.log 2>&1 & bridge=$!; trap "kill $bridge 2>/dev/null || true" EXIT; sleep 4; ros2 topic list -t | grep -E "^/drone_1/mavros/bridge/(local_position/(pose|velocity_local)|battery|state|setpoint_position/local) "'
+
+ros-humble-mavros	2.16.0-1jammy.20260927.163040
+/drone_1/mavros/bridge/battery [sensor_msgs/msg/BatteryState]
+/drone_1/mavros/bridge/local_position/pose [geometry_msgs/msg/PoseStamped]
+/drone_1/mavros/bridge/local_position/velocity_local [geometry_msgs/msg/TwistStamped]
+/drone_1/mavros/bridge/setpoint_position/local [geometry_msgs/msg/PoseStamped]
+/drone_1/mavros/bridge/state [mavros_msgs/msg/State]
+
+EXIT_STATUS: 0

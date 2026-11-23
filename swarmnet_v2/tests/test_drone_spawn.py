@@ -8,6 +8,7 @@ from pathlib import Path
 
 
 MODULE_PATH = Path(__file__).parents[1] / "px4_config" / "scripts" / "drone_spawn.py"
+sys.path.insert(0, str(Path(__file__).parents[1] / "swarmnet_ros2" / "swarmnet_master"))
 SPEC = importlib.util.spec_from_file_location("drone_spawn", MODULE_PATH)
 assert SPEC is not None and SPEC.loader is not None
 drone_spawn = importlib.util.module_from_spec(SPEC)
@@ -18,15 +19,37 @@ SPEC.loader.exec_module(drone_spawn)
 def test_fifty_drones_have_unique_ids_and_ports():
     fleet = drone_spawn.build_instances(50)
 
-    assert [drone.drone_id for drone in fleet] == list(range(1, 51))
-    assert [drone.mavlink_port for drone in fleet] == list(range(14550, 14600))
-    assert len({drone.px4_instance for drone in fleet}) == 50
+    assert [drone.route.drone_id for drone in fleet] == list(range(1, 51))
+    assert len({drone.route.instance for drone in fleet}) == 50
+    assert len({drone.route.namespace for drone in fleet}) == 50
+    assert len({drone.route.state_dir for drone in fleet}) == 50
+    assert len({port for drone in fleet for port in (
+        drone.route.offboard_port, drone.route.mavros_port, drone.route.gcs_source_port
+    )}) == 150
 
 
-def test_grid_is_centered_with_two_meter_spacing():
-    fleet = drone_spawn.build_instances(50)
+def test_two_vehicles_share_grid_but_not_routing_or_storage(tmp_path):
+    first, second = drone_spawn.build_instances(2)
+    assert first.spawn_xyz == (-1.0, 0.0, 0.15)
+    assert second.spawn_xyz == (1.0, 0.0, 0.15)
+    assert first.target.z == second.target.z == 5.0
+    assert first.route.fcu_url("px4_sitl") == "udp://:16000@px4_sitl:15000"
+    assert second.route.fcu_url("px4_sitl") == "udp://:16001@px4_sitl:15001"
+    first_env, command = drone_spawn.px4_command(tmp_path, first)
+    second_env, _ = drone_spawn.px4_command(tmp_path, second)
+    assert command[-1].endswith("spawn_one_drone.sh")
+    for index, env in enumerate((first_env, second_env)):
+        assert env["PX4_INSTANCE"] == str(index)
+        assert env["SWARM_STATE_DIR"] == str(tmp_path / f"instance_{index}")
+        assert env["SWARM_OFFBOARD_PORT"] == str(15000 + index)
+        assert env["SWARM_MAVROS_PORT"] == str(16000 + index)
+        assert env["QGC_PORT"] == "14550"
 
-    assert (fleet[0].x, fleet[0].y, fleet[0].z) == (-6.0, -6.0, 5.0)
-    assert (fleet[6].x, fleet[6].y) == (6.0, -6.0)
-    assert (fleet[7].x, fleet[7].y) == (-6.0, -4.0)
-    assert (fleet[-1].x, fleet[-1].y) == (-6.0, 8.0)
+
+def test_mavlink_boundary_has_no_port_overlap():
+    fleet = drone_spawn.build_instances(254)
+    plan = drone_spawn.manifest(fleet)
+    assert len(plan) == 254
+    assert len({vehicle[key] for vehicle in plan for key in (
+        "px4_offboard_port", "mavros_port", "px4_gcs_source_port"
+    )}) == 3 * 254

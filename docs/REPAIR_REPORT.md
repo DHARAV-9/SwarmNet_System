@@ -2,8 +2,10 @@
 
 Step 1 passed on attempt 2. Step 2 passed its first gate attempt.
 Step 3 stopped after two failed launch attempts, as required by the repair plan.
-Steps 4–8 have not started because Step 3 did not pass.
-No flight or telemetry claim is verified.
+Step 4 code was started at the user's request on 2026-11-23. Its live-aircraft
+gate has not passed. Step 5 verified that two grounded SITL instances sent
+independent MAVROS telemetry, then stopped after two failed hold attempts.
+Steps 6–8 have not started. No flight is verified.
 
 ## Selected stack
 
@@ -21,8 +23,8 @@ Code stays in `swarmnet_v2/`. The source audit is
 
 Base images are pinned by registry manifest digest. Runtime Compose also pins
 the custom images: PX4 `sha256:904f450277bc59147303be7cc0ba0006adcc8c14ea20a4c7c5efe13caf0cfeff`
-and ROS2 `sha256:428618639cda845890386ef1b5e38604309ce3652c488022addae296942b8deb`
-(updated in Step 2 to include the required EGM96 geoid dataset).
+and ROS2 `sha256:55ae9de19acc5eb467120926c4d80c7cca5862208367fdf5b7ee4ac61616dda3`
+(activated in Step 5; includes the Step 2 geoid and Step 3 agent build).
 These images were built locally, not pushed to a public registry. Rebuilds use
 `docker-compose.build.yml`; the gate saves local image content IDs in `.env.lock`.
 APT/Python dependency versions are not a fully vendored reproducible lock.
@@ -55,8 +57,8 @@ in QGC require Step 3 and remain unverified.
 | 1 | Passed on attempt 2 | [Attempt 2](../swarmnet_v2/logs/evidence/step1_attempt2_gate.txt) |
 | 2 | Passed on attempt 1 | [Container build/discovery](../swarmnet_v2/logs/evidence/step2_attempt1_gate.txt) |
 | 3 | Failed twice; stopped | [Attempt 1](../swarmnet_v2/logs/evidence/step3_attempt1_px4_launch.txt), [attempt 2](../swarmnet_v2/logs/evidence/step3_attempt2_px4_launch.txt) |
-| 4 | Not started | Step 3 gate required |
-| 5 | Not started | Step 4 gate required |
+| 4 | Implemented; live gate unverified | [Host tests](../swarmnet_v2/logs/evidence/step4_host_tests.txt), [ROS2 fixture test](../swarmnet_v2/logs/evidence/step4_ros_build_and_smoke.txt) |
+| 5 | Two grounded streams verified; hold gate failed twice | [Attempt 1](../swarmnet_v2/logs/evidence/step5_attempt1_hold.txt), [attempt 2](../swarmnet_v2/logs/evidence/step5_attempt2_hold.txt) |
 | 6 | Not started | Step 5 gate required |
 | 7 | Not started | Step 6 gate required |
 | 8 | Not started | Step 7 gate required |
@@ -93,11 +95,10 @@ RTF, flight RAM, flight CPU, tracking error and separation: **not measured**.
 
 ## Known defects awaiting their ordered steps
 
-Fabricated follower telemetry, arming/OFFBOARD lifecycle, frame origins,
-per-instance PX4 state/routing,
-XRCE integration, metrics, scale tests, and the remaining document corrections
-are still unresolved. Passing Step 1 would establish only image/container
-readiness, not flying vehicles or working ROS2 application packages.
+Arming/OFFBOARD lifecycle, calibration of live vehicle frame origins,
+per-instance PX4 state/routing, XRCE integration, metrics, scale tests, and
+the remaining document corrections are still unresolved. The follower's
+fabricated telemetry code has been replaced; live PX4 validation is pending.
 
 ## Step 3 result — stopped, not passed
 
@@ -135,9 +136,9 @@ Its build manifest digest is
 `sha256:55ae9de19acc5eb467120926c4d80c7cca5862208367fdf5b7ee4ac61616dda3`;
 it is a build artifact, not the currently activated runtime image. Its output is in
 [workspace build](../swarmnet_v2/logs/evidence/step3_workspace_image_build.txt).
-The Compose runtime ROS image remains pinned to the verified **Step 2 image**;
-the Step 3 agent image has not been activated or verified communicating with
-PX4. Transitive source dependencies and APT packages are not fully locked.
+At the end of Step 3, the runtime image remained on the Step 2 pin. Step 5
+activated the newer image for MAVROS; XRCE flight communication remains
+unverified. Transitive source dependencies and APT packages are not fully locked.
 
 Official QGroundControl **v5.1.5** was downloaded, SHA256 checked against its
 release asset, mounted read-only and launched. Its executable contains ARM64.
@@ -152,9 +153,74 @@ not misrepresented as command stdout or successful vehicle telemetry.
 
 Highest verified N: **no flying vehicle**. No arm, takeoff, hover, landing,
 disarm, RTF or flight resource measurement was collected. In particular,
-**N=10 did not demonstrate a 60-second hover**. The next authorized repair
-should first fix and prove rcS/rootfs resolution, then activate the agent
-image and retry the Step 3 gate; Steps 4–8 remain blocked behind that gate.
+**N=10 did not demonstrate a 60-second hover**. Step 5 corrected rcS path
+resolution but did not demonstrate the Step 3 flight and QGC gate.
+
+## Step 4 result — tested with fixtures, live gate unverified
+
+The follower consumes MAVROS vehicle-local pose, local-frame velocity,
+battery, and connection state. It publishes at 10 Hz, independent of whether
+a desired pose is assigned. State and desired formation are separate
+interfaces. The world ENU transform uses a calibrated per-vehicle origin;
+the [measured state contract](../swarmnet_v2/README.md#step-4-measured-state-contract)
+documents the setup, units, frame assumptions, and freshness thresholds
+(2.0 s for pose, velocity, and heartbeat; 5.0 s for battery).
+Both health flags turn false on loss of a required stream. Unavailable fields
+are NaN, not fabricated position, velocity, or battery readings.
+
+The host tests cover per-vehicle ENU/NED transforms, measurement validity,
+expiry of each stream, and reconnect behavior. The
+[full Python suite](../swarmnet_v2/logs/evidence/step4_full_suite.txt) passed
+82 tests. The [installed MAVROS topic graph](../swarmnet_v2/logs/evidence/step4_mavros_topics.txt)
+confirmed topic names and types without PX4. The isolated ROS2 test
+built all three packages, exercised the real follower over DDS with fixture
+inputs, verified that output moved with the input pose rather than the
+desired pose, and timed the health transition when the fixtures stopped.
+This did **not** verify live pose tracking or terminate a PX4 process:
+no flight or real PX4-loss outcome is claimed. Highest verified flight
+count and flight resource measurements are unchanged.
+
+## Step 5 result — two grounded vehicles, independent hold unverified
+
+PX4's positional argument must name the build's `etc` directory. PX4
+symlinks it as `etc` in each instance directory; using `rootfs` previously
+left `etc/init.d-posix/rcS` unresolved. Both vehicles now reached PX4's
+`Startup script returned successfully`. Instance 0 started Gazebo;
+instance 1 used standalone mode against the same world. Their models were
+`x500_0` and `x500_1`, with separate parameters and ULog files. The
+[PX4 1.16 multi-vehicle guide](https://docs.px4.io/v1.16/en/sim_gazebo_gz/multi_vehicle_simulation)
+documents this first-server/later-standalone pattern.
+
+| MAV_SYS_ID | PX4 offboard → MAVROS UDP | PX4 GCS source → QGC UDP | Startup evidence |
+| --- | --- | --- | --- |
+| 1 | 15000 → 16000 | 18570 → 14550 | [Vehicle 1](../swarmnet_v2/logs/evidence/step5_attempt2_vehicle1.txt) |
+| 2 | 15001 → 16001 | 18571 → 14550 | [Vehicle 2](../swarmnet_v2/logs/evidence/step5_attempt2_vehicle2.txt) |
+
+The [MAVROS log](../swarmnet_v2/logs/evidence/step5_bridges.txt) records
+target IDs 1.1 and 2.1 and heartbeats from both. That verifies independent
+ground telemetry, not QGC receipt or absence of airborne cross-control.
+The previous ROS image digest was missing locally; the pinned ARM64
+Step 3 build [started successfully](../swarmnet_v2/logs/evidence/step5_compose_up_pinned.txt).
+
+1. [Attempt 1](../swarmnet_v2/logs/evidence/step5_attempt1_hold.txt) exited 1:
+   the checker assigned to rclpy's existing read-only `Node.publishers`
+   property (`AttributeError: can't set attribute 'publishers'`). It sent
+   no commands. The retry renamed the attribute and corrected the GCS
+   link to use PX4's default MAVLink mode.
+2. [Attempt 2](../swarmnet_v2/logs/evidence/step5_attempt2_hold.txt) got measured
+   pose and connected state from both bridges. Both reported OFFBOARD,
+   but arming returned `success=False, result=1` and the checker exited 1.
+   Both PX4 logs report `Arming denied: Resolve system health failures first`
+   and `Preflight Fail: No connection to the ground control station`.
+   Both vehicles remained disarmed; no landing or hover was demonstrated.
+
+No third attempt. The next flight check requires a working QGC heartbeat
+and resolution of any remaining preflight failures. The revised grid
+supports up to 254 addressable vehicles (255 reserved for the GCS);
+[N=50 dry run](../swarmnet_v2/logs/evidence/step5_n50_dry_run.txt) yields
+5 rows × 10 columns at 2 m spacing. This proves the configuration only.
+Highest verified count: **two booted and grounded; zero flown**. No flight
+RTF, CPU/RAM, or hover error was measured.
 
 ## Step 2 result
 

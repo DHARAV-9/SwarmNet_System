@@ -1,0 +1,9 @@
+UTC: 2026-11-23T10:36:59.831737+00:00
+CWD: /Users/dharavbhatt/swaram_net
+COMMAND: bash -lc 'set -e; venv/bin/python -m pytest -q; for script in swarmnet_v2/scripts/phase2-start.sh swarmnet_v2/scripts/phase2-verify.sh swarmnet_v2/px4_config/scripts/spawn_one_drone.sh; do bash -n "$script"; done; sh -n swarmnet_v2/px4_config/scripts/swarm_startup.sh; git diff --check'
+
+........................................................................ [ 83%]
+..............                                                           [100%]
+86 passed in 0.15s
+
+EXIT_STATUS: 0

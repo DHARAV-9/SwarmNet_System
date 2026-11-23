@@ -1,0 +1,15 @@
+UTC: 2026-11-23T10:33:17.561284+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose exec -T ros2_nodes bash -lc 'source /opt/ros/humble/setup.bash; source install/setup.bash; exec python3 /swarmnet/scripts/step5_independent_hold.py --sitl'
+
+Traceback (most recent call last):
+  File "/swarmnet/scripts/step5_independent_hold.py", line 180, in <module>
+    main()
+  File "/swarmnet/scripts/step5_independent_hold.py", line 171, in main
+    node = IndependentHold()
+  File "/swarmnet/scripts/step5_independent_hold.py", line 42, in __init__
+    self.publishers = {}
+AttributeError: can't set attribute 'publishers'
+
+
+EXIT_STATUS: 1

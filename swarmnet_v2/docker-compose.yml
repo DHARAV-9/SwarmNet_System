@@ -13,12 +13,12 @@ services:
       HEADLESS: "1"
       QGC_HOST: host.docker.internal
       QGC_PORT: "14550"
-      SWARM_OFFBOARD_LOCAL_BASE: "15000"
-      SWARM_OFFBOARD_REMOTE_BASE: "16000"
+      PYTHONPATH: /swarmnet/master
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./px4_config:/px4_config:ro
+      - ./swarmnet_ros2/swarmnet_master:/swarmnet/master:ro
       - ./scripts:/swarmnet/scripts:ro
       - ./logs/evidence:/evidence
       - ./logs/px4:/var/log/swarmnet/px4
@@ -34,7 +34,7 @@ services:
       retries: 3
 
   ros2_nodes:
-    image: ${ROS_IMAGE:-swarmnet/ros2-nodes@sha256:428618639cda845890386ef1b5e38604309ce3652c488022addae296942b8deb}
+    image: ${ROS_IMAGE:-swarmnet/ros2-nodes@sha256:55ae9de19acc5eb467120926c4d80c7cca5862208367fdf5b7ee4ac61616dda3}
     pull_policy: never
     platform: linux/arm64
     container_name: swarmnet_ros2

@@ -34,6 +34,8 @@ export SWARM_QGC_IP="$(getent ahostsv4 host.docker.internal | awk 'NR==1 {print 
 export SWARM_ROS_IP="$(getent ahostsv4 ros2_nodes | awk 'NR==1 {print $1}')"
 test -n "$SWARM_QGC_IP"
 test -n "$SWARM_ROS_IP"
+test -r "$PX4_DIR/build/px4_sitl_default/etc/init.d-posix/rcS"
+export SWARM_STARTUP_SCRIPT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/swarm_startup.sh"
 exec "$PX4_DIR/build/px4_sitl_default/bin/px4" \
-  "$PX4_DIR/build/px4_sitl_default/rootfs" \
-  -i "$PX4_INSTANCE" -w "$SWARM_STATE_DIR" -s /px4_config/scripts/swarm_startup.sh -d
+  "$PX4_DIR/build/px4_sitl_default/etc" \
+  -i "$PX4_INSTANCE" -w "$SWARM_STATE_DIR" -s "$SWARM_STARTUP_SCRIPT" -d

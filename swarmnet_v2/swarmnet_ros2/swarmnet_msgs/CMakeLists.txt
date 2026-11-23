@@ -5,8 +5,8 @@ find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/DroneTarget.msg"
-  "msg/FormationTargets.msg"
+  "msg/DesiredDronePose.msg"
+  "msg/DesiredFormation.msg"
   "msg/DroneState.msg"
 )
 

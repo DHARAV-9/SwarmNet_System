@@ -5,25 +5,27 @@ from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
+from swarmnet_master.routing import VehicleRoute, validate_fleet_size
+
 
 def _bridges(context):
     n_drones = int(LaunchConfiguration("n_drones").perform(context))
-    base_remote_port = int(LaunchConfiguration("base_remote_port").perform(context))
+    validate_fleet_size(n_drones)
+    px4_host = LaunchConfiguration("px4_host").perform(context)
     actions = []
     for drone_id in range(1, n_drones + 1):
-        remote_port = base_remote_port + drone_id - 1
-        local_port = 14600 + drone_id - 1
+        route = VehicleRoute(drone_id)
         actions.append(
             Node(
                 package="mavros",
                 executable="mavros_node",
-                namespace=f"drone_{drone_id}/mavros",
+                namespace=route.namespace,
                 name="bridge",
                 parameters=[
                     {
-                        "fcu_url": f"udp://:{local_port}@swarmnet_px4:{remote_port}",
-                        "target_system_id": drone_id,
-                        "target_component_id": 1,
+                        "fcu_url": route.fcu_url(px4_host),
+                        "tgt_system": drone_id,
+                        "tgt_component": 1,
                     }
                 ],
                 output="screen",
@@ -36,8 +38,8 @@ def generate_launch_description() -> LaunchDescription:
     """Generate a MAVROS bridge for each active PX4 vehicle."""
     return LaunchDescription(
         [
-            DeclareLaunchArgument("n_drones", default_value="50"),
-            DeclareLaunchArgument("base_remote_port", default_value="14550"),
+            DeclareLaunchArgument("n_drones", default_value="2"),
+            DeclareLaunchArgument("px4_host", default_value="px4_sitl"),
             OpaqueFunction(function=_bridges),
         ]
     )

@@ -1,0 +1,26 @@
+UTC: 2026-11-23T10:25:44.931570+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: env ROS_IMAGE=swarmnet/ros2-nodes@sha256:55ae9de19acc5eb467120926c4d80c7cca5862208367fdf5b7ee4ac61616dda3 ROS_DOMAIN_ID=91 docker compose run --rm --no-deps -T ros2_nodes bash -lc 'set -e; source /opt/ros/humble/setup.bash; colcon build --base-paths src/swarmnet --packages-select swarmnet_msgs swarmnet_master swarmnet_follower; source install/setup.bash; ros2 pkg executables swarmnet_follower; ros2 interface show swarmnet_msgs/msg/DesiredFormation; python3 /swarmnet/scripts/step4_telemetry_smoke.py'
+
+Starting >>> swarmnet_msgs
+Finished <<< swarmnet_msgs [11.0s]
+Starting >>> swarmnet_follower
+Finished <<< swarmnet_follower [0.27s]
+Starting >>> swarmnet_master
+Finished <<< swarmnet_master [0.26s]
+
+Summary: 3 packages finished [11.7s]
+swarmnet_follower follower_node
+uint8 formation_type
+swarmnet_msgs/DesiredDronePose[] targets
+	uint8 drone_id
+	float64 x
+	float64 y
+	float64 z
+	float64 yaw
+Source: ROS2 test fixtures; no PX4 or MAVROS aircraft data
+Measured world pose: (10.0, -7.0, 6.0); desired local pose: (92.0, 94.0, 18.0); battery: 76.0%
+Updated reported world x: 13.0 m
+After fixture stream stopped: alive=false comms_healthy=false in 2.003 s
+
+EXIT_STATUS: 0

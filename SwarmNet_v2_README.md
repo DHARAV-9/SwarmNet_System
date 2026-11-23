@@ -121,13 +121,13 @@ swarmnet_v2/
 │   │   └── x500_swarmnet/               # Lightweight drone SDF model
 │   └── scripts/
 │       ├── drone_spawn.py               # Launches 50 PX4 SITL instances
-│       └── formation_init.py            # Sets initial 7×7 grid positions
+│       └── formation_init.py            # Design: 5 rows × 10 columns at N=50
 │
 ├── swarmnet_ros2/                        # ROS2 workspace
 │   ├── swarmnet_msgs/                   # Custom message definitions
 │   │   └── msg/
 │   │       ├── DroneState.msg
-│   │       ├── FormationTargets.msg
+│   │       ├── DesiredFormation.msg
 │   │       ├── PBFTMessage.msg
 │   │       └── JammerState.msg
 │   │

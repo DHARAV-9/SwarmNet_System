@@ -7,4 +7,5 @@ float64 vy
 float64 vz
 float32 battery
 bool alive
+bool comms_healthy
 float64 timestamp

@@ -1,0 +1,1008 @@
+UTC: 2026-11-23T10:34:59.358168+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose exec -T px4_sitl python3 /px4_config/scripts/drone_spawn.py --n 50 --dry-run
+
+[
+  {
+    "drone_id": 1,
+    "px4_instance": 0,
+    "px4_offboard_port": 15000,
+    "mavros_port": 16000,
+    "px4_gcs_source_port": 18570,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_1/mavros",
+    "state_dir": "instance_0",
+    "spawn_world_enu": [
+      -9.0,
+      -4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -9.0,
+      -4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 2,
+    "px4_instance": 1,
+    "px4_offboard_port": 15001,
+    "mavros_port": 16001,
+    "px4_gcs_source_port": 18571,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_2/mavros",
+    "state_dir": "instance_1",
+    "spawn_world_enu": [
+      -7.0,
+      -4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -7.0,
+      -4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 3,
+    "px4_instance": 2,
+    "px4_offboard_port": 15002,
+    "mavros_port": 16002,
+    "px4_gcs_source_port": 18572,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_3/mavros",
+    "state_dir": "instance_2",
+    "spawn_world_enu": [
+      -5.0,
+      -4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -5.0,
+      -4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 4,
+    "px4_instance": 3,
+    "px4_offboard_port": 15003,
+    "mavros_port": 16003,
+    "px4_gcs_source_port": 18573,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_4/mavros",
+    "state_dir": "instance_3",
+    "spawn_world_enu": [
+      -3.0,
+      -4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -3.0,
+      -4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 5,
+    "px4_instance": 4,
+    "px4_offboard_port": 15004,
+    "mavros_port": 16004,
+    "px4_gcs_source_port": 18574,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_5/mavros",
+    "state_dir": "instance_4",
+    "spawn_world_enu": [
+      -1.0,
+      -4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -1.0,
+      -4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 6,
+    "px4_instance": 5,
+    "px4_offboard_port": 15005,
+    "mavros_port": 16005,
+    "px4_gcs_source_port": 18575,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_6/mavros",
+    "state_dir": "instance_5",
+    "spawn_world_enu": [
+      1.0,
+      -4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      1.0,
+      -4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 7,
+    "px4_instance": 6,
+    "px4_offboard_port": 15006,
+    "mavros_port": 16006,
+    "px4_gcs_source_port": 18576,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_7/mavros",
+    "state_dir": "instance_6",
+    "spawn_world_enu": [
+      3.0,
+      -4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      3.0,
+      -4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 8,
+    "px4_instance": 7,
+    "px4_offboard_port": 15007,
+    "mavros_port": 16007,
+    "px4_gcs_source_port": 18577,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_8/mavros",
+    "state_dir": "instance_7",
+    "spawn_world_enu": [
+      5.0,
+      -4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      5.0,
+      -4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 9,
+    "px4_instance": 8,
+    "px4_offboard_port": 15008,
+    "mavros_port": 16008,
+    "px4_gcs_source_port": 18578,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_9/mavros",
+    "state_dir": "instance_8",
+    "spawn_world_enu": [
+      7.0,
+      -4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      7.0,
+      -4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 10,
+    "px4_instance": 9,
+    "px4_offboard_port": 15009,
+    "mavros_port": 16009,
+    "px4_gcs_source_port": 18579,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_10/mavros",
+    "state_dir": "instance_9",
+    "spawn_world_enu": [
+      9.0,
+      -4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      9.0,
+      -4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 11,
+    "px4_instance": 10,
+    "px4_offboard_port": 15010,
+    "mavros_port": 16010,
+    "px4_gcs_source_port": 18580,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_11/mavros",
+    "state_dir": "instance_10",
+    "spawn_world_enu": [
+      -9.0,
+      -2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -9.0,
+      -2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 12,
+    "px4_instance": 11,
+    "px4_offboard_port": 15011,
+    "mavros_port": 16011,
+    "px4_gcs_source_port": 18581,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_12/mavros",
+    "state_dir": "instance_11",
+    "spawn_world_enu": [
+      -7.0,
+      -2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -7.0,
+      -2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 13,
+    "px4_instance": 12,
+    "px4_offboard_port": 15012,
+    "mavros_port": 16012,
+    "px4_gcs_source_port": 18582,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_13/mavros",
+    "state_dir": "instance_12",
+    "spawn_world_enu": [
+      -5.0,
+      -2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -5.0,
+      -2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 14,
+    "px4_instance": 13,
+    "px4_offboard_port": 15013,
+    "mavros_port": 16013,
+    "px4_gcs_source_port": 18583,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_14/mavros",
+    "state_dir": "instance_13",
+    "spawn_world_enu": [
+      -3.0,
+      -2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -3.0,
+      -2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 15,
+    "px4_instance": 14,
+    "px4_offboard_port": 15014,
+    "mavros_port": 16014,
+    "px4_gcs_source_port": 18584,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_15/mavros",
+    "state_dir": "instance_14",
+    "spawn_world_enu": [
+      -1.0,
+      -2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -1.0,
+      -2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 16,
+    "px4_instance": 15,
+    "px4_offboard_port": 15015,
+    "mavros_port": 16015,
+    "px4_gcs_source_port": 18585,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_16/mavros",
+    "state_dir": "instance_15",
+    "spawn_world_enu": [
+      1.0,
+      -2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      1.0,
+      -2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 17,
+    "px4_instance": 16,
+    "px4_offboard_port": 15016,
+    "mavros_port": 16016,
+    "px4_gcs_source_port": 18586,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_17/mavros",
+    "state_dir": "instance_16",
+    "spawn_world_enu": [
+      3.0,
+      -2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      3.0,
+      -2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 18,
+    "px4_instance": 17,
+    "px4_offboard_port": 15017,
+    "mavros_port": 16017,
+    "px4_gcs_source_port": 18587,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_18/mavros",
+    "state_dir": "instance_17",
+    "spawn_world_enu": [
+      5.0,
+      -2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      5.0,
+      -2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 19,
+    "px4_instance": 18,
+    "px4_offboard_port": 15018,
+    "mavros_port": 16018,
+    "px4_gcs_source_port": 18588,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_19/mavros",
+    "state_dir": "instance_18",
+    "spawn_world_enu": [
+      7.0,
+      -2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      7.0,
+      -2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 20,
+    "px4_instance": 19,
+    "px4_offboard_port": 15019,
+    "mavros_port": 16019,
+    "px4_gcs_source_port": 18589,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_20/mavros",
+    "state_dir": "instance_19",
+    "spawn_world_enu": [
+      9.0,
+      -2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      9.0,
+      -2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 21,
+    "px4_instance": 20,
+    "px4_offboard_port": 15020,
+    "mavros_port": 16020,
+    "px4_gcs_source_port": 18590,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_21/mavros",
+    "state_dir": "instance_20",
+    "spawn_world_enu": [
+      -9.0,
+      0.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -9.0,
+      0.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 22,
+    "px4_instance": 21,
+    "px4_offboard_port": 15021,
+    "mavros_port": 16021,
+    "px4_gcs_source_port": 18591,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_22/mavros",
+    "state_dir": "instance_21",
+    "spawn_world_enu": [
+      -7.0,
+      0.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -7.0,
+      0.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 23,
+    "px4_instance": 22,
+    "px4_offboard_port": 15022,
+    "mavros_port": 16022,
+    "px4_gcs_source_port": 18592,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_23/mavros",
+    "state_dir": "instance_22",
+    "spawn_world_enu": [
+      -5.0,
+      0.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -5.0,
+      0.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 24,
+    "px4_instance": 23,
+    "px4_offboard_port": 15023,
+    "mavros_port": 16023,
+    "px4_gcs_source_port": 18593,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_24/mavros",
+    "state_dir": "instance_23",
+    "spawn_world_enu": [
+      -3.0,
+      0.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -3.0,
+      0.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 25,
+    "px4_instance": 24,
+    "px4_offboard_port": 15024,
+    "mavros_port": 16024,
+    "px4_gcs_source_port": 18594,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_25/mavros",
+    "state_dir": "instance_24",
+    "spawn_world_enu": [
+      -1.0,
+      0.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -1.0,
+      0.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 26,
+    "px4_instance": 25,
+    "px4_offboard_port": 15025,
+    "mavros_port": 16025,
+    "px4_gcs_source_port": 18595,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_26/mavros",
+    "state_dir": "instance_25",
+    "spawn_world_enu": [
+      1.0,
+      0.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      1.0,
+      0.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 27,
+    "px4_instance": 26,
+    "px4_offboard_port": 15026,
+    "mavros_port": 16026,
+    "px4_gcs_source_port": 18596,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_27/mavros",
+    "state_dir": "instance_26",
+    "spawn_world_enu": [
+      3.0,
+      0.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      3.0,
+      0.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 28,
+    "px4_instance": 27,
+    "px4_offboard_port": 15027,
+    "mavros_port": 16027,
+    "px4_gcs_source_port": 18597,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_28/mavros",
+    "state_dir": "instance_27",
+    "spawn_world_enu": [
+      5.0,
+      0.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      5.0,
+      0.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 29,
+    "px4_instance": 28,
+    "px4_offboard_port": 15028,
+    "mavros_port": 16028,
+    "px4_gcs_source_port": 18598,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_29/mavros",
+    "state_dir": "instance_28",
+    "spawn_world_enu": [
+      7.0,
+      0.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      7.0,
+      0.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 30,
+    "px4_instance": 29,
+    "px4_offboard_port": 15029,
+    "mavros_port": 16029,
+    "px4_gcs_source_port": 18599,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_30/mavros",
+    "state_dir": "instance_29",
+    "spawn_world_enu": [
+      9.0,
+      0.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      9.0,
+      0.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 31,
+    "px4_instance": 30,
+    "px4_offboard_port": 15030,
+    "mavros_port": 16030,
+    "px4_gcs_source_port": 18600,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_31/mavros",
+    "state_dir": "instance_30",
+    "spawn_world_enu": [
+      -9.0,
+      2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -9.0,
+      2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 32,
+    "px4_instance": 31,
+    "px4_offboard_port": 15031,
+    "mavros_port": 16031,
+    "px4_gcs_source_port": 18601,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_32/mavros",
+    "state_dir": "instance_31",
+    "spawn_world_enu": [
+      -7.0,
+      2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -7.0,
+      2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 33,
+    "px4_instance": 32,
+    "px4_offboard_port": 15032,
+    "mavros_port": 16032,
+    "px4_gcs_source_port": 18602,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_33/mavros",
+    "state_dir": "instance_32",
+    "spawn_world_enu": [
+      -5.0,
+      2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -5.0,
+      2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 34,
+    "px4_instance": 33,
+    "px4_offboard_port": 15033,
+    "mavros_port": 16033,
+    "px4_gcs_source_port": 18603,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_34/mavros",
+    "state_dir": "instance_33",
+    "spawn_world_enu": [
+      -3.0,
+      2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -3.0,
+      2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 35,
+    "px4_instance": 34,
+    "px4_offboard_port": 15034,
+    "mavros_port": 16034,
+    "px4_gcs_source_port": 18604,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_35/mavros",
+    "state_dir": "instance_34",
+    "spawn_world_enu": [
+      -1.0,
+      2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -1.0,
+      2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 36,
+    "px4_instance": 35,
+    "px4_offboard_port": 15035,
+    "mavros_port": 16035,
+    "px4_gcs_source_port": 18605,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_36/mavros",
+    "state_dir": "instance_35",
+    "spawn_world_enu": [
+      1.0,
+      2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      1.0,
+      2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 37,
+    "px4_instance": 36,
+    "px4_offboard_port": 15036,
+    "mavros_port": 16036,
+    "px4_gcs_source_port": 18606,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_37/mavros",
+    "state_dir": "instance_36",
+    "spawn_world_enu": [
+      3.0,
+      2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      3.0,
+      2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 38,
+    "px4_instance": 37,
+    "px4_offboard_port": 15037,
+    "mavros_port": 16037,
+    "px4_gcs_source_port": 18607,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_38/mavros",
+    "state_dir": "instance_37",
+    "spawn_world_enu": [
+      5.0,
+      2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      5.0,
+      2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 39,
+    "px4_instance": 38,
+    "px4_offboard_port": 15038,
+    "mavros_port": 16038,
+    "px4_gcs_source_port": 18608,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_39/mavros",
+    "state_dir": "instance_38",
+    "spawn_world_enu": [
+      7.0,
+      2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      7.0,
+      2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 40,
+    "px4_instance": 39,
+    "px4_offboard_port": 15039,
+    "mavros_port": 16039,
+    "px4_gcs_source_port": 18609,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_40/mavros",
+    "state_dir": "instance_39",
+    "spawn_world_enu": [
+      9.0,
+      2.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      9.0,
+      2.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 41,
+    "px4_instance": 40,
+    "px4_offboard_port": 15040,
+    "mavros_port": 16040,
+    "px4_gcs_source_port": 18610,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_41/mavros",
+    "state_dir": "instance_40",
+    "spawn_world_enu": [
+      -9.0,
+      4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -9.0,
+      4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 42,
+    "px4_instance": 41,
+    "px4_offboard_port": 15041,
+    "mavros_port": 16041,
+    "px4_gcs_source_port": 18611,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_42/mavros",
+    "state_dir": "instance_41",
+    "spawn_world_enu": [
+      -7.0,
+      4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -7.0,
+      4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 43,
+    "px4_instance": 42,
+    "px4_offboard_port": 15042,
+    "mavros_port": 16042,
+    "px4_gcs_source_port": 18612,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_43/mavros",
+    "state_dir": "instance_42",
+    "spawn_world_enu": [
+      -5.0,
+      4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -5.0,
+      4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 44,
+    "px4_instance": 43,
+    "px4_offboard_port": 15043,
+    "mavros_port": 16043,
+    "px4_gcs_source_port": 18613,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_44/mavros",
+    "state_dir": "instance_43",
+    "spawn_world_enu": [
+      -3.0,
+      4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -3.0,
+      4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 45,
+    "px4_instance": 44,
+    "px4_offboard_port": 15044,
+    "mavros_port": 16044,
+    "px4_gcs_source_port": 18614,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_45/mavros",
+    "state_dir": "instance_44",
+    "spawn_world_enu": [
+      -1.0,
+      4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      -1.0,
+      4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 46,
+    "px4_instance": 45,
+    "px4_offboard_port": 15045,
+    "mavros_port": 16045,
+    "px4_gcs_source_port": 18615,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_46/mavros",
+    "state_dir": "instance_45",
+    "spawn_world_enu": [
+      1.0,
+      4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      1.0,
+      4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 47,
+    "px4_instance": 46,
+    "px4_offboard_port": 15046,
+    "mavros_port": 16046,
+    "px4_gcs_source_port": 18616,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_47/mavros",
+    "state_dir": "instance_46",
+    "spawn_world_enu": [
+      3.0,
+      4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      3.0,
+      4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 48,
+    "px4_instance": 47,
+    "px4_offboard_port": 15047,
+    "mavros_port": 16047,
+    "px4_gcs_source_port": 18617,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_48/mavros",
+    "state_dir": "instance_47",
+    "spawn_world_enu": [
+      5.0,
+      4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      5.0,
+      4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 49,
+    "px4_instance": 48,
+    "px4_offboard_port": 15048,
+    "mavros_port": 16048,
+    "px4_gcs_source_port": 18618,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_49/mavros",
+    "state_dir": "instance_48",
+    "spawn_world_enu": [
+      7.0,
+      4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      7.0,
+      4.0,
+      5.0
+    ]
+  },
+  {
+    "drone_id": 50,
+    "px4_instance": 49,
+    "px4_offboard_port": 15049,
+    "mavros_port": 16049,
+    "px4_gcs_source_port": 18619,
+    "qgc_port": 14550,
+    "mavros_namespace": "drone_50/mavros",
+    "state_dir": "instance_49",
+    "spawn_world_enu": [
+      9.0,
+      4.0,
+      0.15
+    ],
+    "desired_world_enu": [
+      9.0,
+      4.0,
+      5.0
+    ]
+  }
+]
+
+EXIT_STATUS: 0

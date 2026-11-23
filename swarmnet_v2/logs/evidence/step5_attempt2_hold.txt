@@ -1,0 +1,26 @@
+UTC: 2026-11-23T10:34:30.386391+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose exec -T ros2_nodes bash -lc 'source /opt/ros/humble/setup.bash; source install/setup.bash; exec python3 /swarmnet/scripts/step5_independent_hold.py --sitl'
+
+vehicle=1 stage='ground and distinct takeoff targets' desired_local_enu=(-0.022802304476499557, 0.006594694219529629, 2.048206090927124) measured_local_enu=(-0.022802304476499557, 0.006594694219529629, 0.04820609092712402) connected=True armed=False mode=AUTO.LOITER
+vehicle=2 stage='ground and distinct takeoff targets' desired_local_enu=(0.0031881192699074745, -0.029922889545559883, 2.9538735449314117) measured_local_enu=(0.0031881192699074745, -0.029922889545559883, -0.04612645506858826) connected=True armed=False mode=AUTO.LOITER
+vehicle=1 mode_request=OFFBOARD response=mavros_msgs.srv.SetMode_Response(mode_sent=True)
+vehicle=2 mode_request=OFFBOARD response=mavros_msgs.srv.SetMode_Response(mode_sent=True)
+vehicle=1 arm_response=mavros_msgs.srv.CommandBool_Response(success=False, result=1)
+vehicle=1 mode_request=AUTO.LAND response=mavros_msgs.srv.SetMode_Response(mode_sent=True)
+vehicle=2 mode_request=AUTO.LAND response=mavros_msgs.srv.SetMode_Response(mode_sent=True)
+vehicle=1 stage='landed/disarmed' desired_local_enu=(-0.022802304476499557, 0.006594694219529629, 2.048206090927124) measured_local_enu=(-0.018233388662338257, 0.012040541507303715, 0.06460028886795044) connected=True armed=False mode=OFFBOARD
+vehicle=2 stage='landed/disarmed' desired_local_enu=(0.0031881192699074745, -0.029922889545559883, 2.9538735449314117) measured_local_enu=(-0.007607190404087305, -0.0005090121412649751, -0.05479307472705841) connected=True armed=False mode=OFFBOARD
+Traceback (most recent call last):
+  File "/swarmnet/scripts/step5_independent_hold.py", line 194, in <module>
+    main()
+  File "/swarmnet/scripts/step5_independent_hold.py", line 187, in main
+    node.run()
+  File "/swarmnet/scripts/step5_independent_hold.py", line 163, in run
+    self.arm()
+  File "/swarmnet/scripts/step5_independent_hold.py", line 108, in arm
+    raise RuntimeError(f"Vehicle {drone_id} rejected arm: {request.result().result}")
+RuntimeError: Vehicle 1 rejected arm: 1
+
+
+EXIT_STATUS: 1

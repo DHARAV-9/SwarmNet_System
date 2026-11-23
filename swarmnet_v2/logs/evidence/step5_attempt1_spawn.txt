@@ -1,0 +1,11 @@
+UTC: 2026-11-23T10:31:28.767550+00:00
+CWD: /Users/dharavbhatt/swaram_net/swarmnet_v2
+COMMAND: docker compose exec -T px4_sitl timeout --signal=TERM 480 python3 -u /px4_config/scripts/drone_spawn.py --n 2 --log-dir /var/log/swarmnet/px4/step5_attempt1
+
+Planned fleet: /var/log/swarmnet/px4/step5_attempt1/swarm_manifest.json
+Vehicle 1 completed PX4 startup; log: /var/log/swarmnet/px4/step5_attempt1/vehicle_1.log
+Vehicle 2 completed PX4 startup; log: /var/log/swarmnet/px4/step5_attempt1/vehicle_2.log
+2 PX4 vehicles started; flight not yet verified
+
+
+EXIT_STATUS: 137
